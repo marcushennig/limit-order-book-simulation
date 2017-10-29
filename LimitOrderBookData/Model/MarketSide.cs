@@ -1,4 +1,4 @@
-﻿namespace LimitOrderBookRepositories
+﻿namespace LimitOrderBookRepositories.Model
 {
     /// <summary>
     /// Buy or sell

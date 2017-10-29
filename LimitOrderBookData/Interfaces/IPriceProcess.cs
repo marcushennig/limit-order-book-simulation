@@ -1,4 +1,4 @@
-﻿namespace LimitOrderBookRepositories
+﻿namespace LimitOrderBookRepositories.Interfaces
 {
     public interface IPriceProcess
     {

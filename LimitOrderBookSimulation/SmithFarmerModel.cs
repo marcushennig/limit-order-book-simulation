@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using log4net;
 using LimitOrderBookRepositories;
+using LimitOrderBookRepositories.Interfaces;
+using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
 using MathNet.Numerics.Statistics;
@@ -147,7 +149,7 @@ namespace LimitOrderBookSimulation
         /// Calibrate the Smith Farmer model from LOB data 
         /// </summary>
         /// <param name="lob"></param>
-        public SmithFarmerModel(ILOBDataRepository lob) : this()
+        public SmithFarmerModel(LobTradingData lob) : this()
         {
             if (!lob.Events.Any())
             {
@@ -446,7 +448,7 @@ namespace LimitOrderBookSimulation
         /// Calibrate model with LOB data  
         /// </summary>
         /// <param name="lob"></param>
-        public void Calibrate(ILOBDataRepository lob)
+        public void Calibrate(LobTradingData lob)
         {
             if (!lob.Events.Any())
             {

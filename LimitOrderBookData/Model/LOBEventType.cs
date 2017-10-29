@@ -1,9 +1,9 @@
-﻿namespace LimitOrderBookRepositories
+﻿namespace LimitOrderBookRepositories.Model
 {
     /// <summary>
     /// Limit order event type  
     /// </summary>
-    public enum LOBEventType
+    public enum LobEventType
     {
         Submission = 1,                 // Submission of a new limit order
         Cancellation = 2,               // Cancellation (Partial deletion of a limit order)

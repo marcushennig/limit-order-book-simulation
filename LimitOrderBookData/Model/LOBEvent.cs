@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace LimitOrderBookRepositories
+namespace LimitOrderBookRepositories.Model
 {
     /// <summary>
     /// Event causing 
@@ -9,7 +9,7 @@ namespace LimitOrderBookRepositories
     /// events are timestamped to seconds after midnight, with decimal 
     /// precision of at least milliseconds and up to nanoseconds depending 
     /// </summary>
-    public class  LOBEvent : IEquatable<LOBEvent>
+    public class  LobEvent : IEquatable<LobEvent>
     {
         #region Properties
 
@@ -29,7 +29,7 @@ namespace LimitOrderBookRepositories
         /// <summary>
         /// Type
         /// </summary>
-        public LOBEventType Type { set; get; }
+        public LobEventType Type { set; get; }
 
         /// <summary>
         /// Number of shares
@@ -53,12 +53,12 @@ namespace LimitOrderBookRepositories
         /// <summary>
         ///Initial state of limit order book before the above event occured 
         /// </summary>
-        public LOBState InitialState { set; get; }
+        public LobState InitialState { set; get; }
 
         /// <summary>
         /// State of limit order book after the above event occured 
         /// </summary>
-        public LOBState FinalState { set; get; }
+        public LobState FinalState { set; get; }
 
         public long TotalBidVolumeChange => FinalState.BidVolume.Sum() - InitialState.BidVolume.Sum();
         public long TotalAskVolumeChange => FinalState.AskVolume.Sum() - InitialState.AskVolume.Sum();
@@ -69,19 +69,19 @@ namespace LimitOrderBookRepositories
         /// <summary>
         /// Submission event that will at least partlly be executed
         /// </summary>
-        public bool IsMarketableLimitOrder => Type == LOBEventType.Submission &&
+        public bool IsMarketableLimitOrder => Type == LobEventType.Submission &&
                                               (Side == MarketSide.Buy ?
                                                   AskRelativePrice >= 0 : BidRelativePrice >= 0);
 
         /// <summary>
         /// Submission event that will change the best ask/bid price 
         /// </summary>
-        public bool IsAggressiveLimitOrder => Type == LOBEventType.Submission && Price > InitialState.BidPrice[0] && Price < InitialState.AskPrice[0];
+        public bool IsAggressiveLimitOrder => Type == LobEventType.Submission && Price > InitialState.BidPrice[0] && Price < InitialState.AskPrice[0];
 
         /// <summary>
         /// Check if order is crossing limit order 
         /// </summary>
-        public bool IsCrossingLimitOrder => Type == LOBEventType.Submission &&
+        public bool IsCrossingLimitOrder => Type == LobEventType.Submission &&
                                             (Side == MarketSide.Buy
                                                 ? Price >= InitialState.AskPrice[0]
                                                 : InitialState.BidPrice[0] >= Price);
@@ -140,7 +140,7 @@ namespace LimitOrderBookRepositories
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(LOBEvent other)
+        public bool Equals(LobEvent other)
         {
             return OrderId == other.OrderId;
         }
@@ -159,13 +159,13 @@ namespace LimitOrderBookRepositories
         /// </summary>
         /// <param name="line"></param>
         /// <returns></returns>
-        public static LOBEvent Parse(string line)
+        public static LobEvent Parse(string line)
         {
             var data = line.Split(',').ToArray();
-            var e = new LOBEvent
+            var e = new LobEvent
             {
                 Time = Convert.ToDouble(data[0]),
-                Type = (LOBEventType)Convert.ToInt32(data[1]),
+                Type = (LobEventType)Convert.ToInt32(data[1]),
                 OrderId = Convert.ToInt64(data[2]),
                 Volume = Convert.ToInt64(data[3]),
                 Price = Convert.ToInt64(data[4]),

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using log4net;
@@ -13,6 +11,7 @@ using log4net.Appender;
 using log4net.Config;
 using log4net.Layout;
 using log4net.Repository.Hierarchy;
+using LimitOrderBookRepositories.Interfaces;
 using LimitOrderBookUtilities;
 using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
@@ -20,12 +19,12 @@ using MathNet.Numerics.Statistics;
 // Necessary to configure log4net
 [assembly: XmlConfigurator(Watch = true)]
 
-namespace LimitOrderBookRepositories
+namespace LimitOrderBookRepositories.Model
 {
     /// <summary>
-    /// Repository to store LOB-Data
+    /// LOB trading data for a single trading day
     /// </summary>
-    public class LOBDataRepository : ILOBDataRepository, IPriceProcess
+    public class LobTradingData : IPriceProcess
     {
         #region Logging
 
@@ -35,6 +34,11 @@ namespace LimitOrderBookRepositories
         #endregion Logging
 
         #region Fields
+
+        private List<LobEvent> _limitOrders;
+        private List<LobEvent> _marketOrders;
+        private List<LobEvent> _submittedOrders;
+        private List<LobEvent> _canceledOrders;
 
         private DiscreteDistribution _limitOrderDistribution;
         private DiscreteDistribution _limitSellOrderDistribution;
@@ -57,6 +61,21 @@ namespace LimitOrderBookRepositories
         #endregion Repository Parameter
 
         #region LOB parameter
+        
+        /// <summary>
+        /// Start trading duration [seconds after midnight]
+        /// </summary>
+        public double StartTradingTime { private set; get; }
+
+        /// <summary>
+        /// End trading duration [seconds after midnight]
+        /// </summary>
+        public double EndTradingTime { private set; get; }
+
+        /// <summary>
+        /// Total trading duration [seconds]
+        /// </summary>
+        public double TradingDuration { private set; get; }
 
         /// <summary>
         /// Level of the LOB data
@@ -71,24 +90,23 @@ namespace LimitOrderBookRepositories
         /// <summary>
         /// Limit order book states
         /// </summary>
-        public LOBState[] States { private set; get; }
+        public LobState[] States { private set; get; }
 
         /// <summary>
         /// Limit order book events
         /// </summary>
-        public LOBEvent[] Events { private set; get; }
+        public LobEvent[] Events { private set; get; }
 
         /// <summary>
         /// Limit orders
         /// </summary>
-        private List<LOBEvent> _limitOrders;
-        public List<LOBEvent> LimitOrders
+        public List<LobEvent> LimitOrders
         {
             get
             {
                 if (_limitOrders == null)
                 {
-                    _limitOrders = Events.Where(p => p.Type == LOBEventType.Submission)
+                    _limitOrders = Events.Where(p => p.Type == LobEventType.Submission)
                                          .ToList();
                 }
                 return _limitOrders; 
@@ -101,8 +119,7 @@ namespace LimitOrderBookRepositories
         /// Get all market order 
         /// </summary>
         /// <returns></returns>
-        private List<LOBEvent> _marketOrders;
-        public List<LOBEvent> MarketOrders
+        public List<LobEvent> MarketOrders
         {
             get
             {
@@ -118,7 +135,7 @@ namespace LimitOrderBookRepositories
                     //                                                            p.First().Event.Type == EventType.ExecutionVisibleLimitOrder))
                     //                             .SelectMany(p => p)
                     //                             .ToList();
-                    _marketOrders = Events.Where(p => p.Type == LOBEventType.ExecutionVisibleLimitOrder).ToList();
+                    _marketOrders = Events.Where(p => p.Type == LobEventType.ExecutionVisibleLimitOrder).ToList();
                 }
                 return _marketOrders;
 
@@ -129,14 +146,13 @@ namespace LimitOrderBookRepositories
         /// Get either market or limit orders 
         /// </summary>
         /// <returns></returns>
-        private List<LOBEvent> _submittedOrders;
-        public List<LOBEvent> SubmittedOrders
+        public List<LobEvent> SubmittedOrders
         {
             get
             {
                 if (_submittedOrders == null)
                 {
-                    _submittedOrders = new List<LOBEvent>();
+                    _submittedOrders = new List<LobEvent>();
 
                     _submittedOrders.AddRange(LimitOrders);
                     _submittedOrders.AddRange(MarketOrders);
@@ -149,35 +165,19 @@ namespace LimitOrderBookRepositories
         /// Returns list of cancellations events 
         /// </summary>
         /// <returns></returns>
-        private List<LOBEvent> _canceledOrders;
-        public List<LOBEvent> CanceledOrders
+        public List<LobEvent> CanceledOrders
         {
             get
             {
                 if (_canceledOrders == null)
                 {
-                    _canceledOrders = Events.Where(p => p.Type == LOBEventType.Deletion || 
-                                                        p.Type == LOBEventType.Cancellation)
+                    _canceledOrders = Events.Where(p => p.Type == LobEventType.Deletion || 
+                                                        p.Type == LobEventType.Cancellation)
                                                  .ToList();
                 }
                 return _canceledOrders;
             }
         }
-
-        /// <summary>
-        /// Start trading duration [seconds after midnight]
-        /// </summary>
-        public double StartTradingTime { private set; get; }
-
-        /// <summary>
-        /// End trading duration [seconds after midnight]
-        /// </summary>
-        public double EndTradingTime { private set; get; }
-
-        /// <summary>
-        /// Total trading duration [seconds]
-        /// </summary>
-        public double TradingDuration { private set; get; }
 
         /// <summary>
         /// Average size of the bid price interval
@@ -202,6 +202,7 @@ namespace LimitOrderBookRepositories
                               .Mean();
             }
         }
+
         /// <summary>
         /// Price tick size  
         /// </summary>
@@ -433,7 +434,7 @@ namespace LimitOrderBookRepositories
         /// <param name="logFolder"></param>
         /// <param name="skipFirstSeconds"></param>
         /// <param name="skipLastSeconds"></param>
-        public LOBDataRepository(string symbol,
+        public LobTradingData(string symbol,
                                  int level,
                                  DateTime tradingDate,
                                  string logFolder,
@@ -474,8 +475,8 @@ namespace LimitOrderBookRepositories
 
             #region Load data
 
-            var eventFile = FindLOBDataFile(tradingDate, LOBDataFileType.EventFile);
-            var stateFile = FindLOBDataFile(tradingDate, LOBDataFileType.StateFile);
+            var eventFile = FindLOBDataFile(tradingDate, LobDataFileType.EventFile);
+            var stateFile = FindLOBDataFile(tradingDate, LobDataFileType.StateFile);
 
             if (string.IsNullOrEmpty(eventFile) || string.IsNullOrEmpty(eventFile))
             {
@@ -538,7 +539,7 @@ namespace LimitOrderBookRepositories
             TradingDuration = EndTradingTime - StartTradingTime;
 
             Log.InfoFormat("Finished loading");
-            
+
             #region Tick size
             var prices = new List<long>();
 
@@ -560,7 +561,7 @@ namespace LimitOrderBookRepositories
 
             // Exclude any hidden orders by using their Id  by order id
             HiddenOrderIds =
-                Events.Where(p => p.Type == LOBEventType.ExecutionHiddenLimitOrder)
+                Events.Where(p => p.Type == LobEventType.ExecutionHiddenLimitOrder)
                        .Select(p => p.OrderId)
                        .Distinct()
                        .ToList();
@@ -577,15 +578,117 @@ namespace LimitOrderBookRepositories
             #endregion Characteristic order size 
         }
 
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="events"></param>
+        /// <param name="states"></param>
+        /// <param name="skipFirstSeconds"></param>
+        /// <param name="skipLastSeconds"></param>
+        public LobTradingData(LobEvent[] events, 
+                              LobState[] states, 
+                              double skipFirstSeconds = 0,
+                              double skipLastSeconds = 0)
+        {
+            #region Skip first and last seconds of states and events
+
+            var t0 = events.Min(p => p.Time);
+            var t1 = events.Max(p => p.Time);
+
+            var k1 = Array.FindIndex(events, p => p.Time >= t0 + skipFirstSeconds) - 1;
+            if (k1 > 0)
+            {
+                events = events.Skip(k1).ToArray();
+                states = states.Skip(k1).ToArray();
+            }
+            var k2 = Array.FindLastIndex(events, p => p.Time <= t1 - skipLastSeconds) + 1;
+            if (k2 > 0 && k2 <= events.Length)
+            {
+                Events = events.Take(k2).ToArray();
+                States = states.Take(k2).ToArray();
+            }
+            else
+            {
+                Events = events;
+                States = states;
+            }
+
+            #endregion Skip first and last seconds of states and events
+
+            #region Map events and states to transitions
+
+            // The 'message' and 'orderbook' files can be viewed as matrices of size (N x 6) and (N x (4 x NumLevel)) respectively, 
+            // where N is the number of events in the requested price range and NumLevel is the number of levels requested
+            // The k-th row in the 'message' file describes the limit order event causing the change in the limit order book 
+            // from line k-1 to line k in the 'orderbook' file.
+            for (var k = 1; k < Events.Length; k++)
+            {
+                Events[k].InitialState = States[k - 1];
+                Events[k].FinalState = States[k];
+            }
+            Events = Events.Skip(1).ToArray();
+
+            #endregion
+
+            #region Tick size
+
+            var prices = new List<long>();
+
+            prices.AddRange(States.SelectMany(p => p.AskPrice));
+            prices.AddRange(States.SelectMany(p => p.BidPrice));
+            prices.Sort();
+
+            var diffs = prices.Select((p, i) => i == 0 ? 0 : p - prices[i - 1])
+                .Where(p => p > 0)
+                .Distinct()
+                .ToList();
+
+            var guess = diffs.Min();
+
+            PriceTickSize = diffs.Select(d => Euclid.GreatestCommonDivisor(guess, d)).Min();
+
+            #endregion Tick size
+
+            #region Hidden orders
+
+            // Exclude any hidden orders by using their Id  by order id
+            HiddenOrderIds =
+                Events.Where(p => p.Type == LobEventType.ExecutionHiddenLimitOrder)
+                    .Select(p => p.OrderId)
+                    .Distinct()
+                    .ToList();
+
+            #endregion Hidden orders
+
+            #region Characteristic order size 
+
+            AverageLimitOrderSize = LimitOrders.Select(p => (double)p.Volume).Mean();
+            AverageMarketOrderSize = MarketOrders.Select(p => (double)p.Volume).Mean();
+
+            AverageOrderSize = 0.5 * (AverageLimitOrderSize + AverageMarketOrderSize);
+
+            #endregion Characteristic order size 
+
+            #region Time
+
+            StartTradingTime = events.Min(p => p.Time);
+            EndTradingTime = events.Max(p => p.Time);
+            TradingDuration = EndTradingTime - StartTradingTime;
+            
+            #endregion
+        }
+
+
         #endregion Constructor
 
         #region Testing
-        
+
         /// <summary>
         /// Check if the given event is a consistent limit order
         /// </summary>
         /// <returns></returns>
-        private static bool IsConsistentLimitOrder(LOBEvent order)
+        private static bool IsConsistentLimitOrder(LobEvent order)
         {
             var consistent = true;
 
@@ -648,7 +751,7 @@ namespace LimitOrderBookRepositories
         /// <param name="initialState"></param>
         /// <param name="finalState"></param>
         /// <returns></returns>
-        private long DepthDifferenceNearSpread(MarketSide side, LOBState initialState, LOBState finalState)
+        private long DepthDifferenceNearSpread(MarketSide side, LobState initialState, LobState finalState)
         {
             // Volume change near spread
             long dDepth = 0;
@@ -667,7 +770,7 @@ namespace LimitOrderBookRepositories
         /// Check if given order is a market order 
         /// </summary>
         /// <returns></returns>
-        private bool IsConsistentMarketOrder(LOBEvent order)
+        private bool IsConsistentMarketOrder(LobEvent order)
         {
             var consistent = true;
 
@@ -740,7 +843,7 @@ namespace LimitOrderBookRepositories
         /// </summary>
         /// <param name="order"></param>
         /// <returns></returns>
-        private static bool IsConsistentCanceledOrder(LOBEvent order)
+        private static bool IsConsistentCanceledOrder(LobEvent order)
         {
             var consistent = true;
 
@@ -847,13 +950,13 @@ namespace LimitOrderBookRepositories
         /// </summary>
         /// <param name="path"></param>
         /// <returns></returns>
-        private static LOBEvent[] LoadEventsFromFile(string path)
+        private static LobEvent[] LoadEventsFromFile(string path)
         {
             var lines = File.ReadAllLines(path);
-            var events = new LOBEvent[lines.Length];
+            var events = new LobEvent[lines.Length];
             Parallel.For(0, lines.Length, i =>
             {
-                events[i] = LOBEvent.Parse(lines[i]);
+                events[i] = LobEvent.Parse(lines[i]);
             });
             return events;
         }
@@ -864,13 +967,13 @@ namespace LimitOrderBookRepositories
         /// <param name="path"></param>
         /// <param name="cleanData"></param>
         /// <returns></returns>
-        private static LOBState[] LoadStatesFromFile(string path, bool cleanData = false)
+        private static LobState[] LoadStatesFromFile(string path, bool cleanData = false)
         {
             var lines = File.ReadAllLines(path);
-            var states = new LOBState[lines.Length];
+            var states = new LobState[lines.Length];
             Parallel.For(0, lines.Length, i =>
             {
-                states[i] = LOBState.Parse(lines[i], cleanData);
+                states[i] = LobState.Parse(lines[i], cleanData);
             });
             return states;
         }
@@ -881,14 +984,14 @@ namespace LimitOrderBookRepositories
         /// <param name="tradingDate"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private string FindLOBDataFile(DateTime tradingDate, LOBDataFileType type)
+        private string FindLOBDataFile(DateTime tradingDate, LobDataFileType type)
         {
             var fileTypeIdentifier = string.Empty;
-            if (type == LOBDataFileType.EventFile)
+            if (type == LobDataFileType.EventFile)
             {
                 fileTypeIdentifier = "message";
             }
-            else if (type == LOBDataFileType.StateFile)
+            else if (type == LobDataFileType.StateFile)
             {
                 fileTypeIdentifier = "orderbook";
             }
@@ -1024,8 +1127,8 @@ namespace LimitOrderBookRepositories
             var transitionGroups = Events.GroupBy(p => p.OrderId)
                                     .Select(p => p.OrderBy(s => s.Time))
                                     .Where(p => p.Count() > 1)
-                                    .Where(p => p.First().Type == LOBEventType.Submission)
-                                    .Where(p => p.Any(s => s.Type == LOBEventType.Cancellation || s.Type == LOBEventType.Deletion))
+                                    .Where(p => p.First().Type == LobEventType.Submission)
+                                    .Where(p => p.Any(s => s.Type == LobEventType.Cancellation || s.Type == LobEventType.Deletion))
                                     .ToList();
 
             foreach (var transitionGroup in transitionGroups)
@@ -1033,8 +1136,8 @@ namespace LimitOrderBookRepositories
                 var submission = transitionGroup.First();
                 var dist = submission.DistanceBestOppositeQuote / PriceTickSize;
                 var t0 = submission.Time;
-                var rates = transitionGroup.Where(p => p.Type == LOBEventType.Cancellation ||
-                                                                    p.Type == LOBEventType.Deletion)
+                var rates = transitionGroup.Where(p => p.Type == LobEventType.Cancellation ||
+                                                                    p.Type == LobEventType.Deletion)
                                                         .Select(p => p.Volume / (AverageLimitOrderSize * (p.Time - t0)))
                                                         .ToList();
 

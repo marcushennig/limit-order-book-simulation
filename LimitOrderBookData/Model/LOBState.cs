@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 
-namespace LimitOrderBookRepositories
+namespace LimitOrderBookRepositories.Model
 {
     /// <summary>
     /// - Levels:
@@ -12,7 +11,7 @@ namespace LimitOrderBookRepositories
     ///	is not necessarily the minimum ticks size.
     ///	- Unoccupied Price Levels
     /// </summary>
-    public class LOBState
+    public class LobState
     {
         #region Properties
         
@@ -115,7 +114,7 @@ namespace LimitOrderBookRepositories
         /// <param name="line"></param>
         /// <param name="skipDummyData"></param>
         /// <returns></returns>
-        public static LOBState Parse(string line, bool skipDummyData = false)
+        public static LobState Parse(string line, bool skipDummyData = false)
         {
             // Columns:
             // 1.) Ask Price 1: 	Level 1 Ask Price 	(Best Ask)
@@ -140,7 +139,7 @@ namespace LimitOrderBookRepositories
 
             if (!skipDummyData)
             {
-                return new LOBState
+                return new LobState
                 {
                     AskPrice = askPrice.ToArray(),
                     AskVolume = askVolume.ToArray(),
@@ -157,7 +156,7 @@ namespace LimitOrderBookRepositories
                 .Where(p => p.Price != -dummyValue)
                 .ToList();
             
-            return new LOBState
+            return new LobState
             {
                 AskPrice = ask.Select(p => p.Price).ToArray(),
                 AskVolume = ask.Select(p => p.Volume).ToArray(),

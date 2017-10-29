@@ -71,15 +71,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ILOBDataRepository.cs" />
-    <Compile Include="IPriceProcess.cs" />
-    <Compile Include="LOBDataFileType.cs" />
+    <Compile Include="Interfaces\IPriceProcess.cs" />
+    <Compile Include="LobDataFileType.cs" />
+    <Compile Include="LobRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LOBDataRepository.cs" />
-    <Compile Include="LOBEvent.cs" />
-    <Compile Include="LOBEventType.cs" />
-    <Compile Include="LOBState.cs" />
-    <Compile Include="MarketSide.cs" />
+    <Compile Include="Model\LobTradingData.cs" />
+    <Compile Include="Model\LobEvent.cs" />
+    <Compile Include="Model\LobEventType.cs" />
+    <Compile Include="Model\LobState.cs" />
+    <Compile Include="Model\MarketSide.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

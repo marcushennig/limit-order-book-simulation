@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using log4net.Config;
 using LimitOrderBookRepositories;
+using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation;
 using LimitOrderBookUtilities;
 
@@ -100,12 +101,12 @@ namespace CommandLineTool
             const string symbol = "AMZN";
             var tradingDate = new DateTime(2016, 1, 5);
 
-            var lobData = new LOBDataRepository(symbol, level, tradingDate, logFolder);
+            var lobData = new LobTradingData(symbol, level, tradingDate, logFolder);
 
             lobData.CheckConsistency();
 
             var model = new SmithFarmerModel(lobData);
-                
+            
             // Save the calibration parameters
             model.Save(Path.Combine(workFolder, "calibration.json"));
             

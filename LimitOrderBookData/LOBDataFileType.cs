@@ -1,6 +1,6 @@
 ﻿namespace LimitOrderBookRepositories
 {
-    public enum LOBDataFileType
+    public enum LobDataFileType
     {
         EventFile,
         StateFile

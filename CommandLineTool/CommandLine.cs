@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using LimitOrderBookRepositories;
+using LimitOrderBookRepositories.Model;
 using LimitOrderBookUtilities;
 
 namespace CommandLineTool
@@ -53,7 +54,7 @@ namespace CommandLineTool
 
                 try
                 {
-                    var repository = new LOBDataRepository(symbol, level, tradingDate, outputPath);
+                    var repository = new LobTradingData(symbol, level, tradingDate, outputPath);
 
                     Console.WriteLine($"Save price process of '{symbol}' for {tradingDate:yyyy-MM-dd}");
                     repository.SavePriceProcess(Path.Combine(outputPath, $"{symbol}_{tradingDate:yyyy-MM-dd}.csv"));
