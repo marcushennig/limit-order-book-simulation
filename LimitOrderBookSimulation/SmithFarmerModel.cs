@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Configuration;
 using System.Reflection;
 using log4net;
 using LimitOrderBookRepositories;
@@ -482,6 +483,10 @@ namespace LimitOrderBookSimulation
         private double CalibrateLimitOrderRate(LobTradingData tradingData, double characteristicOrderSize)
         {
             var duration = tradingData.TradingDuration;
+
+            // User average depth profile and select only those limit order that are in the 60 percent quantile
+            // The average depthe profile described the distribution of limit orders
+            // use relativePrice / Depth time-average 
 
             return 0;
 

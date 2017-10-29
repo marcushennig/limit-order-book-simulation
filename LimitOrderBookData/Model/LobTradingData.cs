@@ -231,7 +231,7 @@ namespace LimitOrderBookRepositories.Model
         #endregion LOB parameter
 
         #region Statistics
-
+        
         #region Limit orders
 
         /// <summary>
@@ -288,6 +288,7 @@ namespace LimitOrderBookRepositories.Model
         }
 
         /// <summary>
+        /// TODO: Error
         /// Number of submitted limit orders in dependence of 
         /// distance to best opposite quote 
         /// </summary>
@@ -309,6 +310,7 @@ namespace LimitOrderBookRepositories.Model
         }
 
         /// <summary>
+        /// TODO: Error
         /// Number of submitted limit sell orders in dependence of 
         /// distance to best opposite quote 
         /// </summary>
@@ -331,6 +333,7 @@ namespace LimitOrderBookRepositories.Model
         }
 
         /// <summary>
+        /// TODO: Error
         /// Number of submitted limit buy orders in dependence of 
         /// distance to best opposite quote 
         /// </summary>
