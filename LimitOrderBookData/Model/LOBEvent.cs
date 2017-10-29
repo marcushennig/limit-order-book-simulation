@@ -60,11 +60,10 @@ namespace LimitOrderBookRepositories.Model
         /// </summary>
         public LobState FinalState { set; get; }
 
+        #region Characteristic
+
         public long TotalBidVolumeChange => FinalState.BidVolume.Sum() - InitialState.BidVolume.Sum();
         public long TotalAskVolumeChange => FinalState.AskVolume.Sum() - InitialState.AskVolume.Sum();
-
-       
-        #region Characteristic
 
         /// <summary>
         /// Submission event that will at least partlly be executed
@@ -133,8 +132,31 @@ namespace LimitOrderBookRepositories.Model
 
         #endregion Properties
 
+        #region Constructor 
+
+        /// <summary>
+        /// Constructor 
+        /// </summary>
+        /// <param name="orderId"></param>
+        /// <param name="time"></param>
+        /// <param name="type"></param>
+        /// <param name="volume"></param>
+        /// <param name="price"></param>
+        /// <param name="side"></param>
+        public LobEvent(long orderId, double time, LobEventType type, long volume, long price, MarketSide side)
+        {
+            OrderId = orderId;
+            Time = time;
+            Type = type;
+            Volume = volume;
+            Price = price;
+            Side = side;
+        }
+
+        #endregion Constructor 
+
         #region Methods
-        
+
         /// <summary>
         /// Events are equal if they have the same order ID
         /// </summary>
@@ -142,7 +164,7 @@ namespace LimitOrderBookRepositories.Model
         /// <returns></returns>
         public bool Equals(LobEvent other)
         {
-            return OrderId == other.OrderId;
+            return OrderId == other?.OrderId;
         }
 
         /// <summary>
@@ -152,26 +174,6 @@ namespace LimitOrderBookRepositories.Model
         public override string ToString()
         {
             return $"(Time={Time}, Type={Type}, OrderId={OrderId}, Volume={Volume}, Price={Price}, Side={Side})";
-        }
-
-        /// <summary>
-        /// Parse line in LOBSTER data
-        /// </summary>
-        /// <param name="line"></param>
-        /// <returns></returns>
-        public static LobEvent Parse(string line)
-        {
-            var data = line.Split(',').ToArray();
-            var e = new LobEvent
-            {
-                Time = Convert.ToDouble(data[0]),
-                Type = (LobEventType)Convert.ToInt32(data[1]),
-                OrderId = Convert.ToInt64(data[2]),
-                Volume = Convert.ToInt64(data[3]),
-                Price = Convert.ToInt64(data[4]),
-                Side = (MarketSide)Convert.ToInt32(data[5])
-            };
-            return e;
         }
 
         #endregion Methods

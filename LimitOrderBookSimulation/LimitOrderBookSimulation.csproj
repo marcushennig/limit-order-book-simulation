@@ -73,7 +73,6 @@
   <ItemGroup>
     <Compile Include="LimitOrderBooks\Enums.cs" />
     <Compile Include="LimitOrderBooks\ILimitOrderBook.cs" />
-    <Compile Include="LimitOrderBooks\LimitOrderBookOld.cs" />
     <Compile Include="LimitOrderBooks\LimitOrderBook.cs" />
     <Compile Include="LimitOrderBooks\LimitOrderBookState.cs" />
     <Compile Include="LimitOrderBooks\Price.cs" />

@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using log4net.Config;
 using LimitOrderBookRepositories;
-using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation;
 using LimitOrderBookUtilities;
 
@@ -15,37 +14,6 @@ namespace CommandLineTool
 {
     static class Program
     {
-        /// <summary>
-        /// Export mid price
-        /// </summary>
-        static void ExportPriceEvolution()
-        {
-            var cli = new CommandLine();
-
-            var startDate = new DateTime(2016, 1, 4);
-            var endDate = new DateTime(2016, 3, 31);
-            //  
-            foreach (var symbol in new[] {"CSCO"}) // { "AMZN", "CSCO", "NFLX", "TSLA" })
-            {
-                var tradingDate = startDate;
-                while (tradingDate <= endDate)
-                {
-                    if ((tradingDate.DayOfWeek >= DayOfWeek.Monday) && (tradingDate.DayOfWeek <= DayOfWeek.Friday))
-                    {
-                        cli.Start(new[]
-                        {
-                            "--Application:ExportPriceEvolution",
-                            $"--Symbol:{symbol}",
-                            $"--TradingDate:{tradingDate:yyyy/MM/dd}",
-                            $"--OutputPath:C:\\Users\\d90789\\Documents\\Oxford MSc in Mathematical Finance\\Thesis\\Lob\\1 Price Time Series\\{symbol}"
-                        });
-                    }
-                    tradingDate = tradingDate.AddDays(1);
-                }
-            }
-        }
-
-        
         /// <summary>
         /// Test random events 
         /// </summary>
@@ -89,6 +57,27 @@ namespace CommandLineTool
         }
 
         /// <summary>
+        /// Test loading LOB data
+        /// </summary>
+        static void LoadLobData()
+        {
+            const int level = 10;
+            const string symbol = "AMZN";
+            var tradingDates = new List<DateTime>{
+
+                new DateTime(2016, 1, 4),
+                new DateTime(2016, 1, 5),
+                new DateTime(2016, 1, 6),
+                new DateTime(2016, 1, 11),
+
+            };
+            var lobRepository = new LobRepository(symbol, level, tradingDates);
+
+            Console.WriteLine(lobRepository);
+
+        }
+
+        /// <summary>
         /// Load lob data into repository 
         /// and use it for calibration
         /// </summary>
@@ -100,8 +89,13 @@ namespace CommandLineTool
             const int level = 10;
             const string symbol = "AMZN";
             var tradingDate = new DateTime(2016, 1, 5);
+            var tradingDates = new List<DateTime>{
+               new DateTime(2016, 1, 5)
+            };
 
-            var lobData = new LobTradingData(symbol, level, tradingDate, logFolder);
+            var lobRepository = new LobRepository(symbol, level, tradingDates);
+
+            var lobData = lobRepository.TradingData[tradingDate];
 
             lobData.CheckConsistency();
 
@@ -131,9 +125,9 @@ namespace CommandLineTool
 
             #endregion
 
-            //model.SimulateOrderFlow(60 *10);
-            //model.Save(Path.Combine(workFolder, "simulation.json"));
-            //model.SavePriceProcess(Path.Combine(workFolder, "price.csv"));
+            model.SimulateOrderFlow(60 *10);
+            model.Save(Path.Combine(workFolder, "simulation.json"));
+            model.SavePriceProcess(Path.Combine(workFolder, "price.csv"));
         }
 
         /// <summary>
@@ -145,8 +139,8 @@ namespace CommandLineTool
 
             // ExportPriceEvolution();
             // LoadLobData();
-            StartSimulation();
-
+            //StartSimulation();
+            LoadLobData();
             Console.WriteLine("Press any key.");
             Console.ReadKey();
         }

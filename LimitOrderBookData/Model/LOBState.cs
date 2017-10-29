@@ -14,29 +14,51 @@ namespace LimitOrderBookRepositories.Model
     public class LobState
     {
         #region Properties
+
+        /// <summary>
+        /// Level
+        /// </summary>
+        public int Level { get; }
+
+        /// <summary>
+        /// Level 1-n ask prices 
+        /// </summary>
+        public long[] AskPrice { get; }
         
-        public long[] AskPrice { set; get; }
-
-        public long[] AskVolume { set; get; }
-
-        public long[] BidPrice { set; get; }
+        /// <summary>
+        /// Level 1-n ask volumes 
+        /// </summary>
+        public long[] AskVolume { get; }
 
         /// <summary>
-        /// Level 1-n Bid Volume 
+        /// Level 1-n of bid prices 
         /// </summary>
-        public long[] BidVolume { set; get; }
+        public long[] BidPrice { get; }
+
+        /// <summary>
+        /// Level 1-n bid volumes 
+        /// </summary>
+        public long[] BidVolume { get; }
+        
+
+        #endregion Properties 
+
+        #region Characteristics
 
         /// <summary>
         /// Return ask side as dictionary
         /// </summary>
-        public IDictionary<long, long> Asks => AskPrice.Zip(AskVolume, (price, volume) => new KeyValuePair<long, long>(price, volume))
-                                                       .ToDictionary(p => p.Key, p => p.Value);
+        public IDictionary<long, long> Asks => AskPrice
+            .Zip(AskVolume, (price, volume) => new KeyValuePair<long, long>(price, volume))
+            .ToDictionary(p => p.Key, p => p.Value);
 
         /// <summary>
         /// Return ask side as dictionary
         /// </summary>
-        public IDictionary<long, long> Bids => BidPrice.Zip(BidVolume, (price, volume) => new KeyValuePair<long, long>(price, volume))
-                                                       .ToDictionary(p => p.Key, p => p.Value);
+        public IDictionary<long, long> Bids => BidPrice
+            .Zip(BidVolume, (price, volume) => new KeyValuePair<long, long>(price, volume))
+            .ToDictionary(p => p.Key, p => p.Value);
+
         /// <summary>
         /// Spread 
         /// </summary>
@@ -62,8 +84,45 @@ namespace LimitOrderBookRepositories.Model
         /// </summary>
         public long BestBidPrice => BidPrice[0];
 
-        #endregion Properties 
+        #endregion
 
+        #region Constructor 
+
+        /// <summary>
+        /// Constructor 
+        /// </summary>
+        /// <param name="askPrice"></param>
+        /// <param name="askVolume"></param>
+        /// <param name="bidPrice"></param>
+        /// <param name="bidVolume"></param>
+        public LobState(long[] askPrice, long[] askVolume, long[] bidPrice, long[] bidVolume)
+        {
+            if (askPrice == null || askVolume == null || bidPrice == null || bidVolume == null)
+            {
+                throw new ArgumentException("Prices or volumes are not allowed to be NULL");
+            }
+
+            if (bidPrice.Length != bidVolume.Length)
+            {
+                throw new ArgumentException($"The number of prices and volumes on bide side are different (Number of prices={askPrice.Length}, number of volumes={askVolume.Length})");
+            }
+
+            if (askPrice.Length != askVolume.Length)
+            {
+                throw new ArgumentException($"The number of prices and volumes on ask side are different (Number of prices={askPrice.Length}, number of volumes={askVolume.Length})");
+            }
+
+            Level = askPrice.Length;
+
+            AskPrice = askPrice;
+            AskVolume = askVolume;
+
+            BidPrice = bidPrice;
+            BidVolume = bidVolume;
+        }
+
+        #endregion
+        
         #region Methods
 
         /// <summary>
@@ -84,7 +143,7 @@ namespace LimitOrderBookRepositories.Model
                 return 0;
 
             }
-            else if (side == MarketSide.Buy)
+            if (side == MarketSide.Buy)
             {
                 var k = Array.IndexOf(BidPrice, price);
                 if (k >= 0)
@@ -93,10 +152,7 @@ namespace LimitOrderBookRepositories.Model
                 }
                 return 0;
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
         /// <summary>
@@ -108,63 +164,6 @@ namespace LimitOrderBookRepositories.Model
             return $" BestBidPrice={BestBidPrice} ({BestBidVolume}), BestAskPrice={BestAskPrice} ({BestAskVolume})";
         }
 
-        /// <summary>
-        /// Parse line in LOBSTER data
-        /// </summary>
-        /// <param name="line"></param>
-        /// <param name="skipDummyData"></param>
-        /// <returns></returns>
-        public static LobState Parse(string line, bool skipDummyData = false)
-        {
-            // Columns:
-            // 1.) Ask Price 1: 	Level 1 Ask Price 	(Best Ask)
-            // 2.) Ask Size 1: 	Level 1 Ask Volume 	(Best Ask Volume)
-            // 3.) Bid Price 1: 	Level 1 Bid Price 	(Best Bid)
-            // 4.) Bid Size 1: 	Level 1 Bid Volume 	(Best Bid Volume)
-            // 5.) Ask Price 2: 	Level 2 Ask Price 	(2nd Best Ask)
-            // ...
-            // Dollar price times 10000 (i.e., A stock price of $91.14 is given by 911400)
-            //	When the selected number of levels exceeds the number of levels 
-            //	available the empty order book positions are filled with dummy 
-            //	information to guarantee a symmetric output. The extra bid 
-            //	and/or ask prices are set to -9999999999 and 9999999999, 
-            //	respectively. The Corresponding volumes are set to 0. 
-            const long dummyValue = 9999999999;
-
-            var data = line.Split(',').Select(p => Convert.ToInt64(p)).ToList();
-            var askPrice = data.Where((value, index) => index % 4 == 0);
-            var askVolume = data.Where((value, index) => (index - 1) % 4 == 0);
-            var bidPrice = data.Where((value, index) => (index - 2) % 4 == 0);
-            var bidVolume = data.Where((value, index) => (index - 3) % 4 == 0);
-
-            if (!skipDummyData)
-            {
-                return new LobState
-                {
-                    AskPrice = askPrice.ToArray(),
-                    AskVolume = askVolume.ToArray(),
-                    BidPrice = bidPrice.ToArray(),
-                    BidVolume = bidVolume.ToArray()
-                };
-            }
-            // Skipy dummy data in LOBSTER file line
-            var ask = askPrice.Zip(askVolume, (p, q) => new { Price = p, Volume = q })
-                .Where(p => p.Price != +dummyValue)
-                .ToList();
-
-            var bid = bidPrice.Zip(bidVolume, (p, q) => new { Price = p, Volume = q })
-                .Where(p => p.Price != -dummyValue)
-                .ToList();
-            
-            return new LobState
-            {
-                AskPrice = ask.Select(p => p.Price).ToArray(),
-                AskVolume = ask.Select(p => p.Volume).ToArray(),
-                BidPrice = bid.Select(p => p.Price).ToArray(),
-                BidVolume = bid.Select(p => p.Volume).ToArray()
-            };
-        }
-
-        #endregion Methods
+        #endregion
     }
 }
