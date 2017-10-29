@@ -66,12 +66,13 @@ namespace CommandLineTool
             var tradingDates = new List<DateTime>{
 
                 new DateTime(2016, 1, 4),
-                new DateTime(2016, 1, 5),
-                new DateTime(2016, 1, 6),
-                new DateTime(2016, 1, 11),
+                new DateTime(2016, 1, 5)
 
             };
             var lobRepository = new LobRepository(symbol, level, tradingDates);
+            var lobModel = new SmithFarmerModel();
+
+            lobModel.Calibrate(lobRepository);
 
             Console.WriteLine(lobRepository);
 

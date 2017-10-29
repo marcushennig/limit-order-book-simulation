@@ -139,7 +139,7 @@ namespace LimitOrderBookSimulation
         /// <summary>
         /// Empty constructor  
         /// </summary>
-        private SmithFarmerModel()
+        public SmithFarmerModel()
         {
             Random = new RandomUtilities(43);
             LimitOrderBook = new LimitOrderBook();
@@ -427,34 +427,117 @@ namespace LimitOrderBookSimulation
 
         #endregion Events
 
-        #region Simulation
-
+        #region Calibration
+        
         /// <summary>
-        /// Calibrate the market order rate  
+        /// Determine the characteristic order size
         /// </summary>
-        private void CalibrateMarketOrderRate()
+        /// <param name="tradingData">LOB data for a trading day</param>
+        /// <returns></returns>
+        private double CalibrateCharacteristicOrderSize(LobTradingData tradingData)
         {
+            // => Sl, Sm, Sc
+            var limitOrderSize = tradingData.LimitOrders
+                .Select(order => (double)order.Volume)
+                .Mean();
 
+            var marketOrderSize = tradingData.MarketOrders
+                .Select(order => (double)order.Volume)
+                .Mean();
+                
+            var canceledOrderSize = tradingData.CanceledOrders
+                .Select(order => (double)order.Volume)
+                .Mean();
+            
+            return (limitOrderSize + marketOrderSize + canceledOrderSize) / 3.0;
         }
 
         /// <summary>
-        /// Set the intial state of the limit order book
+        /// Determine the 'mu'-parameter in Famer & Smith's model 
+        /// Mu characterizes the average market order arrival rate and it is just the number of shares of 
+        /// effective market order ('buy' and 'sell') to the number of events during the trading day
+        /// Unit: [# shares / time]
         /// </summary>
-        private void SetInitialStateOfLob()
+        /// <param name="tradingData">LOB data for a trading day</param>
+        /// <param name="characteristicOrderSize">Characteristic order size</param>
+        /// <returns></returns>
+        private double CalibrateMarketOrderRate(LobTradingData tradingData, double characteristicOrderSize)
         {
+            var duration = tradingData.TradingDuration;
+            var totalVolumeOfMarketOrders = (double) tradingData.MarketOrders
+                .Select(order => order.Volume)
+                .Sum();
+
+            var numberOfMarketOrders = totalVolumeOfMarketOrders / characteristicOrderSize;
+
+            return numberOfMarketOrders / duration;
+        }
+
+        /// <summary>
+        /// Calibrate the limit order rate
+        /// </summary>
+        /// <param name="tradingData"></param>
+        /// <param name="characteristicOrderSize"></param>
+        /// <returns></returns>
+        private double CalibrateLimitOrderRate(LobTradingData tradingData, double characteristicOrderSize)
+        {
+            var duration = tradingData.TradingDuration;
+
+            return 0;
+
         }
 
         /// <summary>
         /// Calibrate model with LOB data  
         /// </summary>
-        /// <param name="lob"></param>
-        public void Calibrate(LobTradingData lob)
+        /// <param name="repository"></param>
+        public void Calibrate(LobRepository repository)
         {
-            if (!lob.Events.Any())
+            if (!repository.TradingData.Any())
             {
-                throw new ArgumentException("Cannot calibrate model from empty data");
+                throw new ArgumentException("Cannot calibrate model without trading data");
             }
+
+            Log.Info("Start calibrating model");
+
+            var marketOrderRates = new List<double>();
+            var characteristicSizes = new List<double>();
+            var tickSizes =new List<double>();
+
+            // Measurement of the parameters mu(market order rate) and sigma(size) is
+            // straightforward: to measure mu, for example, we simply compute
+            // the total number of shares of market orders and divide by time
+            // or, alternatively, we compute mu(t) for each day and average; we get
+            // similar results in either case.
+            foreach (var tradingDay in repository.TradingDays)
+            {
+                var tradingData = repository.TradingData[tradingDay];
+
+                var sigma = CalibrateCharacteristicOrderSize(tradingData);
+                var mu = CalibrateMarketOrderRate(tradingData, sigma);
+                // Price unit
+                var pi = tradingData.PriceTickSize;
+
+                characteristicSizes.Add(sigma);
+                marketOrderRates.Add(mu);
+                tickSizes.Add(pi);
+            }
+
+            CharacteristicOrderSize = characteristicSizes.Mean();
+            MarketOrderRate = marketOrderRates.Mean();
+            TickSize = tickSizes.Mean();
+
+            Log.Info($"Market order rate (mu): {MarketOrderRate} [sigma]/[time]");
+            Log.Info($"Characteristic size (sigma): {CharacteristicOrderSize}");
+            Log.Info($"Tick size (pi); {TickSize}");
+
+            Log.Info("Finished calibrating model");
+
         }
+
+        #endregion Calibration
+
+        #region Simulation
 
         /// <summary>
         /// Run order flow simulation and store result in given file

@@ -53,7 +53,7 @@ namespace LimitOrderBookRepositories
         /// <summary>
         /// Trading dates 
         /// </summary>
-        public List<DateTime> TradingDates { private set; get; }
+        public List<DateTime> TradingDays { private set; get; }
         
         #endregion
 
@@ -62,13 +62,13 @@ namespace LimitOrderBookRepositories
         /// <summary>
         /// Constructor 
         /// </summary>
-        public LobRepository(string symbol, int level, List<DateTime> tradingDates, 
+        public LobRepository(string symbol, int level, List<DateTime> tradingDays, 
             double skipFirstSeconds = 0,
             double skipLastSeconds = 0)
         {
             Symbol = symbol;
             Level = level;
-            TradingDates = tradingDates;
+            TradingDays = tradingDays;
             SkipFirstSeconds = skipFirstSeconds;
             SkipLastSeconds = skipLastSeconds;
 
@@ -246,7 +246,7 @@ namespace LimitOrderBookRepositories
 
             TradingData.Clear();
 
-            foreach (var tradingDate in TradingDates)
+            foreach (var tradingDate in TradingDays)
             {
                 string eventFile;
                 string stateFile;

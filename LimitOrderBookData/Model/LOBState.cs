@@ -126,6 +126,53 @@ namespace LimitOrderBookRepositories.Model
         #region Methods
 
         /// <summary>
+        /// Check is a price is in quantile on given side
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="side"></param>
+        /// <param name="quantile"></param>
+        /// <returns></returns>
+        public bool IsPriceInQuantile(long price, MarketSide side, double quantile)
+        {
+            if (quantile < 0 || quantile > 1)
+            {
+                throw new ArgumentException("Quantile can only be in the intervale [0,1]");
+            }
+
+            if (price > BestBidPrice && price < BestAskPrice)
+            {
+                return true;
+            }
+
+            if (side == MarketSide.Sell)
+            {
+                
+                double totalVolume = AskVolume.Sum();
+                var k = Array.FindIndex(AskPrice, p => p > price);
+                if (k != -1)
+                {
+                    double volume = AskVolume.Take(k + 1).Sum();
+                    return volume / totalVolume <= quantile;
+                }
+                return false;
+            }
+            else
+            {
+                double totalVolume = BidVolume.Sum();
+                var k = Array.FindIndex(BidPrice, p => p < price);
+                if (k != -1)
+                {
+                    double volume = BidVolume.Take(k + 1).Sum();
+                    return volume / totalVolume <= quantile;
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+
+        /// <summary>
         /// Determine the depth at given price on buy or sell side
         /// </summary>
         /// <param name="price"></param>

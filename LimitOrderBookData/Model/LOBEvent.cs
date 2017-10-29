@@ -16,7 +16,7 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// Unique order reference number (Assigned in order flow)
         /// </summary>
-        public long OrderId { set; get; }
+        public long OrderId {get; }
 
         /// <summary>
         /// Seconds after midnight with decimal 
@@ -24,22 +24,22 @@ namespace LimitOrderBookRepositories.Model
 	    /// and up to nanoseconds depending on 
 	    /// the requested period
         /// </summary>
-        public double Time { set; get; }
+        public double Time { get; }
 
         /// <summary>
         /// Type
         /// </summary>
-        public LobEventType Type { set; get; }
+        public LobEventType Type { get; }
 
         /// <summary>
         /// Number of shares
         /// </summary>
-        public long Volume { set; get; }
+        public long Volume { get; }
 
         /// <summary>
         /// Dollar price times 10000 (i.e., A stock price of $91.14 is given by 911400)
         /// </summary>
-        public long Price { set; get; }
+        public long Price { get; }
 
         /// <summary>
         /// Sell/Buy limit order
@@ -48,7 +48,7 @@ namespace LimitOrderBookRepositories.Model
         ///		order corresponds to a buyer (seller) 
         ///		initiated trade, i.e. Buy (Sell) trade.
         /// </summary>
-        public MarketSide Side { set; get; }
+        public MarketSide Side { get; }
         
         /// <summary>
         ///Initial state of limit order book before the above event occured 
@@ -61,7 +61,7 @@ namespace LimitOrderBookRepositories.Model
         public LobState FinalState { set; get; }
 
         #region Characteristic
-
+        
         public long TotalBidVolumeChange => FinalState.BidVolume.Sum() - InitialState.BidVolume.Sum();
         public long TotalAskVolumeChange => FinalState.AskVolume.Sum() - InitialState.AskVolume.Sum();
 
@@ -86,47 +86,29 @@ namespace LimitOrderBookRepositories.Model
                                                 : InitialState.BidPrice[0] >= Price);
 
         /// <summary>
-        /// Relative price of the event to the state before the event was submitted 
+        /// Relative price of the event to 
+        /// the state before the event was submitted 
         /// </summary>
         public long RelativePrice => Side == MarketSide.Buy
-            ? BidRelativePrice
-            : AskRelativePrice;
-
-        /// <summary>
-        /// Logarithmic relative price of the event to the state before the event was submitted 
-        /// </summary>
-        public double LogRelativePrice => Side == MarketSide.Buy
-            ? Math.Log(InitialState.BestBidPrice) - Math.Log(Price)
-            : Math.Log(Price) - Math.Log(InitialState.BestAskPrice);
-
-        /// <summary>
-        /// Relative price to best bid
-        /// </summary>
-        public long BidRelativePrice => InitialState.BestBidPrice - Price;
-
-        /// <summary>
-        /// Relative price to best ask
-        /// </summary>
-        public long AskRelativePrice => Price - InitialState.BestAskPrice;//AskPrice[0];
+            ? InitialState.BestBidPrice - Price
+            : Price - InitialState.BestAskPrice;
 
         /// <summary>
         /// Distance i from the opposite best quote 
         /// </summary>
-        public long DistanceBestOppositeQuote
-        {
-            get
-            {
-                switch (Side)
-                {
-                    case MarketSide.Buy:
-                        return -AskRelativePrice;
-                    case MarketSide.Sell:
-                        return -BidRelativePrice;
-                    default:
-                        return 0;
-                }
-            }
-        }
+        public long DistanceBestOppositeQuote => Side == MarketSide.Buy 
+            ? InitialState.BestAskPrice - Price 
+            : Price - InitialState.BestBidPrice;
+        
+        /// <summary>
+        /// Relative price to best bid
+        /// </summary>
+        private long BidRelativePrice => InitialState.BestBidPrice - Price;
+
+        /// <summary>
+        /// Relative price to best ask
+        /// </summary>
+        private long AskRelativePrice => Price - InitialState.BestAskPrice;
 
         #endregion Characteristic
 
@@ -156,6 +138,16 @@ namespace LimitOrderBookRepositories.Model
         #endregion Constructor 
 
         #region Methods
+
+        /// <summary>
+        /// Check if price is quantile  
+        /// </summary>
+        /// <param name="quantile"></param>
+        /// <returns></returns>
+        public bool IsPriceInQuantile(double quantile)
+        {
+            return InitialState.IsPriceInQuantile(Price, Side, quantile);
+        }
 
         /// <summary>
         /// Events are equal if they have the same order ID
