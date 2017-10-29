@@ -1,0 +1,13 @@
+/LimitOrderBookUtilities/bin
+/LimitOrderBookUtilities/obj
+/LimitOrderBookSimulation/bin
+/LimitOrderBookSimulation/obj
+/LimitOrderBookGUI/obj
+/LimitOrderBookGUI/bin
+/LimitOrderBookData/bin
+/LimitOrderBookData/obj
+/GUI/obj
+/GUI/bin
+/CommandLineTool/bin
+/CommandLineTool/obj
+/.vs/LimitOrderBookSimulator/v15

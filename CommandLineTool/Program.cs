@@ -99,12 +99,13 @@ namespace CommandLineTool
             const int level = 10;
             const string symbol = "AMZN";
             var tradingDate = new DateTime(2016, 1, 5);
+
             var lobData = new LOBDataRepository(symbol, level, tradingDate, logFolder);
 
             lobData.CheckConsistency();
 
             var model = new SmithFarmerModel(lobData);
-   
+                
             // Save the calibration parameters
             model.Save(Path.Combine(workFolder, "calibration.json"));
             
@@ -129,9 +130,9 @@ namespace CommandLineTool
 
             #endregion
 
-            model.SimulateOrderFlow(60 *10);
-            model.Save(Path.Combine(workFolder, "simulation.json"));
-            model.SavePriceProcess(Path.Combine(workFolder, "price.csv"));
+            //model.SimulateOrderFlow(60 *10);
+            //model.Save(Path.Combine(workFolder, "simulation.json"));
+            //model.SavePriceProcess(Path.Combine(workFolder, "price.csv"));
         }
 
         /// <summary>

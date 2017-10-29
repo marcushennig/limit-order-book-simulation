@@ -211,6 +211,15 @@ namespace LimitOrderBookSimulation
             MarketOrderRate = nm / T;
             Log.Info($"Market order rate: {MarketOrderRate} [sigma]/[time]");
 
+            //***************************************************************************************************************
+            // Error:
+            // Select only limit order events events that fall into window where price < price_60%
+            // Check Paper: PNAS: The predictive power of zero intelligence models in financial markes
+            // C:\Users\d90789\Documents\Oxford MSc in Mathematical Finance\Thesis\Literature\Farmer Smith Model
+            //
+            //***************************************************************************************************************
+
+
             //*** Martin Gould suggested to calibrate in a closed window near the spread 
             //*** If level would be say 100, but for small levels no need 
 
@@ -316,7 +325,7 @@ namespace LimitOrderBookSimulation
         #endregion Constructors
 
         #region Methods
-
+     
         #region Events
 
         #region Market orders
@@ -340,7 +349,7 @@ namespace LimitOrderBookSimulation
         #endregion
 
         #region Cancel orders
-       
+        
         /// <summary>
         /// TODO: Cancel limit sell order
         /// </summary>
@@ -417,6 +426,33 @@ namespace LimitOrderBookSimulation
         #endregion Events
 
         #region Simulation
+
+        /// <summary>
+        /// Calibrate the market order rate  
+        /// </summary>
+        private void CalibrateMarketOrderRate()
+        {
+
+        }
+
+        /// <summary>
+        /// Set the intial state of the limit order book
+        /// </summary>
+        private void SetInitialStateOfLob()
+        {
+        }
+
+        /// <summary>
+        /// Calibrate model with LOB data  
+        /// </summary>
+        /// <param name="lob"></param>
+        public void Calibrate(ILOBDataRepository lob)
+        {
+            if (!lob.Events.Any())
+            {
+                throw new ArgumentException("Cannot calibrate model from empty data");
+            }
+        }
 
         /// <summary>
         /// Run order flow simulation and store result in given file

@@ -9,7 +9,7 @@ namespace LimitOrderBookRepositories
     /// events are timestamped to seconds after midnight, with decimal 
     /// precision of at least milliseconds and up to nanoseconds depending 
     /// </summary>
-    public class LOBEvent : IEquatable<LOBEvent>
+    public class  LOBEvent : IEquatable<LOBEvent>
     {
         #region Properties
 
