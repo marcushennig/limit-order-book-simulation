@@ -167,8 +167,6 @@ namespace LimitOrderBookRepositories.Model
                 }
                 return false;
             }
-
-            return false;
         }
 
 

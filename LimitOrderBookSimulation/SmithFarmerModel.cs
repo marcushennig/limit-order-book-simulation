@@ -15,12 +15,6 @@ using Newtonsoft.Json;
 
 namespace LimitOrderBookSimulation
 {
-    public enum FileType
-    {
-        Json, 
-
-    }
-
     /// <summary>
     /// TODO: Implement initialDepthProfile, should be property of the model 
     /// TODO: Sell as well as Buy side should have their own depth profile  
@@ -435,7 +429,7 @@ namespace LimitOrderBookSimulation
         /// </summary>
         /// <param name="tradingData">LOB data for a trading day</param>
         /// <returns></returns>
-        private double CalibrateCharacteristicOrderSize(LobTradingData tradingData)
+        private static double CalibrateCharacteristicOrderSize(LobTradingData tradingData)
         {
             // => Sl, Sm, Sc
             var limitOrderSize = tradingData.LimitOrders
@@ -462,7 +456,7 @@ namespace LimitOrderBookSimulation
         /// <param name="tradingData">LOB data for a trading day</param>
         /// <param name="characteristicOrderSize">Characteristic order size</param>
         /// <returns></returns>
-        private double CalibrateMarketOrderRate(LobTradingData tradingData, double characteristicOrderSize)
+        private static double CalibrateMarketOrderRate(LobTradingData tradingData, double characteristicOrderSize)
         {
             var duration = tradingData.TradingDuration;
             var totalVolumeOfMarketOrders = (double) tradingData.MarketOrders
@@ -476,20 +470,39 @@ namespace LimitOrderBookSimulation
 
         /// <summary>
         /// Calibrate the limit order rate
+        /// Here we count the number of limit order events that are submitted 
+        /// into a small price band near the spread.
         /// </summary>
         /// <param name="tradingData"></param>
         /// <param name="characteristicOrderSize"></param>
+        /// <param name="tickSize"></param>
         /// <returns></returns>
-        private double CalibrateLimitOrderRate(LobTradingData tradingData, double characteristicOrderSize)
+        private static double CalibrateLimitOrderRate(LobTradingData tradingData, double characteristicOrderSize, double tickSize)
         {
-            var duration = tradingData.TradingDuration;
+            // First step: Determine the price band near the spread which will be used
+            // for calibration. To this end, we determine the average depth provile (average depth vs. distance to best opposite quote)
+            // and the 60% quantile of outstanding limit orders.  
+            var averageDepthProfile = tradingData.AverageDepthProfile;
+            var distanceBestOppositeQuoteQuantile = averageDepthProfile.Quantile(0.6);
+            
+            // Price range in ticks within which limit order events will be counted 
+            var priceRangeInTicks = distanceBestOppositeQuoteQuantile / tickSize;
 
-            // User average depth profile and select only those limit order that are in the 60 percent quantile
-            // The average depthe profile described the distribution of limit orders
-            // use relativePrice / Depth time-average 
+            var output = "C:\\Users\\d90789\\Documents\\Oxford MSc in Mathematical Finance\\Thesis\\Lob\\4 Output";
+            averageDepthProfile.Save(Path.Combine(output, $"depth_profile.csv"));
 
-            return 0;
+            // Second step: Count the number of limit sell and buy orders that where placed within price band in 
+            // units of the characteristic order size 
+            var countOfLimitOrders = tradingData.LimitOrders
+                .Where(p => p.DistanceBestOppositeQuote < distanceBestOppositeQuoteQuantile)
+                .Sum(p => p.Volume) / characteristicOrderSize;
 
+          
+            // Third step: Determine the rate density of limit sell and buy orders 
+            // TODO: Divide by factor 2 to account for sell und buy side 
+            var limitOrderRateDensity = countOfLimitOrders / (tradingData.TradingDuration * priceRangeInTicks);
+
+            return limitOrderRateDensity;
         }
 
         /// <summary>
@@ -506,6 +519,7 @@ namespace LimitOrderBookSimulation
             Log.Info("Start calibrating model");
 
             var marketOrderRates = new List<double>();
+            var limitOrderRate = new List<double>();
             var characteristicSizes = new List<double>();
             var tickSizes =new List<double>();
 
@@ -519,16 +533,18 @@ namespace LimitOrderBookSimulation
                 var tradingData = repository.TradingData[tradingDay];
 
                 var sigma = CalibrateCharacteristicOrderSize(tradingData);
-                var mu = CalibrateMarketOrderRate(tradingData, sigma);
-                // Price unit
                 var pi = tradingData.PriceTickSize;
-
+                var mu = CalibrateMarketOrderRate(tradingData, sigma);
+                var alpha = CalibrateLimitOrderRate(tradingData, sigma, pi);
+                
                 characteristicSizes.Add(sigma);
                 marketOrderRates.Add(mu);
+                limitOrderRate.Add(alpha);
                 tickSizes.Add(pi);
             }
 
             CharacteristicOrderSize = characteristicSizes.Mean();
+            LimitOrderRateDensity = limitOrderRate.Mean();
             MarketOrderRate = marketOrderRates.Mean();
             TickSize = tickSizes.Mean();
 

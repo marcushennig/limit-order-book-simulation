@@ -256,6 +256,7 @@ namespace LimitOrderBookRepositories.Model
                     {
                         // Ask side
                         var askVolume = state.AskVolume[j];
+                        
                         var askDistance = state.AskPrice[j] - state.BestBidPrice;
 
                         if (Math.Abs(state.BestBidPrice) != priceError)
