@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using log4net;
-using log4net.Appender;
 using log4net.Config;
-using log4net.Layout;
-using log4net.Repository.Hierarchy;
 using LimitOrderBookRepositories.Interfaces;
 using LimitOrderBookUtilities;
 using MathNet.Numerics;
@@ -421,6 +415,7 @@ namespace LimitOrderBookRepositories.Model
                 return _canceledBuyOrderDistribution;
             }
         }
+        
         #endregion Cancelled orders 
 
         #endregion

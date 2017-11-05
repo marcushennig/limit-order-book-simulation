@@ -459,50 +459,106 @@ namespace LimitOrderBookSimulation
         private static double CalibrateMarketOrderRate(LobTradingData tradingData, double characteristicOrderSize)
         {
             var duration = tradingData.TradingDuration;
-            var totalVolumeOfMarketOrders = (double) tradingData.MarketOrders
-                .Select(order => order.Volume)
-                .Sum();
+            var totalVolumeOfMarketOrders = tradingData.MarketOrders.Sum(p => p.Volume);
 
             var numberOfMarketOrders = totalVolumeOfMarketOrders / characteristicOrderSize;
+            var marketOrderRate = numberOfMarketOrders / duration;
 
-            return numberOfMarketOrders / duration;
+            // Divide by factor 2 to get rate 
+            // for either sell or buy side
+            return marketOrderRate / 2;
         }
 
         /// <summary>
-        /// Calibrate the limit order rate
-        /// Here we count the number of limit order events that are submitted 
+        /// Calibrate limit order rate density from given trading data (assume that rate for sell and buy are equal). 
+        /// Martin Gould suggested to calibrate in a closed window near the spread.
+        /// If level would be say 100, but for small levels no need 
+        /// [...] Roughly 70% of all orders are placed either at the best price or inside the spread. 
+        /// Outside the spread the density of limit order placement falls as a power law as a function of
+        /// the distance from the best prices
+        /// [...] Determine the number of orders within a q_3 and q_60, where q_n is the n quantil 
+        /// of the distribution of orders, any strategy for estimating the density 
+        /// q_60 is made in a compromise to include as much data as possible for 
+        /// statistical stability, but not so much as to
+        /// include orders that are unlikely to ever be executed, and therefore
+        /// unlikely to have any effect on prices.
+        /// [...] Here we count the number of limit order events that are submitted 
         /// into a small price band near the spread.
         /// </summary>
-        /// <param name="tradingData"></param>
-        /// <param name="characteristicOrderSize"></param>
-        /// <param name="tickSize"></param>
+        /// <param name="tradingData">Trading data (events and states) for fixed trading date</param>
+        /// <param name="characteristicOrderSize">characteristic volume of an order</param>
+        /// <param name="tickSize">price tick size</param>
+        /// <param name="distanceBestOppositeQuoteQuantile">Quantile for distance to best opposite quote</param>
         /// <returns></returns>
-        private static double CalibrateLimitOrderRate(LobTradingData tradingData, double characteristicOrderSize, double tickSize)
+        private static double CalibrateLimitOrderRate(LobTradingData tradingData, 
+            double characteristicOrderSize, 
+            double tickSize, double distanceBestOppositeQuoteQuantile)
         {
-            // First step: Determine the price band near the spread which will be used
-            // for calibration. To this end, we determine the average depth provile (average depth vs. distance to best opposite quote)
-            // and the 60% quantile of outstanding limit orders.  
-            var averageDepthProfile = tradingData.AverageDepthProfile;
-            var distanceBestOppositeQuoteQuantile = averageDepthProfile.Quantile(0.6);
             
             // Price range in ticks within which limit order events will be counted 
             var priceRangeInTicks = distanceBestOppositeQuoteQuantile / tickSize;
 
-            var output = "C:\\Users\\d90789\\Documents\\Oxford MSc in Mathematical Finance\\Thesis\\Lob\\4 Output";
-            averageDepthProfile.Save(Path.Combine(output, $"depth_profile.csv"));
+            // var output = "C:\\Users\\d90789\\Documents\\Oxford MSc in Mathematical Finance\\Thesis\\Lob\\4 Output";
+            // averageDepthProfile.Save(Path.Combine(output, $"depth_profile.csv"));
 
-            // Second step: Count the number of limit sell and buy orders that where placed within price band in 
+            // Count the number of limit sell and buy orders that where placed within price band in 
             // units of the characteristic order size 
             var countOfLimitOrders = tradingData.LimitOrders
-                .Where(p => p.DistanceBestOppositeQuote < distanceBestOppositeQuoteQuantile)
-                .Sum(p => p.Volume) / characteristicOrderSize;
+                .Where(order => order.DistanceBestOppositeQuote < distanceBestOppositeQuoteQuantile)
+                .Sum(order => order.Volume) / characteristicOrderSize;
 
           
-            // Third step: Determine the rate density of limit sell and buy orders 
-            // TODO: Divide by factor 2 to account for sell und buy side 
+            // Determine the rate density of limit sell and buy orders 
             var limitOrderRateDensity = countOfLimitOrders / (tradingData.TradingDuration * priceRangeInTicks);
 
-            return limitOrderRateDensity;
+            // Divide by factor 2 to get rate 
+            // for either sell or buy side
+            return limitOrderRateDensity / 2;
+        }
+
+        /// <summary>
+        /// Calibrate cancelation rate  
+        /// We similarly compute delta as the inverse of the average lifetime of orders canceled inside the same price window W.
+        /// </summary>
+        /// <param name="tradingData"></param>
+        /// <param name="characteristicOrderSize"></param>
+        /// <param name="tickSize"></param>
+        /// <param name="distanceBestOppositeQuoteQuantile">Quantile for distance to best opposite quote</param>
+        /// <returns></returns>
+        private static double CalibrateCancelationRate(LobTradingData tradingData, 
+            double characteristicOrderSize,  
+            double tickSize, 
+            double distanceBestOppositeQuoteQuantile)
+        {
+            // TODO: Think more clearly about cancellation rate 
+            // TODO: Work within a narrow band within the 3%-60% 
+            // TODO: Quantile of the limit order distribution
+            // Cancellations occuring at each price level with a rate 
+            // propotional to the depth at this price 
+
+            var canceledOrderRateDistribution = tradingData.CanceledOrderDistribution.Scale(1, 1.0 / tradingData.TradingDuration);
+            var averageDepthProfile = tradingData.AverageDepthProfile;
+            
+  
+
+            // TODO: The devison could be cumbersome, as rate can become very large   
+            var cancellationRateDistribution = canceledOrderRateDistribution.Divide(averageDepthProfile);
+
+            var output = "C:\\Users\\d90789\\Documents\\Oxford MSc in Mathematical Finance\\Thesis\\Lob\\4 Output";
+            averageDepthProfile.Save(Path.Combine(output, $"depth_profile.csv"));
+            cancellationRateDistribution.Save(Path.Combine(output, $"cancellation_rate_distribution.csv"));
+
+            // TODO: Is this correct here, there is a distibution so hence do the correct mean???
+            // TODO: Improve the calculation of the discrete cumulative distribution function as
+            // TODO: approximation of the continuous case 
+            //var rate3 = cancellationRateDistribution.CummulativeDistributionFunction.Last(p => p.Key <= quantile3).Value;
+            //var rate60 = cancellationRateDistribution.CummulativeDistributionFunction.Last(p => p.Key <= quantile60).Value;
+
+            // var rate = (rate60 - rate3) / (quantile60 - quantile3);
+
+            // return rate;
+
+            return 0;
         }
 
         /// <summary>
@@ -519,9 +575,11 @@ namespace LimitOrderBookSimulation
             Log.Info("Start calibrating model");
 
             var marketOrderRates = new List<double>();
-            var limitOrderRate = new List<double>();
+            var limitOrderRateDensities = new List<double>();
+            var cancelationRateDensities = new List<double>();
             var characteristicSizes = new List<double>();
-            var tickSizes =new List<double>();
+            var tickSizes  =new List<double>();
+            
 
             // Measurement of the parameters mu(market order rate) and sigma(size) is
             // straightforward: to measure mu, for example, we simply compute
@@ -531,26 +589,51 @@ namespace LimitOrderBookSimulation
             foreach (var tradingDay in repository.TradingDays)
             {
                 var tradingData = repository.TradingData[tradingDay];
-
                 var sigma = CalibrateCharacteristicOrderSize(tradingData);
                 var pi = tradingData.PriceTickSize;
                 var mu = CalibrateMarketOrderRate(tradingData, sigma);
-                var alpha = CalibrateLimitOrderRate(tradingData, sigma, pi);
+
+                // Determine the price band near the spread which will be used
+                // for calibration. To this end, we determine the average depth provile (average depth vs. distance to best opposite quote)
+                // and the 60% quantile of outstanding limit orders.  
+                var averageDepthProfile = tradingData.AverageDepthProfile;
+                // Probability(order.distanceBestOpposite <= distanceBestOppositeQuoteQuantile) = p
+                var distanceBestOppositeQuoteQuantile = averageDepthProfile.Quantile(0.6);
+
+                var alpha = CalibrateLimitOrderRate(tradingData, sigma, pi, distanceBestOppositeQuoteQuantile);
+                var delta = CalibrateCancelationRate(tradingData, sigma, pi, distanceBestOppositeQuoteQuantile);
+
+                Log.Info("===================================================================");
+                Log.Info($"Calibration parameters for: {tradingDay: yyyy - MM - dd}");
+                Log.Info("===================================================================");
+                Log.Info($"Market order rate (mu): {mu} [sigma]/[time]");
+                Log.Info($"Limit order rate density (alpha): {alpha} [sigma]/([time]*[tick])");
+                Log.Info($"Cancellation rate density (delta): {delta} [sigma]/([time]*[depth])");
+                Log.Info($"Characteristic size (sigma): {sigma}");
+                Log.Info($"Tick size (pi): {pi}");
                 
                 characteristicSizes.Add(sigma);
                 marketOrderRates.Add(mu);
-                limitOrderRate.Add(alpha);
+                limitOrderRateDensities.Add(alpha);
+                cancelationRateDensities.Add(delta);
                 tickSizes.Add(pi);
             }
 
+            Log.Info("===================================================================");
+            Log.Info("Mean calibration parameters");
+            Log.Info("===================================================================");
+
             CharacteristicOrderSize = characteristicSizes.Mean();
-            LimitOrderRateDensity = limitOrderRate.Mean();
+            LimitOrderRateDensity = limitOrderRateDensities.Mean();
+            CancellationRate = cancelationRateDensities.Mean();
             MarketOrderRate = marketOrderRates.Mean();
             TickSize = tickSizes.Mean();
 
             Log.Info($"Market order rate (mu): {MarketOrderRate} [sigma]/[time]");
+            Log.Info($"Limit order rate density (alpha): {LimitOrderRateDensity} [sigma]/([time]*[tick])");
+            Log.Info($"Cancellation rate density (delta): {CancellationRate} [sigma]/([time]*[depth])");
             Log.Info($"Characteristic size (sigma): {CharacteristicOrderSize}");
-            Log.Info($"Tick size (pi); {TickSize}");
+            Log.Info($"Tick size (pi): {TickSize}");
 
             Log.Info("Finished calibrating model");
 
