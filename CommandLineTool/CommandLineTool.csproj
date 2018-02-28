@@ -86,8 +86,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\LimitOrderBookData\LimitOrderBookRepositories.csproj">
-      <Project>{416F1431-23DA-488A-9E83-21DCC54B902B}</Project>
+    <ProjectReference Include="..\LimitOrderBookRepositories\LimitOrderBookRepositories.csproj">
+      <Project>{416f1431-23da-488a-9e83-21dcc54b902b}</Project>
       <Name>LimitOrderBookRepositories</Name>
     </ProjectReference>
     <ProjectReference Include="..\LimitOrderBookSimulation\LimitOrderBookSimulation.csproj">
