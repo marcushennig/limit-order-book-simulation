@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Configuration;
 using System.Reflection;
 using log4net;
 using LimitOrderBookRepositories;
@@ -544,7 +543,7 @@ namespace LimitOrderBookSimulation
             // TODO: The devison could be cumbersome, as rate can become very large   
             var cancellationRateDistribution = canceledOrderRateDistribution.Divide(averageDepthProfile);
 
-            var output = "C:\\Users\\d90789\\Documents\\Oxford MSc in Mathematical Finance\\Thesis\\Lob\\4 Output";
+            var output = "C:\\Users\\d90789\\Documents\\d-fine\\Trainings\\Oxford MSc in Mathematical Finance\\Thesis\\Lob\\4 Output";
             averageDepthProfile.Save(Path.Combine(output, $"depth_profile.csv"));
             cancellationRateDistribution.Save(Path.Combine(output, $"cancellation_rate_distribution.csv"));
 
