@@ -138,17 +138,7 @@ namespace LimitOrderBookRepositories.Model
         #endregion Constructor 
 
         #region Methods
-
-        /// <summary>
-        /// Check if price is quantile  
-        /// </summary>
-        /// <param name="quantile"></param>
-        /// <returns></returns>
-        public bool IsPriceInQuantile(double quantile)
-        {
-            return InitialState.IsPriceInQuantile(Price, Side, quantile);
-        }
-
+        
         /// <summary>
         /// Events are equal if they have the same order ID
         /// </summary>

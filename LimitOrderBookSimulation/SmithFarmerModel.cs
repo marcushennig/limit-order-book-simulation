@@ -569,7 +569,7 @@ namespace LimitOrderBookSimulation
         {
             if (!repository.TradingData.Any())
             {
-                throw new ArgumentException("Cannot calibrate model without trading data");
+                //throw new ArgumentException("Cannot calibrate model without trading data");
             }
 
             Log.Info("Start calibrating model");

@@ -241,7 +241,17 @@ namespace LimitOrderBookRepositories
         {
             // Get data from App.config
             var workFolder = ConfigurationManager.AppSettings["WorkFolder"];
+            if (!Directory.Exists(workFolder))
+            {
+                Log.Error($"The folder '{workFolder}' does not exists, please correct in App.config");
+                return;
+            }
             var lobDataPath = ConfigurationManager.AppSettings["RespositoryFolder"];
+            if (!Directory.Exists(lobDataPath))
+            {
+                Log.Error($"The folder '{lobDataPath}' does not exists, please correct in App.config");
+                return;
+            }
             var repositoryFolder = !Path.IsPathRooted(lobDataPath) ? Path.Combine(workFolder, lobDataPath) : lobDataPath;
 
             TradingData.Clear();
