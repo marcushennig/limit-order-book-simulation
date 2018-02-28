@@ -2,17 +2,8 @@
 /LimitOrderBookUtilities/obj
 /LimitOrderBookSimulation/bin
 /LimitOrderBookSimulation/obj
-/LimitOrderBookGUI/obj
-/LimitOrderBookGUI/bin
-/LimitOrderBookData/bin
-/LimitOrderBookData/obj
-/GUI/obj
-/GUI/bin
 /CommandLineTool/bin
 /CommandLineTool/obj
 /.vs/LimitOrderBookSimulator/v15
-/LimitOrderBookRepositories/bin/Debug
-/LimitOrderBookRepositories/bin/x64/Debug
-/LimitOrderBookRepositories/bin/x64/Release
 /LimitOrderBookRepositories/bin
 /LimitOrderBookRepositories/obj
