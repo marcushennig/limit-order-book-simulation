@@ -6,6 +6,7 @@ using System.Linq;
 using log4net.Config;
 using LimitOrderBookRepositories;
 using LimitOrderBookSimulation;
+using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookUtilities;
 
 [assembly: XmlConfigurator(Watch = true)]

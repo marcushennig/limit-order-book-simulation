@@ -11,17 +11,12 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         long Ask { get; }
 
         long Bid { get; }
-
-        Dictionary<LimitOrderBookEvent, long> Counter { get; }
-
-        /// <summary>
-        /// Evolution of the limit order book
-        /// </summary>
-        SortedList<double, Price> PriceTimeSeries { get; }
-
+        
         #endregion Properties
 
         #region Methods
+
+        #region Events
 
         #region Limit order
 
@@ -47,32 +42,49 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #endregion Cancel order
 
+        #endregion Events
+        
+        #region Time evolution
+
+        Dictionary<LimitOrderBookEvent, long> Counter { get; }
+
+        /// <summary>
+        /// Time-dependent pricing information 
+        /// </summary>
+        SortedList<double, Price> PriceTimeSeries { get; }
+
+        #endregion Time evolution
+
+        #region Statistics
+
         #region Number of orders
 
         long NumberOfBuyOrders(long minPrice = 0, long maxPrice = long.MaxValue);
 
         long NumberOfSellOrders(long minPrice = 0, long maxPrice = long.MaxValue);
 
-        long NumberOfLimitOrders(long priceMin, long priceMax);
+        long NumberOfLimitOrders(long minPrice = 0, long maxPrice = long.MaxValue);
 
         #endregion Number of orders
 
         #region Inverse CDF
 
-        long InverseCDF(long priceMin, long priceMax, long q);
+        long InverseCDF(long minPrice, long maxPrice, long q);
 
         long InverseCDFSellSide(long minPrice, long maxPrice, long q);
 
         long InverseCDFBuySide(long minPrice, long maxPrice, long q);
 
         #endregion Inverse CDF
-
-        #region Iinitialize depth profile
+        
+        #endregion
+        
+        #region Iinitialize
 
         void InitializeDepthProfileBuySide(IDictionary<long, long> depthProdile);
         void InitializeDepthProfileSellSide(IDictionary<long, long> depthProdile);
         
-        #endregion Iinitialize depth profile
+        #endregion Iinitialize
 
         void SaveDepthProfile(string path, long maxReleativeTick = 0);
 

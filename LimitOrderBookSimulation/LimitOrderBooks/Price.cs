@@ -7,8 +7,8 @@
     {
         #region Properties
 
-        public long Bid { set; get; }
-        public long Ask { set; get; }
+        public long Bid { get; }
+        public long Ask { get; }
         public long Spread => Ask - Bid;
         public double Mid => 0.5 * (Bid + Ask);
 

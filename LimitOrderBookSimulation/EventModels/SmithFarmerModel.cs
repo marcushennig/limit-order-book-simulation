@@ -12,7 +12,7 @@ using LimitOrderBookUtilities;
 using MathNet.Numerics.Statistics;
 using Newtonsoft.Json;
 
-namespace LimitOrderBookSimulation
+namespace LimitOrderBookSimulation.EventModels
 {
     /// <summary>
     /// TODO: Implement initialDepthProfile, should be property of the model 

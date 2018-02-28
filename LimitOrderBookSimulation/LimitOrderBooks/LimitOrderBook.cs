@@ -14,8 +14,8 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <summary>
         /// Use map for asks price, stores price/quantity
         /// </summary>
-        public SortedDictionary<long, long> Asks { set; get; }
-        public SortedDictionary<long, long> Bids { set; get; }
+        public SortedDictionary<long, long> Asks { get; }
+        public SortedDictionary<long, long> Bids { get; }
 
         /// <summary>
         /// Check if there is anything in the order book
@@ -39,6 +39,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         public Dictionary<LimitOrderBookEvent, long> Counter { get; }
 
+        /// <inheritdoc />
         /// <summary>
         /// Evolution of the limit order book
         /// </summary>

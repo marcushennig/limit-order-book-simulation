@@ -77,10 +77,9 @@
     <Compile Include="LimitOrderBooks\Enums.cs" />
     <Compile Include="LimitOrderBooks\ILimitOrderBook.cs" />
     <Compile Include="LimitOrderBooks\LimitOrderBook.cs" />
-    <Compile Include="LimitOrderBooks\LimitOrderBookState.cs" />
     <Compile Include="LimitOrderBooks\Price.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SmithFarmerModel.cs" />
+    <Compile Include="EventModels\SmithFarmerModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
