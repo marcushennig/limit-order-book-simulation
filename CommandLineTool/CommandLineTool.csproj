@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CommandLineTool</RootNamespace>
     <AssemblyName>CommandLineTool</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -91,7 +91,7 @@
       <Name>LimitOrderBookRepositories</Name>
     </ProjectReference>
     <ProjectReference Include="..\LimitOrderBookSimulation\LimitOrderBookSimulation.csproj">
-      <Project>{161998C5-6C59-4E89-9C22-18B9AD401D65}</Project>
+      <Project>{161998c5-6c59-4e89-9c22-18b9ad401d65}</Project>
       <Name>LimitOrderBookSimulation</Name>
     </ProjectReference>
     <ProjectReference Include="..\LimitOrderBookUtilities\LimitOrderBookUtilities.csproj">

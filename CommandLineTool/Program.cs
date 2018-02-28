@@ -16,48 +16,6 @@ namespace CommandLineTool
     static class Program
     {
         /// <summary>
-        /// Test random events 
-        /// </summary>
-        static void TestRandomEvent()
-        {
-            var random = new RandomUtilities(34);
-            var events = new List<Action>()
-            {
-                new Action(() => { }),
-                new Action(() => { }),
-                new Action(() => { }),
-                new Action(() => { }),
-            };
-            var probability = new Dictionary<Action,double>
-            {
-                { events[0], 0.6},
-                { events[1], 0.2},
-                { events[2], 0.15},
-                { events[3], 0.05},
-            };
-            var counter = new Dictionary<Action, double>
-            {
-                {events[0], 0},
-                {events[1], 0},
-                {events[2], 0},
-                {events[3], 0},
-            };
-            var n = 100000;
-            for (var i = 0; i < n; i++)
-            {
-                var e = random.PickEvent(probability);
-                counter[e]++;
-            }
-            var total = counter.Values.Sum();
-            for (var i = 0; i < events.Count; i++)
-            {
-                var prob = (double)counter[events[i]]/total;
-                Console.WriteLine($"P(event_{i})={prob}");
-            }
-
-        }
-
-        /// <summary>
         /// Test loading LOB data
         /// </summary>
         static void LoadLobData()
