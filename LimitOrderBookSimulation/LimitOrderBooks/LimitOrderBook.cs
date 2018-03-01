@@ -159,7 +159,14 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         private void SaveCurrentPrice()
         {
-            PriceTimeSeries.Add(Time, new Price(bid: Bid, ask: Ask));
+            if (!PriceTimeSeries.ContainsKey(Time))
+            {
+                PriceTimeSeries.Add(Time, new Price(bid: Bid, ask: Ask));
+            }
+            else
+            {
+                PriceTimeSeries[Time] = new Price(bid: Bid, ask: Ask);
+            }
         }
 
         #endregion Private

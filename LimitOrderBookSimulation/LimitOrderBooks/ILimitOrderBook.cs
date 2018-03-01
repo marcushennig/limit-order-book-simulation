@@ -20,9 +20,9 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Limit order
 
-        void SubmitLimitBuyOrder(long price, long amount =1);
+        void SubmitLimitBuyOrder(long price, long amount = 1);
 
-        void SubmitLimitSellOrder(long price, long amount =1);
+        void SubmitLimitSellOrder(long price, long amount = 1);
 
         #endregion Limit order
 
@@ -36,9 +36,9 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         
         #region Cancel order
 
-        void CancelLimitBuyOrder(long price, long amount =1);
+        void CancelLimitBuyOrder(long price, long amount = 1);
 
-        void CancelLimitSellOrder(long price, long amount =1);
+        void CancelLimitSellOrder(long price, long amount = 1);
 
         #endregion Cancel order
 
