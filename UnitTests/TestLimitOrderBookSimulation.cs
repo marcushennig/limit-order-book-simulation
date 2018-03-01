@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookSimulation.LimitOrderBooks;
+using LimitOrderBookUtilities;
 using MathNet.Numerics;
 using NUnit.Framework;
 
@@ -98,10 +99,10 @@ namespace UnitTests
             // Choose parameter such that certain end result is achieved 
             // Check characteristic scales 
             const double asymtoticDepth = 0.5 * (BuyMaxDepth + SellMaxDepth);
-            const double muC = 0.2;
+            const double muC = 0.01;
             const double muL = asymtoticDepth * muC;
-            const double muM = Spread * muL;
-            const double T = 100;
+            const double muM = Spread * muL * 2;
+            const double T = 1000;
             
             var model = new SmithFarmerModel
             {
@@ -120,8 +121,8 @@ namespace UnitTests
             // Save simulation result for further inspection in e.g. Matlab
             model.SavePriceProcess(Path.Combine(outputFolder, "price_process.csv"));
             model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
-            //SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
-            
+            SharedUtilities.SaveAsJson(model.LimitOrderBook.Counter, Path.Combine(outputFolder, "counter.json"));
+           
             // Do some plausibility checks
             var lob = model.LimitOrderBook;
             
