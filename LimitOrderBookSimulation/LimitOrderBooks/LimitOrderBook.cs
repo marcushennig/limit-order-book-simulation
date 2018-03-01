@@ -331,7 +331,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// Initialize depth profile
         /// </summary>
         /// <param name="depthProdile"></param>
-        /// <param name="side"></param>
+        /// <param name="buyOrSell"></param>
         private void InitilizeDepthProfile(IDictionary<long, long> depthProdile, MarketSide buyOrSell)
         {
             var marketSide = buyOrSell == MarketSide.Buy ? Bids : Asks;
