@@ -19,11 +19,14 @@ namespace UnitTests
         private SortedDictionary<long, long> BuySide { set; get; }
 
         private const int TickSize = 10;
-        private const long Spread = TickSize * 6;
+        private const long Spread = TickSize * 4;
         private const long BuyMinPrice = 10000;
         private const long BuyMaxPrice = BuyMinPrice + TickSize * 100;
         private const long SellMinPrice = BuyMaxPrice + Spread;
         private const long SellMaxPrice = SellMinPrice + TickSize * 100;
+        private const long BuyMaxDepth = 100;
+        private const long SellMaxDepth = 100;
+
         private Random Random { set; get; }
 
         #endregion
@@ -35,15 +38,14 @@ namespace UnitTests
             SellSide = new SortedDictionary<long, long>();
             BuySide = new SortedDictionary<long, long>();
 
-
-            for (var p = BuyMinPrice; p <= BuyMaxPrice; p += TickSize)
+            for (var price = BuyMinPrice; price <= BuyMaxPrice; price += TickSize)
             {
-                BuySide.Add(p, GetDepth(p:p, pmin: BuyMaxPrice, pmax: BuyMinPrice, scale: 100));
+                BuySide.Add(price, GetDepth(p: price, pmin: BuyMaxPrice, pmax: BuyMinPrice, scale: BuyMaxDepth));
             }
 
-            for (var p = SellMinPrice; p <= SellMaxPrice; p += TickSize)
+            for (var price = SellMinPrice; price <= SellMaxPrice; price += TickSize)
             {
-                SellSide.Add(p, GetDepth(p:p, pmin:SellMinPrice, pmax:SellMaxPrice, scale:400));
+                SellSide.Add(price, GetDepth(p: price, pmin: SellMinPrice, pmax: SellMaxPrice, scale: SellMaxDepth));
             }
         }
         
@@ -94,12 +96,19 @@ namespace UnitTests
                 "\\Thesis\\Source\\4 Output\\";
             
             var limitOrderBook = GenerateLimitOrderBook();
+            // Choose parameter such that certain end result is achieved 
+            // Check characteristic scales 
+            const double asymtoticDepth = 0.5 * (BuyMaxDepth + SellMaxDepth);
+            const double muC = 0.01;
+            const double muL = asymtoticDepth * muC;
+            const double muM = Spread * 2 * muL;
+            const double T = 10000;
+            
             var model = new SmithFarmerModel
             {
-                CancellationRate = 1,
-                MarketOrderRate = 10,
-                LimitOrderRateDensity = 5,
-                
+                CancellationRate = muC,
+                MarketOrderRate = muM,
+                LimitOrderRateDensity = muL,
                 CharacteristicOrderSize = 1,
                 TickSize = TickSize,
                 TickIntervalSize = TickSize * 10,
@@ -107,8 +116,14 @@ namespace UnitTests
             };
             model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));
             
-            model.SimulateOrderFlow(duration:10);
+            model.SimulateOrderFlow(duration: T);
             
+            // Save simulation result for further inspection in e.g. Matlab
+            model.SavePriceProcess(Path.Combine(outputFolder, "price_process.csv"));
+            model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
+            //SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
+            
+            // Do some plausibility checks
             var lob = model.LimitOrderBook;
             
             Assert.True(lob.Counter[LimitOrderBookEvent.SubmitMarketSellOrder] > 0);
@@ -117,16 +132,18 @@ namespace UnitTests
             Assert.True(lob.Counter[LimitOrderBookEvent.SubmitLimitBuyOrder] > 0);
             Assert.True(lob.Counter[LimitOrderBookEvent.CancelLimitSellOrder] > 0);
             Assert.True(lob.Counter[LimitOrderBookEvent.CancelLimitBuyOrder] > 0);
+            
+            // Make sure that all depths are positive 
+            Assert.True(lob.Asks.Values.All(p => p > 0), "Depth cannot be negative on sell side");
+            Assert.True(lob.Bids.Values.All(p => p > 0), "Depth cannot be negative on buy side");
 
-            Assert.True(lob.Ask > lob.Bid);
-            Assert.True(lob.PriceTimeSeries.Any());
+            Assert.True(lob.Ask > lob.Bid, "Ask must be greater than bid price");
+            
+            Assert.True(lob.PriceTimeSeries.Any(), "No events where triggered");
+            
             Assert.True(lob.PriceTimeSeries
                 .Select(p => p.Value)
-                .All(p => p.Ask > p.Bid));
-            
-            model.SavePriceProcess(Path.Combine(outputFolder, "price_process.csv"));
-            model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
-            SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
+                .All(p => p.Ask > p.Bid), "Ask must be greater than bid price");          
         }
     }
 }

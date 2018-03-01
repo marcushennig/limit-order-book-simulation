@@ -295,6 +295,36 @@ namespace UnitTests
             }
             Assert.True(lob.Asks.ContainsKey(price) == false);
         }
+        
+        
+        [Test]
+        public void TestSubmitMarketBuyOrderRobustness()
+        {
+            var lob = GenerateLimitOrderBook();
+            
+            var ask = lob.Ask;
+            var depth = lob.Asks[ask];
 
+            for (var i = 0; i < depth + 10; i++)
+            {
+                lob.SubmitMarketBuyOrder();    
+            }
+            Assert.True(lob.Asks.ContainsKey(ask) == false);
+        }
+        
+        [Test]
+        public void TestSubmitMarketSellOrderRobustness()
+        {
+            var lob = GenerateLimitOrderBook();
+            
+            var bid = lob.Bid;
+            var depth = lob.Bids[bid];
+
+            for (var i = 0; i < depth + 10; i++)
+            {
+                lob.SubmitMarketSellOrder();    
+            }
+            Assert.True(lob.Bids.ContainsKey(bid) == false);
+        }
     }
 }

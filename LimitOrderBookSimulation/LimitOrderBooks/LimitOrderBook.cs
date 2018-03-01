@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using log4net;
-using LimitOrderBookSimulation.EventModels;
-using Newtonsoft.Json;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
 {
@@ -87,15 +83,19 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         /// <param name="price"></param>
         /// <param name="amount"></param>
-        /// <param name="side"></param>
-        private void Add(long price, long amount, MarketSide side)
+        /// <param name="buyOrAsk"></param>
+        private void Add(long price, long amount, MarketSide buyOrAsk)
         {
-            var table = side == MarketSide.Buy ? Bids : Asks;
+            var marketSide = buyOrAsk == MarketSide.Buy ? Bids : Asks;
 
-            if (!table.ContainsKey(price))
-                table[price] = amount;
+            if (!marketSide.ContainsKey(price))
+            {
+                marketSide[price] = amount;
+            }
             else
-                table[price] += amount;
+            {
+                marketSide[price] += amount;
+            }
 
             SaveCurrentPrice();
         }
@@ -123,20 +123,20 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         /// <param name="price"></param>
         /// <param name="amount"></param>
-        /// <param name="side"></param>
-        private void Remove(long price, long amount, MarketSide side)
+        /// <param name="buyOrAsk"></param>
+        private void Remove(long price, long amount, MarketSide buyOrAsk)
         {
-            var table = side==MarketSide.Buy ? Bids : Asks;
+            var marketSide = buyOrAsk == MarketSide.Buy ? Bids : Asks;
 
-            if (table.ContainsKey(price))
+            if (!marketSide.ContainsKey(price)) return;
+            
+            marketSide[price] -= amount;
+            // Make sure that 
+            if (marketSide[price] <= 0)
             {
-                table[price] -= amount;
-
-                if (table[price] == 0)
-                    table.Remove(price);
-
-                SaveCurrentPrice();
+                marketSide.Remove(price);
             }
+            SaveCurrentPrice();
         }
 
         /// <summary>
@@ -228,11 +228,11 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Number of orders
 
-        private long NumberOfOrders(long minPrice, long maxPrice, MarketSide side)
+        private long NumberOfOrders(long minPrice, long maxPrice, MarketSide buyOrSell)
         {
-            var table = side == MarketSide.Buy ? Bids : Asks;
-            return table.Where(p => p.Key >= minPrice && p.Key <= maxPrice)
-                      .Sum(p => p.Value);
+            var marketSide = buyOrSell == MarketSide.Buy ? Bids : Asks;
+            return marketSide.Where(p => p.Key >= minPrice && p.Key <= maxPrice)
+                             .Sum(p => p.Value);
         }
 
         /// <summary>
@@ -332,14 +332,14 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         /// <param name="depthProdile"></param>
         /// <param name="side"></param>
-        private void InitilizeDepthProfile(IDictionary<long, long> depthProdile, MarketSide side)
+        private void InitilizeDepthProfile(IDictionary<long, long> depthProdile, MarketSide buyOrSell)
         {
-            var table = side == MarketSide.Buy ? Bids : Asks;
+            var marketSide = buyOrSell == MarketSide.Buy ? Bids : Asks;
 
-            table.Clear();
+            marketSide.Clear();
             foreach (var entry in depthProdile)
             {
-                table.Add(entry.Key, entry.Value);
+                marketSide.Add(entry.Key, entry.Value);
             }
         }
 
