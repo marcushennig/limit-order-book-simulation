@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookSimulation.LimitOrderBooks;
+using MathNet.Numerics;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -33,17 +35,32 @@ namespace UnitTests
             BuySide = new SortedDictionary<long, long>();
 
 
-            for (var p = BuyMinPrice; p < BuyMaxPrice; p += TickSize)
+            for (var p = BuyMinPrice; p <= BuyMaxPrice; p += TickSize)
             {
-                BuySide.Add(p, Random.Next(1, 1000));
+                BuySide.Add(p, GetDepth(p:p, pmin: BuyMaxPrice, pmax: BuyMinPrice, scale: 100));
             }
 
-            for (var p = SellMinPrice; p < SellMaxPrice; p += TickSize)
+            for (var p = SellMinPrice; p <= SellMaxPrice; p += TickSize)
             {
-                SellSide.Add(p, Random.Next(1, 1000));
+                SellSide.Add(p, GetDepth(p:p, pmin:SellMinPrice, pmax:SellMaxPrice, scale:400));
             }
         }
         
+        /**
+         * Depth profile on [pmin, pmax] that more ore less resemble the reality
+         */
+        private static long GetDepth(long p, long pmin, long pmax, long scale)
+        {
+            var x01 = (p - pmin) / (double)(pmax - pmin);
+            
+            const double lambda = 5e-3;
+            const double fmax = 0.07512;
+            
+            var f = Math.Exp(x01 * Math.Log(lambda) - lambda) / SpecialFunctions.Gamma(x01);
+            
+            return (long) (scale * f / fmax);
+        }
+
         /**
          * Generate a pre-initialized limit order book
          */
@@ -66,15 +83,20 @@ namespace UnitTests
             
             return lob;
         }
-        
+            
         [Test]
         public void TestSmithFarmerModel()
         {
+            const string outputFolder =
+                "C:\\Users\\d90789\\Documents" +
+                "\\d-fine\\Trainings\\Oxford MSc in Mathematical Finance" +
+                "\\Thesis\\Source\\4 Output\\";
+            
             var limitOrderBook = GenerateLimitOrderBook();
             var model = new SmithFarmerModel
             {
-                CancellationRate = 10,
-                MarketOrderRate = 3,
+                CancellationRate = 1,
+                MarketOrderRate = 10,
                 LimitOrderRateDensity = 5,
                 
                 CharacteristicOrderSize = 1,
@@ -82,8 +104,12 @@ namespace UnitTests
                 TickIntervalSize = TickSize * 20,
                 LimitOrderBook = limitOrderBook
             };
+            model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));
+            
             model.SimulateOrderFlow(duration:100);
-            model.SavePriceProcess("C:\\Users\\d90789\\Documents\\d-fine\\Trainings\\Oxford MSc in Mathematical Finance\\Thesis\\Source\\4 Output\\test.csv");
+            
+            model.SavePriceProcess(Path.Combine(outputFolder, "test.csv"));
+            model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
         }
     }
 }

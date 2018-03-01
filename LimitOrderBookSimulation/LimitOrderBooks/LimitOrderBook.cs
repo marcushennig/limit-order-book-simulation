@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
@@ -357,10 +358,27 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         }
         
         #endregion Initialize depth profile
-
-        public void SaveDepthProfile(string path, long maxReleativeTick = 0)
+     
+       
+        /// <summary>
+        /// Save bid as well as ask side into a CSV file
+        /// </summary>
+        /// <param name="fileName">Path of CSV file</param>
+        public void SaveDepthProfile(string fileName)
         {
-            // TODO
+            using (var file = new StreamWriter(fileName))
+            {
+                foreach (var side in new List<SortedDictionary<long,long>>{Bids, Asks})
+                {
+                    foreach (var entry in side)
+                    {
+                        var price = entry.Key;
+                        var depth = entry.Value;
+                        
+                        file.WriteLine($"{price}\t{depth}");
+                    }
+                }
+            }
         }
         
         #endregion Public

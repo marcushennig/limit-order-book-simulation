@@ -86,7 +86,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         
         #endregion Iinitialize
 
-        void SaveDepthProfile(string path, long maxReleativeTick = 0);
+        void SaveDepthProfile(string path);
 
         #endregion Methods
     }
