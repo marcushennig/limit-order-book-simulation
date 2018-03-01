@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookSimulation.LimitOrderBooks;
-using LimitOrderBookUtilities;
 using MathNet.Numerics;
 using NUnit.Framework;
 
@@ -99,10 +98,10 @@ namespace UnitTests
             // Choose parameter such that certain end result is achieved 
             // Check characteristic scales 
             const double asymtoticDepth = 0.5 * (BuyMaxDepth + SellMaxDepth);
-            const double muC = 0.01;
+            const double muC = 0.2;
             const double muL = asymtoticDepth * muC;
-            const double muM = Spread * 2 * muL;
-            const double T = 10000;
+            const double muM = Spread * muL;
+            const double T = 100;
             
             var model = new SmithFarmerModel
             {
