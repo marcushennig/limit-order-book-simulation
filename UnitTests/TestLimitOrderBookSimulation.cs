@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
+using System.Linq;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookSimulation.LimitOrderBooks;
+using LimitOrderBookUtilities;
 using MathNet.Numerics;
 using NUnit.Framework;
 
@@ -101,15 +102,31 @@ namespace UnitTests
                 
                 CharacteristicOrderSize = 1,
                 TickSize = TickSize,
-                TickIntervalSize = TickSize * 20,
+                TickIntervalSize = TickSize * 10,
                 LimitOrderBook = limitOrderBook
             };
             model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));
             
-            model.SimulateOrderFlow(duration:100);
+            model.SimulateOrderFlow(duration:10);
             
-            model.SavePriceProcess(Path.Combine(outputFolder, "test.csv"));
+            var lob = model.LimitOrderBook;
+            
+            Assert.True(lob.Counter[LimitOrderBookEvent.SubmitMarketSellOrder] > 0);
+            Assert.True(lob.Counter[LimitOrderBookEvent.SubmitMarketBuyOrder] > 0);
+            Assert.True(lob.Counter[LimitOrderBookEvent.SubmitLimitSellOrder] > 0);
+            Assert.True(lob.Counter[LimitOrderBookEvent.SubmitLimitBuyOrder] > 0);
+            Assert.True(lob.Counter[LimitOrderBookEvent.CancelLimitSellOrder] > 0);
+            Assert.True(lob.Counter[LimitOrderBookEvent.CancelLimitBuyOrder] > 0);
+
+            Assert.True(lob.Ask > lob.Bid);
+            Assert.True(lob.PriceTimeSeries.Any());
+            Assert.True(lob.PriceTimeSeries
+                .Select(p => p.Value)
+                .All(p => p.Ask > p.Bid));
+            
+            model.SavePriceProcess(Path.Combine(outputFolder, "price_process.csv"));
             model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
+            SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
         }
     }
 }

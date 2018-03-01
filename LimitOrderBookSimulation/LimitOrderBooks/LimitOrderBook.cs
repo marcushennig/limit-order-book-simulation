@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using log4net;
+using LimitOrderBookSimulation.EventModels;
+using Newtonsoft.Json;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
 {
@@ -380,7 +384,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                 }
             }
         }
-        
+      
         #endregion Public
         
         #endregion Methods

@@ -62,7 +62,7 @@ namespace CommandLineTool
             var model = new SmithFarmerModel(lobData);
             
             // Save the calibration parameters
-            model.Save(Path.Combine(workFolder, "calibration.json"));
+            SharedUtilities.SaveAsJson(model, Path.Combine(workFolder, "calibration.json"));
             
             #region Statistics           
             
@@ -86,7 +86,7 @@ namespace CommandLineTool
             #endregion
 
             model.SimulateOrderFlow(60 *10);
-            model.Save(Path.Combine(workFolder, "simulation.json"));
+            SharedUtilities.SaveAsJson(model, Path.Combine(workFolder, "simulation.json"));
             model.SavePriceProcess(Path.Combine(workFolder, "price.csv"));
         }
 

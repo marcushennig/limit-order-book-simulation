@@ -33,23 +33,24 @@ namespace LimitOrderBookSimulation.EventModels
     /// </summary>
     public class SmithFarmerModel : IPriceProcess
     {
-        #region Logging
-
-        protected static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        #endregion Logging
+        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         #region Properties
 
         private RandomUtilities Random { set; get; }
-
+        
+        /// <summary>
+        /// Work directory for saving log, intermediate states....
+        /// </summary>
+        public string WorkDirectory { set; get; }
+        
+        #region Model parameter
+        
         /// <summary>
         /// Underlying limit order book
         /// </summary>
         public LimitOrderBook LimitOrderBook { set; get; }
-
-        #region Model parameter
-
+        
         /// <summary>
         /// Limit order rate in units of shares / (ticks * time)
         /// </summary>
@@ -75,20 +76,11 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public double CharacteristicOrderSize { set; get; }
         
-        /// <summary>
-        /// All prices are measured in units of ticks 
-        /// </summary>
-        public int MaxTick { set; get; }
-
+        
         public int TickIntervalSize { set; get; }
         
-        /// <summary>
-        /// Work directory for saving log, intermediate states....
-        /// </summary>
-        public string WorkDirectory { set; get; }
-
         #endregion Model parameter
-
+        
         #region Characteric scales
 
         public double CharacteristicNumberOfShares => MarketOrderRate / (2 * CancellationRate);
@@ -96,8 +88,8 @@ namespace LimitOrderBookSimulation.EventModels
         public double CharacteristicTime => 1 / CancellationRate;
         public double NondimensionalTickSize => 2 * LimitOrderRateDensity * TickSize / MarketOrderRate;
         public double AsymptoticDepth => LimitOrderRateDensity / CancellationRate;
-        public double BidAskSpread => MarketOrderRate/(2*LimitOrderRateDensity);
-        public double Resolution => 2*LimitOrderRateDensity*TickSize/MarketOrderRate;
+        public double BidAskSpread => MarketOrderRate / (2 * LimitOrderRateDensity);
+        public double Resolution => 2 * LimitOrderRateDensity * TickSize/MarketOrderRate;
         
         /// <summary>
         /// NondimensionalOrderSize: epsilon
@@ -719,46 +711,7 @@ namespace LimitOrderBookSimulation.EventModels
         #endregion Simulation
 
         #region Utilities
-        
-        /// <summary>
-        /// Save model in json 
-        /// </summary>
-        /// <param name="path"></param>
-        public void Save(string path)
-        {
-            try
-            {
-                var jsonString = JsonConvert.SerializeObject(this, Formatting.Indented);
-                File.WriteAllText(path, jsonString);
-            }
-            catch (Exception exception)
-            {
-                Log.Error("Could not save model calibration parameters");
-                Log.Error($"Exception: {exception}");
-            }
-
-        }
-
-        /// <summary>
-        /// Calibrate model on LOB data and return result  
-        /// </summary>
-        /// <param name="path">path to calibration fil </param>
-        public static SmithFarmerModel Load(string path)
-        {
-            try
-            {
-                var jsonString = File.ReadAllText(path);
-                return JsonConvert.DeserializeObject<SmithFarmerModel>(jsonString);
-            }
-            catch (Exception exception)
-            {
-                Log.Error("Could load model");
-                Log.Error($"Exception: {exception}");
-
-                return new SmithFarmerModel();
-            }
-        }
-
+      
         /// <summary>
         /// Save the price process to a file 
         /// </summary>
@@ -766,9 +719,7 @@ namespace LimitOrderBookSimulation.EventModels
         public void SavePriceProcess(string fileName)
         {
             using (var file = new StreamWriter(fileName))
-            //using (var progressBar = new ProgressBar(LimitOrderBook.PriceTimeSeries.Count, "Write price process to file"))
             {
-                //var done = 0;
                 foreach (var entry in LimitOrderBook.PriceTimeSeries)
                 {
                     var time = entry.Key;
@@ -776,9 +727,7 @@ namespace LimitOrderBookSimulation.EventModels
                     
                     file.WriteLine($"{time}\t{price.Bid * TickSize}\t{price.Ask * TickSize}");
 
-                    //progressBar.Tick(++done);
                 }
-                //progressBar.Finished();
             }
         }
 
