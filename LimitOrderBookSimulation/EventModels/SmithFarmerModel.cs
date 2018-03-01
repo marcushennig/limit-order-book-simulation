@@ -49,16 +49,6 @@ namespace LimitOrderBookSimulation.EventModels
         public LimitOrderBook LimitOrderBook { set; get; }
 
         #region Model parameter
-        
-        /// <summary>
-        /// Inital depth profile on bid side
-        /// </summary>
-        public Dictionary<long, long> InitalBids { set; get; }
-
-        /// <summary>
-        /// Initial depth profile on ask side
-        /// </summary>
-        public Dictionary<long, long> InitalAsks { set; get; }
 
         /// <summary>
         /// Limit order rate in units of shares / (ticks * time)
@@ -78,7 +68,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// <summary>
         /// Size of one tick in unites of price
         /// </summary>
-        public double TickSize { private set; get; }
+        public double TickSize { set; get; }
         
         /// <summary>
         /// Characteristic order size 
@@ -190,11 +180,15 @@ namespace LimitOrderBookSimulation.EventModels
             // Initialize sell and buy side of the limit order book
             var state = lob.States.First();
          
-            InitalBids = state.Bids.ToDictionary(p => (long)(p.Key / TickSize), 
+            var initalBids = state.Bids.ToDictionary(p => (long)(p.Key / TickSize), 
                                                  p => (long)Math.Ceiling(1*(p.Value) / CharacteristicOrderSize));
 
-            InitalAsks = state.Asks.ToDictionary(p => (long) (p.Key/TickSize),
+            var initalAsks = state.Asks.ToDictionary(p => (long) (p.Key/TickSize),
                                                  p => (long) Math.Ceiling(1*(p.Value) / CharacteristicOrderSize));
+            
+            LimitOrderBook.InitializeDepthProfileBuySide(initalBids);
+            LimitOrderBook.InitializeDepthProfileSellSide(initalAsks);
+            LimitOrderBook.Time = 0;
             
             // Determine the 'mu'-parameter in Famer & Smith's model 
             // Mu characterizes the average market order arrival rate and it is just the number of shares of 
@@ -643,44 +637,25 @@ namespace LimitOrderBookSimulation.EventModels
         #region Simulation
 
         /// <summary>
-        /// Run order flow simulation and store result in given file
+        // Pseudo-code:
+        // [1] Compute the best bid B(t) and best offer A(t).
+        // [2] Compute the number of shares n_B on the bid side of the book from level A(t) - 1 to level A(t) - L.
+        // [3] Compute the number of shares n_A on the offered side of the book from level B(t) + 1 to level B(t) + L.
+        // [4] Draw a new event according to the relative probabilities {ℙMB, ℙMS, ℙLB, ℙLS, ℙCS, ℙCB} ~ {μ/2, μ/2, L * α, L * α, δ * nA, δ * nB}
+        //      - If the selected event is a limit order, draw the relative price level from {1, 2,…, L}.
+        //      - If the selected event is a cancelation, select randomly which order within the band to cancel.
+        // [5] Update the order book and increment t.
         /// </summary>
         /// <param name="duration">In units of seconds</param>
         public void SimulateOrderFlow(double duration)
         {
-            // Pseudo-code:
-            // [1] Compute the best bid B(t) and best offer A(t).
-            // [2] Compute the number of shares n_B on the bid side of the book from level A(t) - 1 to level A(t) - L.
-            // [3] Compute the number of shares n_A on the offered side of the book from level B(t) + 1 to level B(t) + L.
-            // [4] Draw a new event according to the relative probabilities {ℙMB, ℙMS, ℙLB, ℙLS, ℙCS, ℙCB} ~ {μ/2, μ/2, L * α, L * α, δ * nA, δ * nB}
-            //      - If the selected event is a limit order, draw the relative price level from {1, 2,…, L}.
-            //      - If the selected event is a cancelation, select randomly which order within the band to cancel.
-            // [5] Update the order book and increment t.
-
-            var startTradingTime = 0.0;
-            var endTradingTime = startTradingTime + duration;
-
-            // Scale prices to ticks and volumes to units of characteristic size
-
-            LimitOrderBook.Time = startTradingTime;
-            LimitOrderBook.InitializeDepthProfileBuySide(InitalBids);
-            LimitOrderBook.InitializeDepthProfileSellSide(InitalAsks);
-
-            // How to determine the interval tick size?? 
-            // TODO: Choose it conservatively so as to ensure minimal edge effects.
-            TickIntervalSize = 1000;
+            var t0 = LimitOrderBook.Time;
+            var tEnd = t0 + duration;
 
             // Rates are mesured per price 
-            using (var progress = new ProgressBar(duration, "Calculate limit order book process"))
-            {
+            //using (var progress = new ProgressBar(duration, "Calculate limit order book process"))
+            //{
                 var limitOrderRate = LimitOrderRateDensity * TickIntervalSize;
-                //var depthProfileFile = Path.Combine(WorkDirectory, "depth_profile.csv");
-
-                // Save intial state of depth profile
-                //LimitOrderBook.SaveDepthProfile(depthProfileFile);
-
-                var dt = endTradingTime / 20;
-                var T = startTradingTime + dt;
 
                 // Initialize event probabilities
                 var probability = new Dictionary<Action, double>
@@ -693,12 +668,8 @@ namespace LimitOrderBookSimulation.EventModels
                     {CancelLimitBuyOrder, 0},
                 };
                
-                var t = startTradingTime;
-
-                // Clean up limit order book
-                LimitOrderBook.Time = t;
-     
-                while (t <= endTradingTime)
+                var t = t0;
+                while (t <= tEnd)
                 {
                     var ask = LimitOrderBook.Ask;
                     var bid = LimitOrderBook.Bid;
@@ -709,12 +680,12 @@ namespace LimitOrderBookSimulation.EventModels
                     var nAskSide = LimitOrderBook.NumberOfSellOrders(ask, ask + TickIntervalSize);
 
                     //Console.WriteLine($"({nBidSide}, {nAskSide})");
-                    var cancellatioRateSell = nAskSide * CancellationRate;
+                    var cancellationRateSell = nAskSide * CancellationRate;
                     var cancellationRateBuy = nBidSide * CancellationRate;
 
                     // total event rate 
                     var eventRate = 2 * MarketOrderRate + 2 * limitOrderRate + 
-                                    cancellatioRateSell + cancellationRateBuy;
+                                    cancellationRateSell + cancellationRateBuy;
 
                     // re-calculate probabilities of events
                     probability[SubmitLimitSellOrder] = limitOrderRate / eventRate;
@@ -722,10 +693,12 @@ namespace LimitOrderBookSimulation.EventModels
                     probability[SubmitMarketBuyOrder] = MarketOrderRate / eventRate;
                     probability[SubmitMarketSellOrder] = MarketOrderRate / eventRate;
                     probability[CancelLimitBuyOrder] = cancellationRateBuy / eventRate;
-                    probability[CancelLimitSellOrder] = cancellatioRateSell / eventRate;
+                    probability[CancelLimitSellOrder] = cancellationRateSell / eventRate;
 
                     t += Random.PickExponentialTime(eventRate);
-                    Random.PickEvent(probability).Invoke();
+                    
+                    Random.PickEvent(probability)
+                          .Invoke();
 
                     if (!LimitOrderBook.Asks.Any() || !LimitOrderBook.Bids.Any())
                     {
@@ -737,9 +710,9 @@ namespace LimitOrderBookSimulation.EventModels
                     LimitOrderBook.Time = t;
 
                     // Update progress bar
-                    progress.Tick(t - startTradingTime);
-                }
-                progress.Finished();
+                    //progress.Tick(t - t0);
+                //}
+                //progress.Finished();
             }
         }
 
@@ -793,9 +766,9 @@ namespace LimitOrderBookSimulation.EventModels
         public void SavePriceProcess(string fileName)
         {
             using (var file = new StreamWriter(fileName))
-            using (var progressBar = new ProgressBar(LimitOrderBook.PriceTimeSeries.Count, "Write price process to file"))
+            //using (var progressBar = new ProgressBar(LimitOrderBook.PriceTimeSeries.Count, "Write price process to file"))
             {
-                var done = 0;
+                //var done = 0;
                 foreach (var entry in LimitOrderBook.PriceTimeSeries)
                 {
                     var time = entry.Key;
@@ -803,9 +776,9 @@ namespace LimitOrderBookSimulation.EventModels
                     
                     file.WriteLine($"{time}\t{price.Bid * TickSize}\t{price.Ask * TickSize}");
 
-                    progressBar.Tick(++done);
+                    //progressBar.Tick(++done);
                 }
-                progressBar.Finished();
+                //progressBar.Finished();
             }
         }
 

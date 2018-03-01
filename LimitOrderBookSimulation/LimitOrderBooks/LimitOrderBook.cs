@@ -174,7 +174,8 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         #region Public
 
         #region Limit order
-        public void SubmitLimitBuyOrder(long price, long amount =1)
+        
+        public void SubmitLimitBuyOrder(long price, long amount = 1)
         {
             AddBid(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitBuyOrder]++;
@@ -185,6 +186,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
             AddAsk(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitSellOrder]++;
         }
+        
         #endregion Limit order
 
         #region Market order

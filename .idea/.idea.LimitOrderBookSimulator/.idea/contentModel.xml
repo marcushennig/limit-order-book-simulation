@@ -75,6 +75,7 @@
           <e p="AssemblyInfo.cs" t="Include" />
         </e>
         <e p="TestLimitOrderBook.cs" t="Include" />
+        <e p="TestLimitOrderBookSimulation.cs" t="Include" />
         <e p="TestLimitOrderBookUtilities.cs" t="Include" />
         <e p="UnitTests.csproj" t="IncludeRecursive" />
       </e>
