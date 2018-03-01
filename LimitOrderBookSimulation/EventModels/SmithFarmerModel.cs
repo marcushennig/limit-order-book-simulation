@@ -16,7 +16,6 @@ namespace LimitOrderBookSimulation.EventModels
 {
     /// <summary>
     /// TODO: Implement initialDepthProfile, should be property of the model 
-    /// TODO: Sell as well as Buy side should have their own depth profile  
     /// TODO: Scale everything to ticks instead of prices
     ///  => set the corresponding best price to boundaries of the price interval
     /// Artifical double auction market proposed by E. Smith & J.D. Farmer, 
@@ -76,8 +75,10 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public double CharacteristicOrderSize { set; get; }
         
-        
-        public int TickIntervalSize { set; get; }
+        /// <summary>
+        /// Size of the simulation interval
+        /// </summary>
+        public int SimulationIntervalSize { set; get; }
         
         #endregion Model parameter
         
@@ -333,39 +334,34 @@ namespace LimitOrderBookSimulation.EventModels
         #region Cancel orders
         
         /// <summary>
-        /// TODO: Cancel limit sell order
+        ///  Cancel limit sell order by selecting the price randomly from
+        ///  the interval [ask, ask + SimulationIntervalSize] using the depth as weight.
         /// </summary>
         private void CancelLimitSellOrder()
         {
-            var ask = LimitOrderBook.Ask;
-            var priceMin = ask;
-            var priceMax = ask + TickIntervalSize;
-
-            var n = LimitOrderBook.NumberOfSellOrders(priceMin, priceMax);
-
-            // generate random price with the distribution in [priceMin, priceMax]
-            var q = Random.Next(1, n);
-            var price = LimitOrderBook.InverseCDFSellSide(priceMin, priceMax, q);
-
+          var ask = LimitOrderBook.Ask;
+          var weightedPrices = LimitOrderBook.Asks
+                .Where(p => p.Key >= ask && 
+                            p.Key <= ask + SimulationIntervalSize)
+                .ToDictionary(s => s.Key, s => s.Value);
+            
+            var price = Random.NextFromWeights(weightedPrices);
             LimitOrderBook.CancelLimitSellOrder(price, amount: 1);
         }
 
         /// <summary>
-        ///  TODO: Cancel limit buy order
+        ///  Cancel limit buy order by selecting the price randomly from
+        ///  the interval [bid - SimulationIntervalSize, bid] using the depth as weight
         /// </summary>
         private void CancelLimitBuyOrder()
         {
             var bid = LimitOrderBook.Bid;
-
-            var priceMin = bid - TickIntervalSize;
-            var priceMax = bid;
-
-            var n = LimitOrderBook.NumberOfBuyOrders(priceMin, priceMax);
-
-            // generate random price with the distribution in [priceMin, priceMax]
-            var q = Random.Next(1, n);
-            var price = LimitOrderBook.InverseCDFBuySide(priceMin, priceMax, q);
-
+            var weightedPrices = LimitOrderBook.Bids
+                .Where(p => p.Key >= bid- SimulationIntervalSize && 
+                            p.Key <= bid)
+                .ToDictionary(s => s.Key, s => s.Value);
+            
+            var price = Random.NextFromWeights(weightedPrices);
             LimitOrderBook.CancelLimitBuyOrder(price, amount: 1);
         }
 
@@ -378,13 +374,11 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         private void SubmitLimitBuyOrder()
         {
-            //if (is.na(price))
-            //{ prx << -(bestOffer() - pick(L))}
-            //else prx << -price
-            //if (logging == T) { eventLog[count,] << -c("LB", prx)}
-            //book$buySize[book$Price == prx] << -book$buySize[book$Price == prx] + 1}
-
-            var price = LimitOrderBook.Ask - Random.Next(1, TickIntervalSize);
+            var s = (long) TickSize;
+            var t = SimulationIntervalSize / s;
+            var d = s * (1 + Random.Next(0, t));
+            var price = LimitOrderBook.Ask - d;
+         
             LimitOrderBook.SubmitLimitBuyOrder(price, amount:1);
         }
 
@@ -393,13 +387,11 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         private void SubmitLimitSellOrder()
         {
-            //    if (is.na(price))
-            //{ prx << -(bestBid() + pick(L))}
-            // else prx << -price
-            // if (logging == T) { eventLog[count,] << -c("LS", prx)}
-            //    book$sellSize[book$Price == prx] << -book$sellSize[book$Price == prx] + 1}
-
-            var price = LimitOrderBook.Bid + Random.Next(1, TickIntervalSize);
+            var s = (long) TickSize;
+            var t = SimulationIntervalSize / s;
+            var d = s * (1 + Random.Next(0, t));
+            var price = LimitOrderBook.Bid + d;
+            
             LimitOrderBook.SubmitLimitSellOrder(price, amount:1);
         }
 
@@ -644,10 +636,10 @@ namespace LimitOrderBookSimulation.EventModels
             var t0 = LimitOrderBook.Time;
             var tEnd = t0 + duration;
 
-            // Rates are mesured per price 
+            // Rates are measured per price 
             //using (var progress = new ProgressBar(duration, "Calculate limit order book process"))
             //{
-                var limitOrderRate = LimitOrderRateDensity * TickIntervalSize;
+                var limitOrderRate = LimitOrderRateDensity * SimulationIntervalSize;
 
                 // Initialize event probabilities
                 var probability = new Dictionary<Action, double>
@@ -668,8 +660,8 @@ namespace LimitOrderBookSimulation.EventModels
 
                     //var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1);
                     //var nAskSide = LimitOrderBook.NumberOfSellOrders(bid + 1, bid + TickIntervalSize);
-                    var nBidSide = LimitOrderBook.NumberOfBuyOrders(bid - TickIntervalSize, bid);
-                    var nAskSide = LimitOrderBook.NumberOfSellOrders(ask, ask + TickIntervalSize);
+                    var nBidSide = LimitOrderBook.NumberOfBuyOrders(bid - SimulationIntervalSize, bid);
+                    var nAskSide = LimitOrderBook.NumberOfSellOrders(ask, ask + SimulationIntervalSize);
 
                     //Console.WriteLine($"({nBidSide}, {nAskSide})");
                     var cancellationRateSell = nAskSide * CancellationRate;
@@ -689,12 +681,12 @@ namespace LimitOrderBookSimulation.EventModels
 
                     t += Random.PickExponentialTime(eventRate);
                     
-                    Random.PickEvent(probability)
-                          .Invoke();
+                    var orderFlowEvent = Random.NextFromProbabilities(probability);
+                    orderFlowEvent.Invoke();
 
                     if (!LimitOrderBook.Asks.Any() || !LimitOrderBook.Bids.Any())
                     {
-                        throw new Exception("Either the bis or ask side is empty");
+                        throw new Exception("Either the bid or ask side is empty");
                     }
 
                     // Update time of limit order book 
@@ -726,7 +718,6 @@ namespace LimitOrderBookSimulation.EventModels
                     var price = entry.Value;
                     
                     file.WriteLine($"{time}\t{price.Bid * TickSize}\t{price.Ask * TickSize}");
-
                 }
             }
         }

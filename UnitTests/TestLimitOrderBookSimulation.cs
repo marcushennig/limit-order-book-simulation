@@ -110,7 +110,7 @@ namespace UnitTests
                 LimitOrderRateDensity = muL,
                 CharacteristicOrderSize = 1,
                 TickSize = TickSize,
-                TickIntervalSize = TickSize * 10,
+                SimulationIntervalSize = TickSize * 10,
                 LimitOrderBook = limitOrderBook
             };
             model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));

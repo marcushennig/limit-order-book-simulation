@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace LimitOrderBookUtilities
 {
@@ -59,7 +62,7 @@ namespace LimitOrderBookUtilities
         /// </summary>
         /// <param name="probabilities"></param>
         /// <returns></returns>
-        public Action PickEvent(Dictionary<Action, double> probabilities)
+        public T NextFromProbabilities<T>(Dictionary<T, double> probabilities)
         {
             var r = RandomGenerator.NextDouble();
             // cumulative sum in C#
@@ -68,7 +71,6 @@ namespace LimitOrderBookUtilities
             {
                 var probability = entry.Value;
                 var randomEvent = entry.Key;
-
                 p += probability;
                 if (r <= p)
                 {
@@ -76,7 +78,32 @@ namespace LimitOrderBookUtilities
                 }
             }
             // will never be reached as r el [0,1]
-            return null;
+           return default(T) ;
+        }
+        
+        /// <summary>
+        /// Draw random action from given actions with relative probabilities  
+        /// </summary>
+        /// <param name="weights"></param>
+        /// <returns></returns>
+        public T NextFromWeights<T>(Dictionary<T, long> weights)
+        {
+            var r = RandomGenerator.NextDouble();
+            // cumulative sum in C#
+            var p = 0.0;
+            var totalWeight = weights.Select(q=>q.Value).Sum();
+            foreach (var entry in weights)
+            {
+                var probability = entry.Value / (double) totalWeight;
+                var randomEvent = entry.Key;
+                p += probability;
+                if (r <= p)
+                {
+                    return randomEvent;
+                }
+            }
+            // will never be reached as r el [0,1]
+            return default(T) ;
         }
 
         #endregion Methods
