@@ -104,6 +104,7 @@ namespace UnitTests
 
             var parameter = new SmithFarmerModelParameter
             {
+                Seed = 50,
                 CancellationRate = muC,
                 MarketOrderRate = muM,
                 LimitOrderRateDensity = muL,

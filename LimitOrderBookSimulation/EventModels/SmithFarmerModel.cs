@@ -10,7 +10,6 @@ using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
 using MathNet.Numerics.Statistics;
-using Newtonsoft.Json;
 
 namespace LimitOrderBookSimulation.EventModels
 {
@@ -82,11 +81,11 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public SmithFarmerModel()
         {
-            Random = new ExtendedRandom(42);
             LimitOrderBook = new LimitOrderBook();
             Parameter = new SmithFarmerModelParameter();
         }
         
+        /// <inheritdoc />
         /// <summary>
         /// Calibrate the Smith Farmer model from LOB data 
         /// </summary>
@@ -611,6 +610,8 @@ namespace LimitOrderBookSimulation.EventModels
         /// <param name="duration">In units of seconds</param>
         public void SimulateOrderFlow(double duration)
         {
+            Random = new ExtendedRandom(42);
+            
             var t0 = LimitOrderBook.Time;
             var tEnd = t0 + duration;
 

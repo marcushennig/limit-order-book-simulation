@@ -5,6 +5,11 @@ namespace LimitOrderBookSimulation.EventModels
     public class SmithFarmerModelParameter
     {
         /// <summary>
+        /// Seed for random generator  
+        /// </summary>
+        public int Seed;
+        
+        /// <summary>
         /// Limit order rate
         /// Unit: shares / (ticks * time))
         /// </summary>
