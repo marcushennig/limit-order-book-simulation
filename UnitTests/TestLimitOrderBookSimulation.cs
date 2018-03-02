@@ -98,7 +98,7 @@ namespace UnitTests
             // Choose parameter such that certain end result is achieved 
             // Check characteristic scales 
             const double asymtoticDepth = 0.5 * (BuyMaxDepth + SellMaxDepth);
-            const double muC = 0.01;
+            const double muC = 0.05;
             const double muL = asymtoticDepth * muC;
             const double muM = Spread * muL * 2;
 
@@ -107,7 +107,7 @@ namespace UnitTests
                 CancellationRate = muC,
                 MarketOrderRate = muM,
                 LimitOrderRateDensity = muL,
-                SimulationIntervalSize = Spread * 5,
+                SimulationIntervalSize = Spread * 4,
                 CharacteristicOrderSize = 10.3,
                 PriceTickSize = 5.6,
             };

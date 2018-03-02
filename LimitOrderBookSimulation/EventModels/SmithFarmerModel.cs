@@ -82,7 +82,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public SmithFarmerModel()
         {
-            Random = new ExtendedRandom(43);
+            Random = new ExtendedRandom(42);
             LimitOrderBook = new LimitOrderBook();
             Parameter = new SmithFarmerModelParameter();
         }
@@ -302,10 +302,16 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int CancelLimitSellOrder()
         {
-          var ask = LimitOrderBook.Ask;
-          var weightedPriceTicks = LimitOrderBook.DepthSellSide
-                .Where(p => p.Key >= ask && 
-                            p.Key <= ask + Parameter.SimulationIntervalSize)
+            var minTick = LimitOrderBook.Ask;
+            var maxTick = minTick + Parameter.SimulationIntervalSize;
+            
+            /*var n = LimitOrderBook.NumberOfSellOrders(minTick, maxTick);
+            var q = Random.Next(1, n);
+            var priceTick = LimitOrderBook.InverseCDFSellSide(minTick, maxTick, q)*/;
+            
+            var weightedPriceTicks = LimitOrderBook.DepthSellSide
+                .Where(p => p.Key >= minTick && 
+                            p.Key <= maxTick)
                 .ToDictionary(s => s.Key, 
                               s => s.Value);
             
@@ -321,10 +327,16 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int CancelLimitBuyOrder()
         {
-            var bid = LimitOrderBook.Bid;
+            var maxTick = LimitOrderBook.Bid;
+            var minTick = maxTick - Parameter.SimulationIntervalSize;
+            
+            //var n = LimitOrderBook.NumberOfBuyOrders(minTick, maxTick);
+            //var q = Random.Next(1, n);
+            //var priceTick = LimitOrderBook.InverseCDFBuySide(minTick, maxTick, q);
+            
             var weightedPriceTicks = LimitOrderBook.DepthBuySide
-                .Where(p => p.Key >= bid - Parameter.SimulationIntervalSize && 
-                            p.Key <= bid)
+                .Where(p => p.Key >= minTick && 
+                            p.Key <= maxTick)
                 .ToDictionary(s => s.Key, 
                               s => s.Value);
             
@@ -339,11 +351,11 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int SubmitLimitBuyOrder()
         {
-            var maxTick = LimitOrderBook.Ask - 1;
-            var minTick = maxTick - Parameter.SimulationIntervalSize;
-            var priceTick = Random.Next(minTick, maxTick);
-            
-            LimitOrderBook.SubmitLimitBuyOrder(price:priceTick, amount:1);
+            //var maxTick = LimitOrderBook.Ask - 1;
+            //var minTick = maxTick - Parameter.SimulationIntervalSize;
+            //var priceTick = Random.Next(minTick, maxTick);
+            var priceTick = LimitOrderBook.Ask - 1 - Random.Next(Parameter.SimulationIntervalSize + 1);
+            LimitOrderBook.SubmitLimitBuyOrder(priceTick, amount:1);
             
             return priceTick;
         }
@@ -353,11 +365,12 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int SubmitLimitSellOrder()
         {
-            var minTick = LimitOrderBook.Bid + 1;
-            var maxTick = minTick + Parameter.SimulationIntervalSize;
-            var priceTick = Random.Next(minTick, maxTick);
-
-            LimitOrderBook.SubmitLimitSellOrder(price:priceTick, amount:1);
+            //var minTick = LimitOrderBook.Bid + 1;
+            //var maxTick = minTick + Parameter.SimulationIntervalSize;
+            
+            //var priceTick = Random.Next(minTick, maxTick);
+            var priceTick = LimitOrderBook.Bid + 1 + Random.Next(Parameter.SimulationIntervalSize + 1);
+            LimitOrderBook.SubmitLimitSellOrder(priceTick, amount:1);
             
             return priceTick;
         }
