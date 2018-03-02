@@ -7,16 +7,16 @@
     {
         #region Properties
 
-        public long Bid { get; }
-        public long Ask { get; }
-        public long Spread => Ask - Bid;
+        public int Bid { get; }
+        public int Ask { get; }
+        public int Spread => Ask - Bid;
         public double Mid => 0.5 * (Bid + Ask);
 
         #endregion Properties
 
         #region Constructor 
 
-        public Price(long bid, long ask)
+        public Price(int bid, int ask)
         {
             Bid = bid;
             Ask = ask;

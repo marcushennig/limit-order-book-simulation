@@ -94,9 +94,9 @@ namespace LimitOrderBookRepositories
 
             var time = Convert.ToDouble(data[0]);
             var type = (LobEventType)Convert.ToInt32(data[1]);
-            var orderId = Convert.ToInt64(data[2]);
-            var volume = Convert.ToInt64(data[3]);
-            var price = Convert.ToInt64(data[4]);
+            var orderId = Convert.ToInt32(data[2]);
+            var volume = Convert.ToInt32(data[3]);
+            var price = Convert.ToInt32(data[4]);
             var side = (MarketSide)Convert.ToInt32(data[5]);
             
             return new LobEvent(orderId, time, type, volume, price, side);
@@ -125,7 +125,7 @@ namespace LimitOrderBookRepositories
             //	respectively. The Corresponding volumes are set to 0. 
             const long dummyValue = 9999999999;
 
-            var data = line.Split(',').Select(p => Convert.ToInt64(p)).ToList();
+            var data = line.Split(',').Select(p => Convert.ToInt32(p)).ToList();
             var askPrice = data.Where((value, index) => index % 4 == 0);
             var askVolume = data.Where((value, index) => (index - 1) % 4 == 0);
             var bidPrice = data.Where((value, index) => (index - 2) % 4 == 0);

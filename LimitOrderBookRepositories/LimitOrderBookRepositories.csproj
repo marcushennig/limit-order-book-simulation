@@ -73,7 +73,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interfaces\IPriceProcess.cs" />
     <Compile Include="LobDataFileType.cs" />
     <Compile Include="LobRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

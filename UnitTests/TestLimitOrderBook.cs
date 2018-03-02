@@ -11,15 +11,15 @@ namespace UnitTests
     {
         #region Limit order book data
 
-        private SortedDictionary<long, long> SellSide { set; get; }
-        private SortedDictionary<long, long> BuySide { set; get; }
+        private SortedDictionary<int, int> SellSide { set; get; }
+        private SortedDictionary<int, int> BuySide { set; get; }
 
-        private const long TickSize = 10;
-        private const long Spread = TickSize * 6;
-        private const long BuyMinPrice = 10000;
-        private const long BuyMaxPrice = BuyMinPrice + TickSize * 100;
-        private const long SellMinPrice = BuyMaxPrice + Spread;
-        private const long SellMaxPrice = SellMinPrice + TickSize * 100;
+        private const int TickSize = 10;
+        private const int Spread = TickSize * 6;
+        private const int BuyMinPrice = 10000;
+        private const int BuyMaxPrice = BuyMinPrice + TickSize * 100;
+        private const int SellMinPrice = BuyMaxPrice + Spread;
+        private const int SellMaxPrice = SellMinPrice + TickSize * 100;
         private Random Random { set; get; }
 
         #endregion
@@ -28,8 +28,8 @@ namespace UnitTests
         public void Init()
         {
             Random = new Random(42);
-            SellSide = new SortedDictionary<long, long>();
-            BuySide = new SortedDictionary<long, long>();
+            SellSide = new SortedDictionary<int, int>();
+            BuySide = new SortedDictionary<int, int>();
 
 
             for (var p = BuyMinPrice; p < BuyMaxPrice; p += TickSize)
@@ -49,7 +49,7 @@ namespace UnitTests
         private LimitOrderBook GenerateLimitOrderBook()
         {
             var lob = new LimitOrderBook();
-            var buySide = new SortedDictionary<long, long>();
+            var buySide = new SortedDictionary<int, int>();
             foreach (var pair in BuySide)
             {
                 buySide.Add(pair.Key, pair.Value);
@@ -57,7 +57,7 @@ namespace UnitTests
 
             lob.InitializeDepthProfileBuySide(buySide);
 
-            var sellSide = new SortedDictionary<long, long>();
+            var sellSide = new SortedDictionary<int, int>();
             foreach (var pair in SellSide)
             {
                 sellSide.Add(pair.Key, pair.Value);
@@ -73,13 +73,13 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = BuyMinPrice;
-            const long amount = 1;
+            const int price = BuyMinPrice;
+            const int amount = 1;
 
             lob.SubmitLimitBuyOrder(price, amount);
 
             var expectdDepth = BuySide[price] + amount;
-            var depth = lob.Bids[price];
+            var depth = lob.GetDepthAtPriceTick(price);
 
             Assert.True(depth == expectdDepth,
                 $"Depth on buy side: {depth} is not the expectd depth: {expectdDepth}");
@@ -91,13 +91,13 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = SellMinPrice + TickSize * 3;
-            const long amount = 1;
+            const int price = SellMinPrice + TickSize * 3;
+            const int amount = 1;
 
             lob.SubmitLimitSellOrder(price, amount);
 
             var expectdDepth = SellSide[price] + amount;
-            var depth = lob.Asks[price];
+            var depth = lob.GetDepthAtPriceTick(price);
 
             Assert.True(depth == expectdDepth,
                 $"Depth on sell side: {depth} is not the expectd depth: {expectdDepth}");
@@ -110,12 +110,12 @@ namespace UnitTests
             var lob = GenerateLimitOrderBook();
 
             var askPrice = SellSide.Keys.Min();
-            const long amount = 1;
+            const int amount = 1;
 
             lob.SubmitMarketBuyOrder(amount);
 
             var expectdDepth = SellSide[askPrice] - amount;
-            var depth = lob.Asks[askPrice];
+            var depth = lob.GetDepthAtPriceTick(askPrice);
 
 
             Assert.True(depth == expectdDepth,
@@ -129,12 +129,12 @@ namespace UnitTests
             var lob = GenerateLimitOrderBook();
 
             var bidPrice = BuySide.Keys.Max();
-            const long amount = 1;
+            const int amount = 1;
 
             lob.SubmitMarketSellOrder(amount);
 
             var expectdDepth = BuySide[bidPrice] - amount;
-            var depth = lob.Bids[bidPrice];
+            var depth = lob.GetDepthAtPriceTick(bidPrice);
 
 
             Assert.True(depth == expectdDepth,
@@ -147,13 +147,13 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = BuyMaxPrice - TickSize * 3;
-            const long amount = 1;
+            const int price = BuyMaxPrice - TickSize * 3;
+            const int amount = 1;
 
             lob.CancelLimitBuyOrder(price, amount);
 
             var expectdDepth = BuySide[price] - amount;
-            var depth = lob.Bids[price];
+            var depth = lob.GetDepthAtPriceTick(price);
 
 
             Assert.True(depth == expectdDepth,
@@ -166,13 +166,13 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = SellMinPrice + TickSize * 3;
-            const long amount = 1;
+            const int price = SellMinPrice + TickSize * 3;
+            const int amount = 1;
 
             lob.CancelLimitSellOrder(price, amount);
 
             var expectdDepth = SellSide[price] - amount;
-            var depth = lob.Asks[price];
+            var depth = lob.GetDepthAtPriceTick(price);
 
 
             Assert.True(depth == expectdDepth,
@@ -185,8 +185,8 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = BuyMinPrice + 3 * TickSize;
-            const long amount = 1;
+            const int price = BuyMinPrice + 3 * TickSize;
+            const int amount = 1;
             const int numberOfSubmission = 5;
 
             for (var i = 0; i < numberOfSubmission; i++)
@@ -195,7 +195,7 @@ namespace UnitTests
             }
 
             var expectdDepth = BuySide[price] + numberOfSubmission * amount;
-            var depth = lob.Bids[price];
+            var depth = lob.GetDepthAtPriceTick(price);
 
             Assert.True(depth == expectdDepth,
                 $"Depth on buy side: {depth} is not the expectd depth: {expectdDepth}");
@@ -205,8 +205,8 @@ namespace UnitTests
         public void TestMultipleSubmissionsAndCancellations()
         {
             var lob = GenerateLimitOrderBook();
-            const long price = BuyMinPrice + 3 * TickSize;
-            const long amount = 1;
+            const int price = BuyMinPrice + 3 * TickSize;
+            const int amount = 1;
             
             lob.SubmitLimitBuyOrder(price, amount);
             lob.SubmitLimitBuyOrder(price, amount);
@@ -215,7 +215,7 @@ namespace UnitTests
             lob.CancelLimitBuyOrder(price, amount);
 
             var expectdDepth = BuySide[price] + (3 - 2) * amount;
-            var depth = lob.Bids[price];
+            var depth = lob.GetDepthAtPriceTick(price);
 
             Assert.True(depth == expectdDepth,
                 $"Depth on buy side: {depth} is not the expectd depth: {expectdDepth}");
@@ -244,12 +244,12 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
             var ask = lob.Ask;
-            var depth = lob.Asks[ask];
+            var depth = lob.GetDepthAtPriceTick(ask);
             
             lob.SubmitMarketBuyOrder(depth);
             var newAsk = lob.Ask;
             
-            Assert.True(lob.Asks.ContainsKey(ask) == false);
+            Assert.True(lob.GetDepthAtPriceTick(ask) == 0);
             Assert.True(newAsk > ask);
         }
         
@@ -258,12 +258,12 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
             var bid = lob.Bid;
-            var depth = lob.Bids[bid];
+            var depth = lob.GetDepthAtPriceTick(bid);
             
             lob.SubmitMarketSellOrder(depth);
             var newBid = lob.Bid;
             
-            Assert.True(lob.Bids.ContainsKey(bid) == false);
+            Assert.True(lob.GetDepthAtPriceTick(bid) == 0);
             Assert.True(newBid < bid);
         }
         
@@ -271,29 +271,29 @@ namespace UnitTests
         public void TestCancellationBuyOrderRobustness()
         {
             var lob = GenerateLimitOrderBook();
-            const long price = BuyMinPrice + 3 * TickSize;
-            var depth = lob.Bids[price];
+            const int price = BuyMinPrice + 3 * TickSize;
+            var depth = lob.GetDepthAtPriceTick(price);
 
             for (var i = 0; i < depth + 10; i++)
             {
                 lob.CancelLimitBuyOrder(price);    
             }
             
-            Assert.True(lob.Bids.ContainsKey(price) == false);
+            Assert.True(lob.GetDepthAtPriceTick(price) == 0);
         }
         
         [Test]
         public void TestCancellationSellOrderRobustness()
         {
             var lob = GenerateLimitOrderBook();
-            const long price = SellMinPrice + 3 * TickSize;
-            var depth = lob.Asks[price];
+            const int price = SellMinPrice + 3 * TickSize;
+            var depth = lob.GetDepthAtPriceTick(price);
 
             for (var i = 0; i < depth + 10; i++)
             {
                 lob.CancelLimitSellOrder(price);    
             }
-            Assert.True(lob.Asks.ContainsKey(price) == false);
+            Assert.True(lob.GetDepthAtPriceTick(price) == 0);
         }
         
         
@@ -303,13 +303,13 @@ namespace UnitTests
             var lob = GenerateLimitOrderBook();
             
             var ask = lob.Ask;
-            var depth = lob.Asks[ask];
+            var depth = lob.GetDepthAtPriceTick(ask);
 
             for (var i = 0; i < depth + 10; i++)
             {
                 lob.SubmitMarketBuyOrder();    
             }
-            Assert.True(lob.Asks.ContainsKey(ask) == false);
+            Assert.True(lob.GetDepthAtPriceTick(ask) == 0);
         }
         
         [Test]
@@ -318,13 +318,13 @@ namespace UnitTests
             var lob = GenerateLimitOrderBook();
             
             var bid = lob.Bid;
-            var depth = lob.Bids[bid];
+            var depth = lob.GetDepthAtPriceTick(bid);
 
             for (var i = 0; i < depth + 10; i++)
             {
                 lob.SubmitMarketSellOrder();    
             }
-            Assert.True(lob.Bids.ContainsKey(bid) == false);
+            Assert.True(lob.GetDepthAtPriceTick(bid) == 0);
         }
     }
 }

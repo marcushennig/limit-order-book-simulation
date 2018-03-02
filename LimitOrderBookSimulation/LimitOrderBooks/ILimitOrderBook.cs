@@ -1,52 +1,42 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using LimitOrderBookUtilities;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
 {
     public interface ILimitOrderBook
     {
-        #region Properties
-
         double Time { set; get; }
 
-        long Ask { get; }
+        int Ask { get; }
 
-        long Bid { get; }
-        
-        #endregion Properties
+        int Bid { get; }
 
-        #region Methods
+        int GetDepthAtPriceTick(int priceTick);
+
+        int GetRandomPriceFromSellSide(ExtendedRandom random, int pmin, int pmax);
+
+        int GetRandomPriceFromBuySide(ExtendedRandom random, int pmin, int pmax);
 
         #region Events
 
-        #region Limit order
+        void SubmitLimitBuyOrder(int price, int amount = 1);
 
-        void SubmitLimitBuyOrder(long price, long amount = 1);
+        void SubmitLimitSellOrder(int price, int amount = 1);
 
-        void SubmitLimitSellOrder(long price, long amount = 1);
+        int SubmitMarketBuyOrder(int amount =1);
 
-        #endregion Limit order
+        int SubmitMarketSellOrder(int amount =1);
 
-        #region Market order
+        void CancelLimitBuyOrder(int price, int amount = 1);
 
-        void SubmitMarketBuyOrder(long amount =1);
-
-        void SubmitMarketSellOrder(long amount =1);
-
-        #endregion Market order
-        
-        #region Cancel order
-
-        void CancelLimitBuyOrder(long price, long amount = 1);
-
-        void CancelLimitSellOrder(long price, long amount = 1);
-
-        #endregion Cancel order
+        void CancelLimitSellOrder(int price, int amount = 1);
 
         #endregion Events
         
         #region Time evolution
 
-        Dictionary<LimitOrderBookEvent, long> Counter { get; }
+        Dictionary<LimitOrderBookEvent, int> Counter { get; }
 
         /// <summary>
         /// Time-dependent pricing information 
@@ -57,37 +47,25 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Statistics
 
-        #region Number of orders
-
-        long NumberOfBuyOrders(long minPrice = 0, long maxPrice = long.MaxValue);
-
-        long NumberOfSellOrders(long minPrice = 0, long maxPrice = long.MaxValue);
-
-        long NumberOfLimitOrders(long minPrice = 0, long maxPrice = long.MaxValue);
-
-        #endregion Number of orders
-
-        #region Inverse CDF
-
-        long InverseCDF(long minPrice, long maxPrice, long q);
-
-        long InverseCDFSellSide(long minPrice, long maxPrice, long q);
-
-        long InverseCDFBuySide(long minPrice, long maxPrice, long q);
-
-        #endregion Inverse CDF
+        bool IsBuySideEmpty();
         
+        bool IsSellSideEmpty();
+
+        int NumberOfBuyOrders(int minPrice = 0, int maxPrice = int.MaxValue);
+
+        int NumberOfSellOrders(int minPrice = 0, int maxPrice = int.MaxValue);
+
+        int NumberOfLimitOrders(int minPrice = 0, int maxPrice = int.MaxValue);
+
         #endregion
         
         #region Iinitialize
 
-        void InitializeDepthProfileBuySide(IDictionary<long, long> depthProdile);
-        void InitializeDepthProfileSellSide(IDictionary<long, long> depthProdile);
+        void InitializeDepthProfileBuySide(IDictionary<int, int> depthProdile);
+        void InitializeDepthProfileSellSide(IDictionary<int, int> depthProdile);
         
         #endregion Iinitialize
 
         void SaveDepthProfile(string path);
-
-        #endregion Methods
     }
 }
