@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookSimulation.LimitOrderBooks;
+using LimitOrderBookUtilities;
 using MathNet.Numerics;
 using NUnit.Framework;
 
