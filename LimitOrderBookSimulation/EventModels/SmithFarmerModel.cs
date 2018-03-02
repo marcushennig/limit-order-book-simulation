@@ -330,13 +330,13 @@ namespace LimitOrderBookSimulation.EventModels
         private void CancelLimitSellOrder()
         {
           var ask = LimitOrderBook.Ask;
-          var weightedPriceTickes = LimitOrderBook.Asks
+          var weightedPriceTicks = LimitOrderBook.Asks
                 .Where(p => p.Key >= ask && 
                             p.Key <= ask + SimulationIntervalSize)
                 .ToDictionary(s => s.Key, 
                               s => s.Value);
             
-            var priceTick = Random.NextFromWeights(weightedPriceTickes);
+            var priceTick = Random.NextFromWeights(weightedPriceTicks);
             LimitOrderBook.CancelLimitSellOrder(price:priceTick, amount: 1);
         }
 
@@ -348,7 +348,7 @@ namespace LimitOrderBookSimulation.EventModels
         {
             var bid = LimitOrderBook.Bid;
             var weightedPriceTicks = LimitOrderBook.Bids
-                .Where(p => p.Key >= bid- SimulationIntervalSize && 
+                .Where(p => p.Key >= bid - SimulationIntervalSize && 
                             p.Key <= bid)
                 .ToDictionary(s => s.Key, 
                               s => s.Value);

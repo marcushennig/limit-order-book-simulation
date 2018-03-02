@@ -18,7 +18,7 @@ namespace UnitTests
         private SortedDictionary<int, int> SellSide { set; get; }
         private SortedDictionary<int, int> BuySide { set; get; }
 
-        private const int Spread = 4;
+        private const int Spread = 10;
         private const int BuyMinPriceTick = 100;
         private const int BuyMaxPriceTick = BuyMinPriceTick + 200;
         private const int SellMinPriceTick = BuyMaxPriceTick + Spread;
@@ -107,14 +107,14 @@ namespace UnitTests
             const double muC = 0.01;
             const double muL = asymtoticDepth * muC;
             const double muM = Spread * muL * 2;
-            const double T = 1000;
+            const double T = 10000;
             
             var model = new SmithFarmerModel
             {
                 CancellationRate = muC,
                 MarketOrderRate = muM,
                 LimitOrderRateDensity = muL,
-                SimulationIntervalSize = 10,
+                SimulationIntervalSize = Spread * 5,
                 LimitOrderBook = limitOrderBook,
                 CharacteristicOrderSize = 10.3,
                 PriceTickSize = 5.6,
