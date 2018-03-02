@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="TestLimitOrderBook.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestLimitOrderBookRepository.cs" />
     <Compile Include="TestLimitOrderBookSimulation.cs" />
     <Compile Include="TestLimitOrderBookUtilities.cs" />
   </ItemGroup>
