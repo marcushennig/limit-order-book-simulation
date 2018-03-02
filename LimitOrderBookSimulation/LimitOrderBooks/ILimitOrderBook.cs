@@ -14,33 +14,20 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         
         #endregion Properties
 
-        #region Methods
-
         #region Events
-
-        #region Limit order
 
         void SubmitLimitBuyOrder(int price, int amount = 1);
 
         void SubmitLimitSellOrder(int price, int amount = 1);
 
-        #endregion Limit order
+        int SubmitMarketBuyOrder(int amount =1);
 
-        #region Market order
+        int SubmitMarketSellOrder(int amount =1);
 
-        void SubmitMarketBuyOrder(int amount =1);
-
-        void SubmitMarketSellOrder(int amount =1);
-
-        #endregion Market order
-        
-        #region Cancel order
 
         void CancelLimitBuyOrder(int price, int amount = 1);
 
         void CancelLimitSellOrder(int price, int amount = 1);
-
-        #endregion Cancel order
 
         #endregion Events
         
@@ -87,7 +74,5 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         #endregion Iinitialize
 
         void SaveDepthProfile(string path);
-
-        #endregion Methods
     }
 }

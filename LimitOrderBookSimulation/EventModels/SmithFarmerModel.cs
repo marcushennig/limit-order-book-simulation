@@ -35,9 +35,7 @@ namespace LimitOrderBookSimulation.EventModels
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private ExtendedRandom Random { set; get; }
-        
-        #region Model parameter
-        
+                
         /// <summary>
         /// Underlying limit order book
         /// Unit: Price: ticks
@@ -46,51 +44,19 @@ namespace LimitOrderBookSimulation.EventModels
         public LimitOrderBook LimitOrderBook { set; get; }
         
         /// <summary>
-        /// Limit order rate
-        /// Unit: shares / (ticks * time))
+        /// Model paramater
         /// </summary>
-        public double LimitOrderRateDensity { set; get; }
-        
-        /// <summary>
-        /// Market order rate
-        /// Unit: shares / time
-        /// </summary>
-        public double MarketOrderRate { set; get; }
-
-        /// <summary>
-        /// Cancellation rate (in units of 1/time)
-        /// </summary>
-        public double CancellationRate { set; get; }
-        
-        /// <summary>
-        /// Size of the simulation interval (in units of ticks)
-        /// </summary>
-        public int SimulationIntervalSize { set; get; }
-        
-        /// <summary>
-        /// TODO: Should be part of the limit order book
-        /// Denotes the size of a tick in units of price
-        /// </summary>
-        public double PriceTickSize { set; get; }
-        
-        /// <summary>
-        /// TODO: Should be part of the limit order book
-        /// Denotes what is the number of shared for on depth unit
-        /// in limit order book
-        /// </summary>
-        public double CharacteristicOrderSize { set; get; }
-        
-        #endregion Model parameter
+        public SmithFarmerModelParameter Parameter { set; get; }
         
         #region Characteric scales
 
-        public double CharacteristicNumberOfShares => MarketOrderRate / (2 * CancellationRate);
-        public double CharacteristicPriceInterval => MarketOrderRate / (2 * LimitOrderRateDensity);
-        public double CharacteristicTime => 1 / CancellationRate;
-        public double NondimensionalTickSize => 2 * LimitOrderRateDensity * PriceTickSize / MarketOrderRate;
-        public double AsymptoticDepth => LimitOrderRateDensity / CancellationRate;
-        public double BidAskSpread => MarketOrderRate / (2 * LimitOrderRateDensity);
-        public double Resolution => 2 * LimitOrderRateDensity * PriceTickSize/MarketOrderRate;
+        public double CharacteristicNumberOfShares => Parameter.MarketOrderRate / (2 * Parameter.CancellationRate);
+        public double CharacteristicPriceInterval => Parameter.MarketOrderRate / (2 * Parameter.LimitOrderRateDensity);
+        public double CharacteristicTime => 1 / Parameter.CancellationRate;
+        public double NondimensionalTickSize => 2 * Parameter.LimitOrderRateDensity * Parameter.PriceTickSize / Parameter.MarketOrderRate;
+        public double AsymptoticDepth => Parameter.LimitOrderRateDensity / Parameter.CancellationRate;
+        public double BidAskSpread => Parameter.MarketOrderRate / (2 * Parameter.LimitOrderRateDensity);
+        public double Resolution => 2 * Parameter.LimitOrderRateDensity * Parameter.PriceTickSize / Parameter.MarketOrderRate;
         
         /// <summary>
         /// NondimensionalOrderSize: epsilon
@@ -105,7 +71,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// is very small, the depth profile is a convex function of price near the
         /// midpoint and the price impact is very concave.
         /// </summary>
-        public double NondimensionalOrderSize => 2 * CancellationRate * CharacteristicOrderSize / MarketOrderRate;
+        public double NondimensionalOrderSize => 2 * Parameter.CancellationRate * Parameter.CharacteristicOrderSize / Parameter.MarketOrderRate;
 
         #endregion Characteric scales
 
@@ -118,6 +84,7 @@ namespace LimitOrderBookSimulation.EventModels
         {
             Random = new ExtendedRandom(43);
             LimitOrderBook = new LimitOrderBook();
+            Parameter = new SmithFarmerModelParameter();
         }
         
         /// <summary>
@@ -157,11 +124,11 @@ namespace LimitOrderBookSimulation.EventModels
 
 
             // Characteristic size 
-            CharacteristicOrderSize = limitOrderSize;
-            Log.Info($"Characteristic size: {CharacteristicOrderSize}");
+            Parameter.CharacteristicOrderSize = limitOrderSize;
+            Log.Info($"Characteristic size: {Parameter.CharacteristicOrderSize}");
             
             // Price unit
-            PriceTickSize = lob.PriceTickSize;
+            Parameter.PriceTickSize = lob.PriceTickSize;
             
             // Some Statistics 
             Log.Info($"Number of market order events: {lob.MarketOrders.Count}");
@@ -171,11 +138,11 @@ namespace LimitOrderBookSimulation.EventModels
             // Initialize sell and buy side of the limit order book
             var state = lob.States.First();
          
-            var initalBids = state.Bids.ToDictionary(p => (int)(p.Key / PriceTickSize), 
-                                                 p => (int)Math.Ceiling(1*(p.Value) / CharacteristicOrderSize));
+            var initalBids = state.Bids.ToDictionary(p => (int)(p.Key / Parameter.PriceTickSize), 
+                                                 p => (int)Math.Ceiling(1*(p.Value) / Parameter.CharacteristicOrderSize));
 
-            var initalAsks = state.Asks.ToDictionary(p => (int) (p.Key/PriceTickSize),
-                                                 p => (int) Math.Ceiling(1*(p.Value) / CharacteristicOrderSize));
+            var initalAsks = state.Asks.ToDictionary(p => (int) (p.Key/Parameter.PriceTickSize),
+                                                 p => (int) Math.Ceiling(1*(p.Value) / Parameter.CharacteristicOrderSize));
             
             LimitOrderBook.InitializeDepthProfileBuySide(initalBids);
             LimitOrderBook.InitializeDepthProfileSellSide(initalAsks);
@@ -185,12 +152,12 @@ namespace LimitOrderBookSimulation.EventModels
             // Mu characterizes the average market order arrival rate and it is just the number of shares of 
             // effective market order ('buy' and 'sell') to the number of events during the trading day
             // Unit: [# shares / time]
-            var nm = lob.MarketOrders.Sum(p => p.Volume) / CharacteristicOrderSize;
+            var nm = lob.MarketOrders.Sum(p => p.Volume) / Parameter.CharacteristicOrderSize;
             //var nm = lob.MarketOrders.Count() * marketOrderSize / CharacteristicOrderSize;
-            Log.Info($"Rescaled factor market order events: {marketOrderSize / CharacteristicOrderSize}");
+            Log.Info($"Rescaled factor market order events: {marketOrderSize / Parameter.CharacteristicOrderSize}");
 
-            MarketOrderRate = nm / T;
-            Log.Info($"Market order rate: {MarketOrderRate} [sigma]/[time]");
+            Parameter.MarketOrderRate = nm / T;
+            Log.Info($"Market order rate: {Parameter.MarketOrderRate} [sigma]/[time]");
 
             //***************************************************************************************************************
             // Error:
@@ -214,7 +181,7 @@ namespace LimitOrderBookSimulation.EventModels
             //statistical stability, but not so much as to
             // include orders that are unlikely to ever be executed, and therefore
             // unlikely to have any effect on prices.
-            var limitOrderDistribution = lob.LimitOrderDistribution.Scale(1 / PriceTickSize, 1 / CharacteristicOrderSize);
+            var limitOrderDistribution = lob.LimitOrderDistribution.Scale(1 / Parameter.PriceTickSize, 1 / Parameter.CharacteristicOrderSize);
 
             // TODO: Should be properties of the model, 
             // TODO: use  the percentage of submitted limitorders  
@@ -232,8 +199,8 @@ namespace LimitOrderBookSimulation.EventModels
             Log.Info($"Price interval (Ask+Bid): {priceRange}");
 
             // Divide by factor of 2, as sell/buy 
-            LimitOrderRateDensity = totalVolumeInRange / (T * priceRange) / 6; 
-            Log.Info($"Limit order rate density: {LimitOrderRateDensity} [sigma]/([time]*[tick])");
+            Parameter.LimitOrderRateDensity = totalVolumeInRange / (T * priceRange) / 6; 
+            Log.Info($"Limit order rate density: {Parameter.LimitOrderRateDensity} [sigma]/([time]*[tick])");
 
             // Old Calibration: Quite bad at this point 
             // Try to define an interval in which most limit orders fall 
@@ -254,11 +221,11 @@ namespace LimitOrderBookSimulation.EventModels
             // propotional to the depth at this price 
             
             var canceledOrderDistribution = lob.CanceledOrderDistribution
-                                               .Scale(1 / PriceTickSize, 
-                                                      1 / CharacteristicOrderSize);
+                                               .Scale(1 / Parameter.PriceTickSize, 
+                                                      1 / Parameter.CharacteristicOrderSize);
             var averageDepthProfile = lob.AverageDepthProfile
-                                         .Scale(1 / PriceTickSize, 
-                                                1 / CharacteristicOrderSize);
+                                         .Scale(1 / Parameter.PriceTickSize, 
+                                                1 / Parameter.CharacteristicOrderSize);
             
             // TODO: The devison could be cumbersome, as rate can become very large   
             var cancellationRateDistribution = canceledOrderDistribution.Divide(averageDepthProfile)
@@ -271,7 +238,7 @@ namespace LimitOrderBookSimulation.EventModels
             var rate60 = cancellationRateDistribution.CummulativeDistributionFunction.Last(p => p.Key <= quantile60).Value;
 
             var rate = (rate60 - rate3)/(quantile60 - quantile3);
-            CancellationRate = rate; //cancellationRateDistribution.Data 
+            Parameter.CancellationRate = rate; //cancellationRateDistribution.Data 
                                      //                      .Select(p => p.Value)
                                      //                      .Mean();
 
@@ -295,7 +262,7 @@ namespace LimitOrderBookSimulation.EventModels
                                                              //.Select(p => p.Nc / (T * averageDepthDistribution[p.Distance]))
                                                              //.Mean();
 
-            Log.Info($"Cancellation rate density: {CancellationRate} [sigma]/([time]*[depth])");
+            Log.Info($"Cancellation rate density: {Parameter.CancellationRate} [sigma]/([time]*[depth])");
 
 
 
@@ -306,79 +273,93 @@ namespace LimitOrderBookSimulation.EventModels
         #endregion Constructors
      
         #region Events
-
+        
+        /// <summary>
+        /// Function signature  
+        /// </summary>
+        private delegate int LimitOrderBookEvent();
+        
         /// <summary>
         /// Submit market buy order 
         /// </summary>
-        private void SubmitMarketBuyOrder()
+        public int SubmitMarketBuyOrder()
         {
-            LimitOrderBook.SubmitMarketBuyOrder(amount: 1);
+            return LimitOrderBook.SubmitMarketBuyOrder(amount: 1);
         }
 
         /// <summary>
         /// Submit market sell order
         /// </summary>
-        private void SubmitMarketSellOrder()
+        public int SubmitMarketSellOrder()
         {
-            LimitOrderBook.SubmitMarketSellOrder(amount: 1);
+            
+            return LimitOrderBook.SubmitMarketSellOrder(amount: 1);
         }
         
         /// <summary>
         ///  Cancel limit sell order by selecting the price randomly from
         ///  the interval [ask, ask + SimulationIntervalSize] using the depth as weight.
         /// </summary>
-        private void CancelLimitSellOrder()
+        public int CancelLimitSellOrder()
         {
           var ask = LimitOrderBook.Ask;
-          var weightedPriceTicks = LimitOrderBook.Asks
+          var weightedPriceTicks = LimitOrderBook.DepthSellSide
                 .Where(p => p.Key >= ask && 
-                            p.Key <= ask + SimulationIntervalSize)
+                            p.Key <= ask + Parameter.SimulationIntervalSize)
                 .ToDictionary(s => s.Key, 
                               s => s.Value);
             
             var priceTick = Random.NextFromWeights(weightedPriceTicks);
             LimitOrderBook.CancelLimitSellOrder(price:priceTick, amount: 1);
+            
+            return priceTick;
         }
 
         /// <summary>
         ///  Cancel limit buy order by selecting the price randomly from
         ///  the interval [bid - SimulationIntervalSize, bid] using the depth as weight
         /// </summary>
-        private void CancelLimitBuyOrder()
+        public int CancelLimitBuyOrder()
         {
             var bid = LimitOrderBook.Bid;
-            var weightedPriceTicks = LimitOrderBook.Bids
-                .Where(p => p.Key >= bid - SimulationIntervalSize && 
+            var weightedPriceTicks = LimitOrderBook.DepthBuySide
+                .Where(p => p.Key >= bid - Parameter.SimulationIntervalSize && 
                             p.Key <= bid)
                 .ToDictionary(s => s.Key, 
                               s => s.Value);
             
             var priceTick = Random.NextFromWeights(weightedPriceTicks);
             LimitOrderBook.CancelLimitBuyOrder(price:priceTick, amount: 1);
+            
+            return priceTick;
         }
 
         /// <summary>
         /// Limit buy order @ time = t
         /// </summary>
-        private void SubmitLimitBuyOrder()
+        public int SubmitLimitBuyOrder()
         {
             var maxTick = LimitOrderBook.Ask - 1;
-            var minTick = maxTick - SimulationIntervalSize;
+            var minTick = maxTick - Parameter.SimulationIntervalSize;
             var priceTick = Random.Next(minTick, maxTick);
             
             LimitOrderBook.SubmitLimitBuyOrder(price:priceTick, amount:1);
+            
+            return priceTick;
         }
 
         /// <summary>
         /// Limit sell order @ time = t
         /// </summary>
-        private void SubmitLimitSellOrder()
+        public int SubmitLimitSellOrder()
         {
             var minTick = LimitOrderBook.Bid + 1;
-            var maxTick = minTick + SimulationIntervalSize;
+            var maxTick = minTick + Parameter.SimulationIntervalSize;
             var priceTick = Random.Next(minTick, maxTick);
 
             LimitOrderBook.SubmitLimitSellOrder(price:priceTick, amount:1);
+            
+            return priceTick;
         }
 
         #endregion Events
@@ -584,17 +565,17 @@ namespace LimitOrderBookSimulation.EventModels
             Log.Info("Mean calibration parameters");
             Log.Info("===================================================================");
 
-            CharacteristicOrderSize = characteristicSizes.Mean();
-            LimitOrderRateDensity = limitOrderRateDensities.Mean();
-            CancellationRate = cancelationRateDensities.Mean();
-            MarketOrderRate = marketOrderRates.Mean();
-            PriceTickSize = tickSizes.Mean();
+            Parameter.CharacteristicOrderSize = characteristicSizes.Mean();
+            Parameter.LimitOrderRateDensity = limitOrderRateDensities.Mean();
+            Parameter.CancellationRate = cancelationRateDensities.Mean();
+            Parameter.MarketOrderRate = marketOrderRates.Mean();
+            Parameter.PriceTickSize = tickSizes.Mean();
 
-            Log.Info($"Market order rate (mu): {MarketOrderRate} [sigma]/[time]");
-            Log.Info($"Limit order rate density (alpha): {LimitOrderRateDensity} [sigma]/([time]*[tick])");
-            Log.Info($"Cancellation rate density (delta): {CancellationRate} [sigma]/([time]*[depth])");
-            Log.Info($"Characteristic size (sigma): {CharacteristicOrderSize}");
-            Log.Info($"Tick size (pi): {PriceTickSize}");
+            Log.Info($"Market order rate (mu): {Parameter.MarketOrderRate} [sigma]/[time]");
+            Log.Info($"Limit order rate density (alpha): {Parameter.LimitOrderRateDensity} [sigma]/([time]*[tick])");
+            Log.Info($"Cancellation rate density (delta): {Parameter.CancellationRate} [sigma]/([time]*[depth])");
+            Log.Info($"Characteristic size (sigma): {Parameter.CharacteristicOrderSize}");
+            Log.Info($"Tick size (pi): {Parameter.PriceTickSize}");
 
             Log.Info("Finished calibrating model");
 
@@ -603,7 +584,7 @@ namespace LimitOrderBookSimulation.EventModels
         #endregion Calibration
 
         #region Simulation
-
+        
         /// <summary>
         // Pseudo-code:
         // [1] Compute the best bid B(t) and best offer A(t).
@@ -623,10 +604,10 @@ namespace LimitOrderBookSimulation.EventModels
             // Rates are measured per price 
             //using (var progress = new ProgressBar(duration, "Calculate limit order book process"))
             //{
-                var limitOrderRate = LimitOrderRateDensity * SimulationIntervalSize;
+                var limitOrderRate = Parameter.LimitOrderRateDensity * Parameter.SimulationIntervalSize;
 
                 // Initialize event probabilities
-                var probability = new Dictionary<Action, double>
+                var probability = new Dictionary<LimitOrderBookEvent, double>
                 {
                     {SubmitLimitSellOrder, 0},
                     {SubmitLimitBuyOrder, 0},
@@ -644,22 +625,22 @@ namespace LimitOrderBookSimulation.EventModels
 
                     //var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1);
                     //var nAskSide = LimitOrderBook.NumberOfSellOrders(bid + 1, bid + TickIntervalSize);
-                    var nBidSide = LimitOrderBook.NumberOfBuyOrders(bid - SimulationIntervalSize, bid);
-                    var nAskSide = LimitOrderBook.NumberOfSellOrders(ask, ask + SimulationIntervalSize);
+                    var nBidSide = LimitOrderBook.NumberOfBuyOrders(bid - Parameter.SimulationIntervalSize, bid);
+                    var nAskSide = LimitOrderBook.NumberOfSellOrders(ask, ask + Parameter.SimulationIntervalSize);
 
                     //Console.WriteLine($"({nBidSide}, {nAskSide})");
-                    var cancellationRateSell = nAskSide * CancellationRate;
-                    var cancellationRateBuy = nBidSide * CancellationRate;
+                    var cancellationRateSell = nAskSide * Parameter.CancellationRate;
+                    var cancellationRateBuy = nBidSide * Parameter.CancellationRate;
 
                     // total event rate 
-                    var eventRate = 2 * MarketOrderRate + 2 * limitOrderRate + 
+                    var eventRate = 2 * Parameter.MarketOrderRate + 2 * limitOrderRate + 
                                     cancellationRateSell + cancellationRateBuy;
 
                     // re-calculate probabilities of events
                     probability[SubmitLimitSellOrder] = limitOrderRate / eventRate;
                     probability[SubmitLimitBuyOrder] = limitOrderRate / eventRate;
-                    probability[SubmitMarketBuyOrder] = MarketOrderRate / eventRate;
-                    probability[SubmitMarketSellOrder] = MarketOrderRate / eventRate;
+                    probability[SubmitMarketBuyOrder] = Parameter.MarketOrderRate / eventRate;
+                    probability[SubmitMarketSellOrder] = Parameter.MarketOrderRate / eventRate;
                     probability[CancelLimitBuyOrder] = cancellationRateBuy / eventRate;
                     probability[CancelLimitSellOrder] = cancellationRateSell / eventRate;
 
@@ -668,7 +649,7 @@ namespace LimitOrderBookSimulation.EventModels
                     var orderFlowEvent = Random.NextFromProbabilities(probability);
                     orderFlowEvent.Invoke();
 
-                    if (!LimitOrderBook.Asks.Any() || !LimitOrderBook.Bids.Any())
+                    if (!LimitOrderBook.DepthSellSide.Any() || !LimitOrderBook.DepthBuySide.Any())
                     {
                         throw new Exception("Either the bid or ask side is empty");
                     }
@@ -701,9 +682,20 @@ namespace LimitOrderBookSimulation.EventModels
                     var time = entry.Key;
                     var price = entry.Value;
                     
-                    file.WriteLine($"{time}\t{price.Bid * PriceTickSize}\t{price.Ask * PriceTickSize}");
+                    file.WriteLine($"{time}\t" +
+                                   $"{price.Bid * Parameter.PriceTickSize}\t" +
+                                   $"{price.Ask * Parameter.PriceTickSize}");
                 }
             }
+        }
+        
+        /// <summary>
+        /// Save current depth profile 
+        /// </summary>
+        /// <param name="fileName"></param>
+        public void SaveDepthProfile(string fileName)
+        {
+            LimitOrderBook.SaveDepthProfile(fileName);
         }
 
         #endregion Utilities

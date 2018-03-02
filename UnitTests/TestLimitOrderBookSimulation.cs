@@ -26,14 +26,11 @@ namespace UnitTests
         private const int BuyMaxDepth = 100;
         private const int SellMaxDepth = 100;
 
-        private Random Random { set; get; }
-
         #endregion
         
         [SetUp]
         public void Init()
         {
-            Random = new Random(42);
             SellSide = new SortedDictionary<int, int>();
             BuySide = new SortedDictionary<int, int>();
 
@@ -66,7 +63,7 @@ namespace UnitTests
             
             var f = Math.Exp(x01 * Math.Log(lambda) - lambda) / SpecialFunctions.Gamma(x01);
             
-            return (int) (scale * f / fmax);
+            return Math.Max((int) (scale * f / fmax), 1);
         }
 
         /**
@@ -91,7 +88,37 @@ namespace UnitTests
             
             return lob;
         }
+
+        /// <summary>
+        /// Generate model with sythetic parameters 
+        /// </summary>
+        /// <returns></returns>
+        private SmithFarmerModel GenerateSmithFarmerModel()
+        {
+            // Choose parameter such that certain end result is achieved 
+            // Check characteristic scales 
+            const double asymtoticDepth = 0.5 * (BuyMaxDepth + SellMaxDepth);
+            const double muC = 0.01;
+            const double muL = asymtoticDepth * muC;
+            const double muM = Spread * muL * 2;
+
+            var parameter = new SmithFarmerModelParameter
+            {
+                CancellationRate = muC,
+                MarketOrderRate = muM,
+                LimitOrderRateDensity = muL,
+                SimulationIntervalSize = Spread * 5,
+                CharacteristicOrderSize = 10.3,
+                PriceTickSize = 5.6,
+            };
             
+            return new SmithFarmerModel
+            {
+                Parameter = parameter,
+                LimitOrderBook =  GenerateLimitOrderBook()
+            };
+        }
+
         [Test]
         public void TestSmithFarmerModel()
         {
@@ -100,35 +127,19 @@ namespace UnitTests
                 "\\d-fine\\Trainings\\Oxford MSc in Mathematical Finance" +
                 "\\Thesis\\Source\\4 Output\\";
             
-            var limitOrderBook = GenerateLimitOrderBook();
-            // Choose parameter such that certain end result is achieved 
-            // Check characteristic scales 
-            const double asymtoticDepth = 0.5 * (BuyMaxDepth + SellMaxDepth);
-            const double muC = 0.01;
-            const double muL = asymtoticDepth * muC;
-            const double muM = Spread * muL * 2;
-            const double T = 10000;
+            var model = GenerateSmithFarmerModel();
             
-            var model = new SmithFarmerModel
-            {
-                CancellationRate = muC,
-                MarketOrderRate = muM,
-                LimitOrderRateDensity = muL,
-                SimulationIntervalSize = Spread * 5,
-                LimitOrderBook = limitOrderBook,
-                CharacteristicOrderSize = 10.3,
-                PriceTickSize = 5.6,
-
-            };
-            model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));
+            model.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));
             
-            model.SimulateOrderFlow(duration: T);
+            model.SimulateOrderFlow(duration: 1000);
             
             // Save simulation result for further inspection in e.g. Matlab
             model.SavePriceProcess(Path.Combine(outputFolder, "price_process.csv"));
-            model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
+            model.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
+            
             SharedUtilities.SaveAsJson(model.LimitOrderBook.Counter, Path.Combine(outputFolder, "counter.json"));
-           
+            SharedUtilities.SaveAsJson(model.Parameter, Path.Combine(outputFolder, "model_parameter.json"));
+            
             // Do some plausibility checks
             var lob = model.LimitOrderBook;
             
@@ -140,8 +151,8 @@ namespace UnitTests
             Assert.True(lob.Counter[LimitOrderBookEvent.CancelLimitBuyOrder] > 0);
             
             // Make sure that all depths are positive 
-            Assert.True(lob.Asks.Values.All(p => p > 0), "Depth cannot be negative on sell side");
-            Assert.True(lob.Bids.Values.All(p => p > 0), "Depth cannot be negative on buy side");
+            Assert.True(lob.DepthSellSide.Values.All(p => p > 0), "Depth cannot be negative on sell side");
+            Assert.True(lob.DepthBuySide.Values.All(p => p > 0), "Depth cannot be negative on buy side");
 
             Assert.True(lob.Ask > lob.Bid, "Ask must be greater than bid price");
             
@@ -150,6 +161,99 @@ namespace UnitTests
             Assert.True(lob.PriceTimeSeries
                 .Select(p => p.Value)
                 .All(p => p.Ask > p.Bid), "Ask must be greater than bid price");          
+        }
+
+        [Test]
+        public void TestSubmitMarketBuyOrderEvent()
+        {
+            var model = GenerateSmithFarmerModel();
+
+            var ask = model.LimitOrderBook.Ask;
+            var depth = model.LimitOrderBook.GetDepthAtPriceTick(ask);
+            
+            var price = model.SubmitMarketBuyOrder();
+
+            var measuredDepth = model.LimitOrderBook.GetDepthAtPriceTick(price);
+            var expectedDepth = depth - 1;
+            
+            Assert.True(price == ask);
+            Assert.True(measuredDepth == expectedDepth);
+        }
+        
+        [Test]
+        public void TestSubmitMarketSellOrderEvent()
+        {
+            var model = GenerateSmithFarmerModel();
+
+            var bid = model.LimitOrderBook.Bid;
+            var depth = model.LimitOrderBook.GetDepthAtPriceTick(bid);
+            
+            var price = model.SubmitMarketSellOrder();
+
+            var measuredDepth = model.LimitOrderBook.GetDepthAtPriceTick(price);
+            var expectedDepth = depth - 1;
+            
+            Assert.True(price == bid);
+            Assert.True(measuredDepth == expectedDepth);
+        }
+        
+        [Test]
+        public void TestSubmitLimitBuyOrderEvent()
+        {
+            var model = GenerateSmithFarmerModel();
+            for (var i = 0; i < 1000; i++)
+            {
+                var ask = model.LimitOrderBook.Ask;
+                var price = model.SubmitLimitBuyOrder();
+                
+                Assert.True(price >= ask - 1 - model.Parameter.SimulationIntervalSize && 
+                            price <= ask - 1);     
+            }
+        }
+        
+        [Test]
+        public void TestSubmitLimitSellOrderEvent()
+        {
+            var model = GenerateSmithFarmerModel();
+
+            for (var i = 0; i < 1000; i++)
+            {
+                var bid = model.LimitOrderBook.Bid;
+                var price = model.SubmitLimitSellOrder();
+                
+                Assert.True(price >= bid + 1 && 
+                            price <= bid + 1 + model.Parameter.SimulationIntervalSize);     
+            }
+        }
+        
+        [Test]
+        public void TestCancelLimitBuyOrderEvent()
+        {
+            var model = GenerateSmithFarmerModel();
+
+            for (var i = 0; i < 1000; i++)
+            {
+                var bid = model.LimitOrderBook.Bid;
+                var price = model.CancelLimitBuyOrder();
+                    
+                Assert.True(price >= bid - model.Parameter.SimulationIntervalSize && 
+                            price <= bid);     
+            }
+        }
+        
+        [Test]
+        public void TestCancelLimitSellOrderEvent()
+        {
+            var model = GenerateSmithFarmerModel();
+
+            for (var i = 0; i < 1000; i++)
+            {
+                var ask = model.LimitOrderBook.Ask;
+                var price = model.CancelLimitSellOrder();
+                    
+                Assert.True(price >= ask && 
+                            price <= ask + model.Parameter.SimulationIntervalSize);     
+            }
         }
     }
 }
