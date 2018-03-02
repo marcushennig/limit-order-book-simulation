@@ -23,8 +23,8 @@ namespace UnitTests
         private const int BuyMaxPriceTick = BuyMinPriceTick + 200;
         private const int SellMinPriceTick = BuyMaxPriceTick + Spread;
         private const int SellMaxPriceTick = SellMinPriceTick + 200;
-        private const int BuyMaxDepth = 10000;
-        private const int SellMaxDepth = 1000;
+        private const int BuyMaxDepth = 100;
+        private const int SellMaxDepth = 100;
 
         #endregion
         

@@ -16,9 +16,6 @@
       </e>
       <e p="LimitOrderBookRepositories" t="IncludeRecursive">
         <e p="bin" t="ExcludeRecursive" />
-        <e p="Interfaces" t="Include">
-          <e p="IPriceProcess.cs" t="Include" />
-        </e>
         <e p="LimitOrderBookRepositories.csproj" t="IncludeRecursive" />
         <e p="LobDataFileType.cs" t="Include" />
         <e p="LobRepository.cs" t="Include" />

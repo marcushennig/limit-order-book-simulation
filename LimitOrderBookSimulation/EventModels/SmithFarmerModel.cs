@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using log4net;
 using LimitOrderBookRepositories;
-using LimitOrderBookRepositories.Interfaces;
 using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
@@ -14,22 +13,18 @@ using MathNet.Numerics.Statistics;
 namespace LimitOrderBookSimulation.EventModels
 {
     /// <summary>
-    /// TODO: Implement initialDepthProfile, should be property of the model 
-    /// TODO: Scale everything to ticks instead of prices
-    ///  => set the corresponding best price to boundaries of the price interval
     /// Artifical double auction market proposed by E. Smith & J.D. Farmer, 
     /// Paper: "Quantitative finance 3.6 (2003): 481-514"
-    /// Goal: Designed to capture int-run statistical properties of L(t) 
     /// Assumptions:
-    /// [.] All orders are for unit size sigma
-    /// [.] All order ows governed by independent Poisson processes
-    /// [.] Buy market orders arrive with fixed rate 
-    /// [.] Sell market orders arrive with fixed rate 
-    /// [.] Buy limit orders arrive with fixed rate  at all prices p &lt; a(t)
-    /// [.] Sell limit orders arrive with ifxed rate  at all prices p &gt; b(t)
-    /// [.] All active orders are cancelled with xed rate 
+    /// [.] All orders are for unit size sigma
+    /// [.] All order flows governed by independent Poisson processes
+    /// [.] Buy market orders arrive with fixed rate 'mu'
+    /// [.] Sell market orders arrive with fixed rate 'mu'
+    /// [.] Buy limit orders arrive with fixed rate 'alpha' at all prices p &lt; a(t)
+    /// [.] Sell limit orders arrive with fixed rate 'alpha' at all prices p &gt; b(t)
+    /// [.] All active orders are cancelled with fixed rate 'delta'
     /// </summary>
-    public class SmithFarmerModel : IPriceProcess
+    public class SmithFarmerModel
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -591,7 +586,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// <param name="duration">In units of seconds</param>
         public void SimulateOrderFlow(double duration)
         {
-            Random = new ExtendedRandom(42);
+            Random = new ExtendedRandom(Parameter.Seed);
             
             var t0 = LimitOrderBook.Time;
             var tEnd = t0 + duration;
@@ -644,7 +639,8 @@ namespace LimitOrderBookSimulation.EventModels
                     var orderFlowEvent = Random.NextFromProbabilities(probability);
                     orderFlowEvent.Invoke();
 
-                    if (LimitOrderBook.IsBuySideEmpty() || LimitOrderBook.IsSellSideEmpty())
+                    if (LimitOrderBook.IsBuySideEmpty() || 
+                        LimitOrderBook.IsSellSideEmpty())
                     {
                         throw new Exception("Either the bid or ask side is empty");
                     }

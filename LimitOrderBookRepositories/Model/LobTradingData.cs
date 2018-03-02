@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using log4net;
 using log4net.Config;
-using LimitOrderBookRepositories.Interfaces;
 using LimitOrderBookUtilities;
 using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
@@ -18,7 +17,7 @@ namespace LimitOrderBookRepositories.Model
     /// <summary>
     /// LOB trading data for a single trading day
     /// </summary>
-    public class LobTradingData : IPriceProcess
+    public class LobTradingData
     {
         #region Logging
 
