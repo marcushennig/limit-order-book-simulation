@@ -15,17 +15,16 @@ namespace UnitTests
     {
         #region Limit order book data
 
-        private SortedDictionary<long, long> SellSide { set; get; }
-        private SortedDictionary<long, long> BuySide { set; get; }
+        private SortedDictionary<int, int> SellSide { set; get; }
+        private SortedDictionary<int, int> BuySide { set; get; }
 
-        private const int TickSize = 10;
-        private const long Spread = TickSize * 4;
-        private const long BuyMinPrice = 10000;
-        private const long BuyMaxPrice = BuyMinPrice + TickSize * 100;
-        private const long SellMinPrice = BuyMaxPrice + Spread;
-        private const long SellMaxPrice = SellMinPrice + TickSize * 100;
-        private const long BuyMaxDepth = 100;
-        private const long SellMaxDepth = 100;
+        private const int Spread = 4;
+        private const int BuyMinPriceTick = 100;
+        private const int BuyMaxPriceTick = BuyMinPriceTick + 200;
+        private const int SellMinPriceTick = BuyMaxPriceTick + Spread;
+        private const int SellMaxPriceTick = SellMinPriceTick + 200;
+        private const int BuyMaxDepth = 100;
+        private const int SellMaxDepth = 100;
 
         private Random Random { set; get; }
 
@@ -35,24 +34,30 @@ namespace UnitTests
         public void Init()
         {
             Random = new Random(42);
-            SellSide = new SortedDictionary<long, long>();
-            BuySide = new SortedDictionary<long, long>();
+            SellSide = new SortedDictionary<int, int>();
+            BuySide = new SortedDictionary<int, int>();
 
-            for (var price = BuyMinPrice; price <= BuyMaxPrice; price += TickSize)
+            for (var price = BuyMinPriceTick; price <= BuyMaxPriceTick; price++)
             {
-                BuySide.Add(price, GetDepth(p: price, pmin: BuyMaxPrice, pmax: BuyMinPrice, scale: BuyMaxDepth));
+                BuySide.Add(price, GetDepth(p: price, 
+                                            pmin: BuyMaxPriceTick, 
+                                            pmax: BuyMinPriceTick, 
+                                            scale: BuyMaxDepth));
             }
 
-            for (var price = SellMinPrice; price <= SellMaxPrice; price += TickSize)
+            for (var price = SellMinPriceTick; price <= SellMaxPriceTick; price++)
             {
-                SellSide.Add(price, GetDepth(p: price, pmin: SellMinPrice, pmax: SellMaxPrice, scale: SellMaxDepth));
+                SellSide.Add(price, GetDepth(p: price, 
+                                             pmin: SellMinPriceTick, 
+                                             pmax: SellMaxPriceTick, 
+                                             scale: SellMaxDepth));
             }
         }
         
         /**
          * Depth profile on [pmin, pmax] that more ore less resemble the reality
          */
-        private static long GetDepth(long p, long pmin, long pmax, long scale)
+        private static int GetDepth(int p, int pmin, int pmax, int scale)
         {
             var x01 = (p - pmin) / (double)(pmax - pmin);
             
@@ -61,7 +66,7 @@ namespace UnitTests
             
             var f = Math.Exp(x01 * Math.Log(lambda) - lambda) / SpecialFunctions.Gamma(x01);
             
-            return (long) (scale * f / fmax);
+            return (int) (scale * f / fmax);
         }
 
         /**
@@ -69,12 +74,12 @@ namespace UnitTests
          */
         private LimitOrderBook GenerateLimitOrderBook()
         {
-            var buySide = new SortedDictionary<long, long>();
+            var buySide = new SortedDictionary<int, int>();
             foreach (var pair in BuySide)
             {
                 buySide.Add(pair.Key, pair.Value);
             }
-            var sellSide = new SortedDictionary<long, long>();
+            var sellSide = new SortedDictionary<int, int>();
             foreach (var pair in SellSide)
             {
                 sellSide.Add(pair.Key, pair.Value);
@@ -109,10 +114,11 @@ namespace UnitTests
                 CancellationRate = muC,
                 MarketOrderRate = muM,
                 LimitOrderRateDensity = muL,
-                CharacteristicOrderSize = 1,
-                TickSize = TickSize,
-                SimulationIntervalSize = TickSize * 10,
-                LimitOrderBook = limitOrderBook
+                SimulationIntervalSize = 10,
+                LimitOrderBook = limitOrderBook,
+                CharacteristicOrderSize = 10.3,
+                PriceTickSize = 5.6,
+
             };
             model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));
             

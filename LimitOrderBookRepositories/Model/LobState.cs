@@ -23,22 +23,22 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// Level 1-n ask prices 
         /// </summary>
-        public long[] AskPrice { get; }
+        public int[] AskPrice { get; }
         
         /// <summary>
         /// Level 1-n ask volumes 
         /// </summary>
-        public long[] AskVolume { get; }
+        public int[] AskVolume { get; }
 
         /// <summary>
         /// Level 1-n of bid prices 
         /// </summary>
-        public long[] BidPrice { get; }
+        public int[] BidPrice { get; }
 
         /// <summary>
         /// Level 1-n bid volumes 
         /// </summary>
-        public long[] BidVolume { get; }
+        public int[] BidVolume { get; }
         
 
         #endregion Properties 
@@ -48,41 +48,41 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// Return ask side as dictionary
         /// </summary>
-        public IDictionary<long, long> Asks => AskPrice
-            .Zip(AskVolume, (price, volume) => new KeyValuePair<long, long>(price, volume))
+        public IDictionary<int, int> Asks => AskPrice
+            .Zip(AskVolume, (price, volume) => new KeyValuePair<int, int>(price, volume))
             .ToDictionary(p => p.Key, p => p.Value);
 
         /// <summary>
         /// Return ask side as dictionary
         /// </summary>
-        public IDictionary<long, long> Bids => BidPrice
-            .Zip(BidVolume, (price, volume) => new KeyValuePair<long, long>(price, volume))
+        public IDictionary<int, int> Bids => BidPrice
+            .Zip(BidVolume, (price, volume) => new KeyValuePair<int, int>(price, volume))
             .ToDictionary(p => p.Key, p => p.Value);
 
         /// <summary>
         /// Spread 
         /// </summary>
-        public long Spread => BestAskPrice - BestBidPrice;
+        public int Spread => BestAskPrice - BestBidPrice;
 
         /// <summary>
         /// Best ask volume
         /// </summary>
-        public long BestAskVolume => AskVolume[0];
+        public int BestAskVolume => AskVolume[0];
 
         /// <summary>
         /// Best ask price
         /// </summary>
-        public long BestAskPrice => AskPrice[0];
+        public int BestAskPrice => AskPrice[0];
 
         /// <summary>
         /// Best bid volume
         /// </summary>
-        public long BestBidVolume => BidVolume[0];
+        public int BestBidVolume => BidVolume[0];
 
         /// <summary>
         /// Best bid price
         /// </summary>
-        public long BestBidPrice => BidPrice[0];
+        public int BestBidPrice => BidPrice[0];
 
         #endregion
 
@@ -95,7 +95,7 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="askVolume"></param>
         /// <param name="bidPrice"></param>
         /// <param name="bidVolume"></param>
-        public LobState(long[] askPrice, long[] askVolume, long[] bidPrice, long[] bidVolume)
+        public LobState(int[] askPrice, int[] askVolume, int[] bidPrice, int[] bidVolume)
         {
             if (askPrice == null || askVolume == null || bidPrice == null || bidVolume == null)
             {
@@ -132,7 +132,7 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="side"></param>
         /// <param name="quantile"></param>
         /// <returns></returns>
-        public bool IsPriceInQuantile(long price, MarketSide side, double quantile)
+        public bool IsPriceInQuantile(int price, MarketSide side, double quantile)
         {
             if (quantile < 0 || quantile > 1)
             {
@@ -176,7 +176,7 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="price"></param>
         /// <param name="side"></param>
         /// <returns></returns>
-        public long Depth(long price, MarketSide side)
+        public int Depth(int price, MarketSide side)
         {
             if (side == MarketSide.Sell)
             {

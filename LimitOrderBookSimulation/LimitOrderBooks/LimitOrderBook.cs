@@ -15,8 +15,8 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <summary>
         /// Use map for asks price, stores price/quantity
         /// </summary>
-        public SortedDictionary<long, long> Asks { get; }
-        public SortedDictionary<long, long> Bids { get; }
+        public SortedDictionary<int, int> Asks { get; }
+        public SortedDictionary<int, int> Bids { get; }
 
         /// <summary>
         /// Check if there is anything in the order book
@@ -31,14 +31,14 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <summary>
         /// Best ask price (Asks is sorted according to key, first is smallest )
         /// </summary>
-        public long Ask => Asks.Any()? Asks.First().Key : long.MaxValue;
+        public int Ask => Asks.Any()? Asks.First().Key : int.MaxValue;
         
         /// <summary>
         /// Best bid (Asks is sorted according to key, first is smallest )
         /// </summary>
-        public long Bid => Bids.Any() ? Bids.Last().Key : long.MinValue;
+        public int Bid => Bids.Any() ? Bids.Last().Key : int.MinValue;
 
-        public Dictionary<LimitOrderBookEvent, long> Counter { get; }
+        public Dictionary<LimitOrderBookEvent, int> Counter { get; }
 
         /// <inheritdoc />
         /// <summary>
@@ -55,13 +55,13 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         public LimitOrderBook()
         {
-            Asks = new SortedDictionary<long, long>();
-            Bids = new SortedDictionary<long, long>();
+            Asks = new SortedDictionary<int, int>();
+            Bids = new SortedDictionary<int, int>();
 
             PriceTimeSeries = new SortedList<double, Price>();
 
             // Counter used for statistics
-            Counter = new Dictionary<LimitOrderBookEvent, long>
+            Counter = new Dictionary<LimitOrderBookEvent, int>
             {
                 { LimitOrderBookEvent.CancelLimitBuyOrder, 0 },
                 { LimitOrderBookEvent.CancelLimitSellOrder, 0 },
@@ -84,7 +84,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <param name="price"></param>
         /// <param name="amount"></param>
         /// <param name="buyOrAsk"></param>
-        private void Add(long price, long amount, MarketSide buyOrAsk)
+        private void Add(int price, int amount, MarketSide buyOrAsk)
         {
             var marketSide = buyOrAsk == MarketSide.Buy ? Bids : Asks;
 
@@ -105,7 +105,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         /// <param name="price"></param>
         /// <param name="amount"></param>
-        private void AddBid(long price, long amount)
+        private void AddBid(int price, int amount)
         {
             Add(price, amount, MarketSide.Buy);
         }
@@ -113,7 +113,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <summary>
         /// Add limit sell order
         /// </summary>
-        private void AddAsk(long price, long amount)
+        private void AddAsk(int price, int amount)
         {
             Add(price, amount, MarketSide.Sell);
         }
@@ -124,7 +124,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <param name="price"></param>
         /// <param name="amount"></param>
         /// <param name="buyOrAsk"></param>
-        private void Remove(long price, long amount, MarketSide buyOrAsk)
+        private void Remove(int price, int amount, MarketSide buyOrAsk)
         {
             var marketSide = buyOrAsk == MarketSide.Buy ? Bids : Asks;
 
@@ -144,7 +144,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         /// <param name="price"></param>
         /// <param name="amount"></param>
-        private void RemoveBid(long price, long amount)
+        private void RemoveBid(int price, int amount)
         {
             Remove(price, amount, MarketSide.Buy);
         }
@@ -154,7 +154,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         /// <param name="price"></param>
         /// <param name="amount"></param>
-        private void RemoveAsk(long price, long amount)
+        private void RemoveAsk(int price, int amount)
         {
             Remove(price, amount, MarketSide.Sell);
         }
@@ -180,13 +180,13 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Limit order
         
-        public void SubmitLimitBuyOrder(long price, long amount = 1)
+        public void SubmitLimitBuyOrder(int price, int amount = 1)
         {
             AddBid(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitBuyOrder]++;
         }
 
-        public void SubmitLimitSellOrder(long price, long amount = 1)
+        public void SubmitLimitSellOrder(int price, int amount = 1)
         {
             AddAsk(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitSellOrder]++;
@@ -196,13 +196,13 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Market order
 
-        public void SubmitMarketBuyOrder(long amount = 1)
+        public void SubmitMarketBuyOrder(int amount = 1)
         {
             RemoveAsk(Ask,  amount);
             Counter[LimitOrderBookEvent.SubmitMarketBuyOrder]++;
         }
 
-        public void SubmitMarketSellOrder(long amount = 1)
+        public void SubmitMarketSellOrder(int amount = 1)
         {
             RemoveBid(Bid, amount);
             Counter[LimitOrderBookEvent.SubmitMarketSellOrder]++;
@@ -212,13 +212,13 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Cancel order
 
-        public void CancelLimitBuyOrder(long price, long amount =1)
+        public void CancelLimitBuyOrder(int price, int amount =1)
         {
             RemoveBid(price, amount);
             Counter[LimitOrderBookEvent.CancelLimitBuyOrder]++;
         }
 
-        public void CancelLimitSellOrder(long price, long amount = 1)
+        public void CancelLimitSellOrder(int price, int amount = 1)
         {
             RemoveAsk(price, amount);
             Counter[LimitOrderBookEvent.CancelLimitSellOrder]++;
@@ -228,7 +228,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Number of orders
 
-        private long NumberOfOrders(long minPrice, long maxPrice, MarketSide buyOrSell)
+        private int NumberOfOrders(int minPrice, int maxPrice, MarketSide buyOrSell)
         {
             var marketSide = buyOrSell == MarketSide.Buy ? Bids : Asks;
             return marketSide.Where(p => p.Key >= minPrice && p.Key <= maxPrice)
@@ -239,7 +239,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// Number of buy orders within given price range
         /// </summary>
         /// <returns></returns>
-        public long NumberOfBuyOrders(long minPrice = 0, long maxPrice = long.MaxValue)
+        public int NumberOfBuyOrders(int minPrice = 0, int maxPrice = int.MaxValue)
         {
             return NumberOfOrders(minPrice, maxPrice, MarketSide.Buy);
         }
@@ -248,7 +248,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// Number of sell orders within given price range
         /// </summary>
         /// <returns></returns>
-        public long NumberOfSellOrders(long minPrice = 0, long maxPrice = long.MaxValue)
+        public int NumberOfSellOrders(int minPrice = 0, int maxPrice = int.MaxValue)
         {
             return NumberOfOrders(minPrice, maxPrice, MarketSide.Sell);
         }
@@ -259,7 +259,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <param name="minPrice"></param>
         /// <param name="maxPrice"></param>
         /// <returns></returns>
-        public long NumberOfLimitOrders(long minPrice, long maxPrice)
+        public int NumberOfLimitOrders(int minPrice, int maxPrice)
         {
             return NumberOfBuyOrders(minPrice, maxPrice) + NumberOfSellOrders(minPrice, maxPrice);
         }
@@ -268,7 +268,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Inverse CDF
 
-        public long InverseCDF(long priceMin, long priceMax, long q)
+        public int InverseCDF(int priceMin, int priceMax, int q)
         {
             throw new NotImplementedException();
         }
@@ -281,10 +281,10 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <param name="q"></param>
         /// <param name="side"></param>
         /// <returns></returns>
-        private long InverseCDF(long min, long max, long q, MarketSide side)
+        private int InverseCDF(int min, int max, int q, MarketSide side)
         {
             var quantity = side==MarketSide.Buy ? Bids : Asks;
-            long sum = 0;
+            int sum = 0;
 
             for (var price = min; price <= max; price++)
             {
@@ -306,7 +306,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <param name="maxPrice"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        public long InverseCDFSellSide(long minPrice, long maxPrice, long q)
+        public int InverseCDFSellSide(int minPrice, int maxPrice, int q)
         {
             return InverseCDF(minPrice, maxPrice, q, MarketSide.Sell);
         }
@@ -318,7 +318,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <param name="maxPrice"></param>
         /// <param name="q"></param>
         /// <returns></returns>
-        public long InverseCDFBuySide(long minPrice, long maxPrice, long q)
+        public int InverseCDFBuySide(int minPrice, int maxPrice, int q)
         {
             return InverseCDF(minPrice, maxPrice, q, MarketSide.Buy);
         }
@@ -332,7 +332,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// </summary>
         /// <param name="depthProdile"></param>
         /// <param name="buyOrSell"></param>
-        private void InitilizeDepthProfile(IDictionary<long, long> depthProdile, MarketSide buyOrSell)
+        private void InitilizeDepthProfile(IDictionary<int, int> depthProdile, MarketSide buyOrSell)
         {
             var marketSide = buyOrSell == MarketSide.Buy ? Bids : Asks;
 
@@ -347,7 +347,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// Initialize depth profile on buy side
         /// </summary>
         /// <param name="depthProdile"></param>
-        public void InitializeDepthProfileBuySide(IDictionary<long, long> depthProdile)
+        public void InitializeDepthProfileBuySide(IDictionary<int, int> depthProdile)
         {
             InitilizeDepthProfile(depthProdile, MarketSide.Buy);
         }
@@ -356,7 +356,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// Initialize depth profile on buy side
         /// </summary>
         /// <param name="depthProdile"></param>
-        public void InitializeDepthProfileSellSide(IDictionary<long, long> depthProdile)
+        public void InitializeDepthProfileSellSide(IDictionary<int, int> depthProdile)
         {
             InitilizeDepthProfile(depthProdile, MarketSide.Sell);
         }
@@ -372,7 +372,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         {
             using (var file = new StreamWriter(fileName))
             {
-                foreach (var side in new List<SortedDictionary<long,long>>{Bids, Asks})
+                foreach (var side in new List<SortedDictionary<int,int>>{Bids, Asks})
                 {
                     foreach (var entry in side)
                     {

@@ -11,15 +11,15 @@ namespace UnitTests
     {
         #region Limit order book data
 
-        private SortedDictionary<long, long> SellSide { set; get; }
-        private SortedDictionary<long, long> BuySide { set; get; }
+        private SortedDictionary<int, int> SellSide { set; get; }
+        private SortedDictionary<int, int> BuySide { set; get; }
 
-        private const long TickSize = 10;
-        private const long Spread = TickSize * 6;
-        private const long BuyMinPrice = 10000;
-        private const long BuyMaxPrice = BuyMinPrice + TickSize * 100;
-        private const long SellMinPrice = BuyMaxPrice + Spread;
-        private const long SellMaxPrice = SellMinPrice + TickSize * 100;
+        private const int TickSize = 10;
+        private const int Spread = TickSize * 6;
+        private const int BuyMinPrice = 10000;
+        private const int BuyMaxPrice = BuyMinPrice + TickSize * 100;
+        private const int SellMinPrice = BuyMaxPrice + Spread;
+        private const int SellMaxPrice = SellMinPrice + TickSize * 100;
         private Random Random { set; get; }
 
         #endregion
@@ -28,8 +28,8 @@ namespace UnitTests
         public void Init()
         {
             Random = new Random(42);
-            SellSide = new SortedDictionary<long, long>();
-            BuySide = new SortedDictionary<long, long>();
+            SellSide = new SortedDictionary<int, int>();
+            BuySide = new SortedDictionary<int, int>();
 
 
             for (var p = BuyMinPrice; p < BuyMaxPrice; p += TickSize)
@@ -49,7 +49,7 @@ namespace UnitTests
         private LimitOrderBook GenerateLimitOrderBook()
         {
             var lob = new LimitOrderBook();
-            var buySide = new SortedDictionary<long, long>();
+            var buySide = new SortedDictionary<int, int>();
             foreach (var pair in BuySide)
             {
                 buySide.Add(pair.Key, pair.Value);
@@ -57,7 +57,7 @@ namespace UnitTests
 
             lob.InitializeDepthProfileBuySide(buySide);
 
-            var sellSide = new SortedDictionary<long, long>();
+            var sellSide = new SortedDictionary<int, int>();
             foreach (var pair in SellSide)
             {
                 sellSide.Add(pair.Key, pair.Value);
@@ -73,8 +73,8 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = BuyMinPrice;
-            const long amount = 1;
+            const int price = BuyMinPrice;
+            const int amount = 1;
 
             lob.SubmitLimitBuyOrder(price, amount);
 
@@ -91,8 +91,8 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = SellMinPrice + TickSize * 3;
-            const long amount = 1;
+            const int price = SellMinPrice + TickSize * 3;
+            const int amount = 1;
 
             lob.SubmitLimitSellOrder(price, amount);
 
@@ -110,7 +110,7 @@ namespace UnitTests
             var lob = GenerateLimitOrderBook();
 
             var askPrice = SellSide.Keys.Min();
-            const long amount = 1;
+            const int amount = 1;
 
             lob.SubmitMarketBuyOrder(amount);
 
@@ -129,7 +129,7 @@ namespace UnitTests
             var lob = GenerateLimitOrderBook();
 
             var bidPrice = BuySide.Keys.Max();
-            const long amount = 1;
+            const int amount = 1;
 
             lob.SubmitMarketSellOrder(amount);
 
@@ -147,8 +147,8 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = BuyMaxPrice - TickSize * 3;
-            const long amount = 1;
+            const int price = BuyMaxPrice - TickSize * 3;
+            const int amount = 1;
 
             lob.CancelLimitBuyOrder(price, amount);
 
@@ -166,8 +166,8 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = SellMinPrice + TickSize * 3;
-            const long amount = 1;
+            const int price = SellMinPrice + TickSize * 3;
+            const int amount = 1;
 
             lob.CancelLimitSellOrder(price, amount);
 
@@ -185,8 +185,8 @@ namespace UnitTests
         {
             var lob = GenerateLimitOrderBook();
 
-            const long price = BuyMinPrice + 3 * TickSize;
-            const long amount = 1;
+            const int price = BuyMinPrice + 3 * TickSize;
+            const int amount = 1;
             const int numberOfSubmission = 5;
 
             for (var i = 0; i < numberOfSubmission; i++)
@@ -205,8 +205,8 @@ namespace UnitTests
         public void TestMultipleSubmissionsAndCancellations()
         {
             var lob = GenerateLimitOrderBook();
-            const long price = BuyMinPrice + 3 * TickSize;
-            const long amount = 1;
+            const int price = BuyMinPrice + 3 * TickSize;
+            const int amount = 1;
             
             lob.SubmitLimitBuyOrder(price, amount);
             lob.SubmitLimitBuyOrder(price, amount);
@@ -271,7 +271,7 @@ namespace UnitTests
         public void TestCancellationBuyOrderRobustness()
         {
             var lob = GenerateLimitOrderBook();
-            const long price = BuyMinPrice + 3 * TickSize;
+            const int price = BuyMinPrice + 3 * TickSize;
             var depth = lob.Bids[price];
 
             for (var i = 0; i < depth + 10; i++)
@@ -286,7 +286,7 @@ namespace UnitTests
         public void TestCancellationSellOrderRobustness()
         {
             var lob = GenerateLimitOrderBook();
-            const long price = SellMinPrice + 3 * TickSize;
+            const int price = SellMinPrice + 3 * TickSize;
             var depth = lob.Asks[price];
 
             for (var i = 0; i < depth + 10; i++)

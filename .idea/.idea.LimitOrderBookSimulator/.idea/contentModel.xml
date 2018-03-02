@@ -58,6 +58,7 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="CommandLineInterface.cs" t="Include" />
         <e p="DiscreteDistribution.cs" t="Include" />
+        <e p="ExtendedRandom.cs" t="Include" />
         <e p="LimitOrderBookUtilities.csproj" t="IncludeRecursive" />
         <e p="obj" t="ExcludeRecursive" />
         <e p="packages.config" t="Include" />
@@ -65,7 +66,6 @@
         <e p="Properties" t="Include">
           <e p="AssemblyInfo.cs" t="Include" />
         </e>
-        <e p="RandomUtilities.cs" t="Include" />
         <e p="SharedUtilities.cs" t="Include" />
       </e>
       <e p="packages" t="ExcludeRecursive" />

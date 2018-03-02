@@ -200,7 +200,7 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// Price tick size  
         /// </summary>
-        public long PriceTickSize { private set; get; }
+        public int PriceTickSize { private set; get; }
 
         /// <summary>
         /// Characteristic order size  
@@ -220,7 +220,7 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// List of the order ids of hidden orders
         /// </summary>
-        private List<long> HiddenOrderIds { set; get; }
+        private List<int> HiddenOrderIds { set; get; }
 
         #endregion LOB parameter
 
@@ -238,7 +238,7 @@ namespace LimitOrderBookRepositories.Model
             {
                 if (_averageDepthProfile != null) return _averageDepthProfile;
 
-                var outstandingLimitOrders = new Dictionary<long, double>();
+                var outstandingLimitOrders = new Dictionary<int, double>();
                 const long priceError = 9999999999;
                 var totalWeight = 0.0;
                 for (var i = 0; i < Events.Length - 1; i++)
@@ -293,7 +293,7 @@ namespace LimitOrderBookRepositories.Model
             {
                 if (_limitOrderDistribution != null) return _limitOrderDistribution;
 
-                var data = new SortedDictionary<long, long>();
+                var data = new SortedDictionary<int, int>();
                 foreach (var entry in LimitOrders.GroupBy(p => p.DistanceBestOppositeQuote))
                 {
                     data.Add(entry.Key, entry.Sum(p => p.Volume));
@@ -315,7 +315,7 @@ namespace LimitOrderBookRepositories.Model
             {
                 if (_limitSellOrderDistribution != null) return _limitSellOrderDistribution;
 
-                var data = new SortedDictionary<long, long>();
+                var data = new SortedDictionary<int, int>();
                 foreach (var entry in LimitOrders.Where(p=>p.Side == MarketSide.Sell)
                                                  .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
@@ -338,7 +338,7 @@ namespace LimitOrderBookRepositories.Model
             {
                 if (_limitBuyOrderDistribution != null) return _limitBuyOrderDistribution;
 
-                var data = new SortedDictionary<long, long>();
+                var data = new SortedDictionary<int, int>();
                 foreach (var entry in LimitOrders.Where(p => p.Side == MarketSide.Buy)
                                                  .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
@@ -364,7 +364,7 @@ namespace LimitOrderBookRepositories.Model
             {
                 if (_canceledOrderDistribution != null) return _canceledOrderDistribution;
 
-                var data = new SortedDictionary<long, long>();
+                var data = new SortedDictionary<int, int>();
                 foreach (var entry in CanceledOrders.GroupBy(p => p.DistanceBestOppositeQuote))
                 {
                     data.Add(entry.Key, entry.Sum(p => p.Volume));
@@ -384,7 +384,7 @@ namespace LimitOrderBookRepositories.Model
             {
                 if (_canceledSellOrderDistribution != null) return _canceledSellOrderDistribution;
 
-                var data = new SortedDictionary<long, long>();
+                var data = new SortedDictionary<int, int>();
                 foreach (var entry in CanceledOrders.Where(p=>p.Side == MarketSide.Sell)
                                                     .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
@@ -405,7 +405,7 @@ namespace LimitOrderBookRepositories.Model
             {
                 if (_canceledBuyOrderDistribution != null) return _canceledBuyOrderDistribution;
 
-                var data = new SortedDictionary<long, long>();
+                var data = new SortedDictionary<int, int>();
                 foreach (var entry in CanceledOrders.Where(p => p.Side == MarketSide.Buy)
                                                     .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
@@ -482,7 +482,7 @@ namespace LimitOrderBookRepositories.Model
 
             #region Tick size
 
-            var prices = new List<long>();
+            var prices = new List<int>();
 
             prices.AddRange(States.SelectMany(p => p.AskPrice));
             prices.AddRange(States.SelectMany(p => p.BidPrice));
@@ -495,7 +495,7 @@ namespace LimitOrderBookRepositories.Model
 
             var guess = diffs.Min();
 
-            PriceTickSize = diffs.Select(d => Euclid.GreatestCommonDivisor(guess, d)).Min();
+            PriceTickSize = diffs.Select(d => (int)Euclid.GreatestCommonDivisor(guess, d)).Min();
 
             #endregion Tick size
 
@@ -600,11 +600,11 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="initialState"></param>
         /// <param name="finalState"></param>
         /// <returns></returns>
-        private long DepthDifferenceNearSpread(MarketSide side, LobState initialState, LobState finalState)
+        private int DepthDifferenceNearSpread(MarketSide side, LobState initialState, LobState finalState)
         {
             // Volume change near spread
-            long dDepth = 0;
-            long depthDifferenceNearSpread = 0;
+            int dDepth = 0;
+            int depthDifferenceNearSpread = 0;
             var price = side == MarketSide.Buy ? initialState.BestBidPrice : initialState.BestAskPrice;
             do
             {
@@ -800,9 +800,9 @@ namespace LimitOrderBookRepositories.Model
         /// distance to best opposite quote 
         /// </summary>
         /// <returns></returns>
-        public Dictionary<long, double> AverageNumberOfOutstandingLimitOrders(MarketSide side)
+        public Dictionary<int, double> AverageNumberOfOutstandingLimitOrders(MarketSide side)
         {
-            var averageNumber = new Dictionary<long, double>();
+            var averageNumber = new Dictionary<int, double>();
             var sign = side == MarketSide.Sell ? -1 : 1;
             var totalWeight = 0.0;
 
@@ -847,12 +847,12 @@ namespace LimitOrderBookRepositories.Model
         /// Q[i], which is the average number of outstanding orders at a 
         /// distance of i ticks from the opposite best quote 
         /// </summary>
-        public Dictionary<long, double> AverageNumberOfOutstandingLimitOrders()
+        public Dictionary<int, double> AverageNumberOfOutstandingLimitOrders()
         {
             var averageBuy = AverageNumberOfOutstandingLimitOrders(MarketSide.Buy);
             var averageSell = AverageNumberOfOutstandingLimitOrders(MarketSide.Sell);
 
-            var average = new Dictionary<long, double>();
+            var average = new Dictionary<int, double>();
             foreach (var key in averageBuy.Keys.Concat(averageSell.Keys).Distinct())
             {
                 double buyDepth = 0;

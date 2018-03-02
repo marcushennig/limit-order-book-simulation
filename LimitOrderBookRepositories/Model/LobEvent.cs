@@ -16,7 +16,7 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// Unique order reference number (Assigned in order flow)
         /// </summary>
-        public long OrderId {get; }
+        public int OrderId {get; }
 
         /// <summary>
         /// Seconds after midnight with decimal 
@@ -34,12 +34,12 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// Number of shares
         /// </summary>
-        public long Volume { get; }
+        public int Volume { get; }
 
         /// <summary>
         /// Dollar price times 10000 (i.e., A stock price of $91.14 is given by 911400)
         /// </summary>
-        public long Price { get; }
+        public int Price { get; }
 
         /// <summary>
         /// Sell/Buy limit order
@@ -62,8 +62,8 @@ namespace LimitOrderBookRepositories.Model
 
         #region Characteristic
         
-        public long TotalBidVolumeChange => FinalState.BidVolume.Sum() - InitialState.BidVolume.Sum();
-        public long TotalAskVolumeChange => FinalState.AskVolume.Sum() - InitialState.AskVolume.Sum();
+        public int TotalBidVolumeChange => FinalState.BidVolume.Sum() - InitialState.BidVolume.Sum();
+        public int TotalAskVolumeChange => FinalState.AskVolume.Sum() - InitialState.AskVolume.Sum();
 
         /// <summary>
         /// Submission event that will at least partlly be executed
@@ -89,26 +89,26 @@ namespace LimitOrderBookRepositories.Model
         /// Relative price of the event to 
         /// the state before the event was submitted 
         /// </summary>
-        public long RelativePrice => Side == MarketSide.Buy
+        public int RelativePrice => Side == MarketSide.Buy
             ? InitialState.BestBidPrice - Price
             : Price - InitialState.BestAskPrice;
 
         /// <summary>
         /// Distance i from the opposite best quote 
         /// </summary>
-        public long DistanceBestOppositeQuote => Side == MarketSide.Buy 
+        public int DistanceBestOppositeQuote => Side == MarketSide.Buy 
             ? InitialState.BestAskPrice - Price 
             : Price - InitialState.BestBidPrice;
         
         /// <summary>
         /// Relative price to best bid
         /// </summary>
-        private long BidRelativePrice => InitialState.BestBidPrice - Price;
+        private int BidRelativePrice => InitialState.BestBidPrice - Price;
 
         /// <summary>
         /// Relative price to best ask
         /// </summary>
-        private long AskRelativePrice => Price - InitialState.BestAskPrice;
+        private int AskRelativePrice => Price - InitialState.BestAskPrice;
 
         #endregion Characteristic
 
@@ -125,7 +125,7 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="volume"></param>
         /// <param name="price"></param>
         /// <param name="side"></param>
-        public LobEvent(long orderId, double time, LobEventType type, long volume, long price, MarketSide side)
+        public LobEvent(int orderId, double time, LobEventType type, int volume, int price, MarketSide side)
         {
             OrderId = orderId;
             Time = time;

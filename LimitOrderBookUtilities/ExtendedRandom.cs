@@ -1,47 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 
 namespace LimitOrderBookUtilities
-{
-
-    public class RandomUtilities
+{   
+    public class ExtendedRandom : Random
     {
-        #region Properties
-        
+        /// <inheritdoc />
         /// <summary>
-        /// Random generator  
+        /// Construct randomizer from seed
         /// </summary>
-        private Random RandomGenerator { set; get; }
-
-        #endregion Properties
-
-        #region Constructor 
-
-        /// <summary>
-        /// Contructor
-        /// </summary>
-        public RandomUtilities(int seed)
-        {
-            RandomGenerator = new Random(seed);
-        }
-
-        #endregion Constructor 
-
-        #region Methods
-
-        /// <summary>
-        /// Random integer in [a,b]
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        public int Next(long a, long b)
-        {
-            return RandomGenerator.Next((int)a, (int)b);
-        }
+        /// <param name="seed"></param>
+        public ExtendedRandom(int seed) : base(seed) {}
 
         /// <summary>
         /// Interarrival time of Poisson point process:  {X_n}
@@ -49,10 +19,10 @@ namespace LimitOrderBookUtilities
         /// </summary>
         /// <param name="lambda">Rate [1/time]</param>
         /// <returns></returns>
-        public double PickExponentialTime(double lambda)
+        public double NextExponentialTime(double lambda)
         {
             // Generate random number on [0,1]
-            var u = RandomGenerator.NextDouble();
+            var u = NextDouble();
             // F(x) = P(X < x) = 1 - exp(- lambda * x)
             return -1.0 / lambda * Math.Log(1 - u);
         }
@@ -64,7 +34,7 @@ namespace LimitOrderBookUtilities
         /// <returns></returns>
         public T NextFromProbabilities<T>(Dictionary<T, double> probabilities)
         {
-            var r = RandomGenerator.NextDouble();
+            var r = NextDouble();
             // cumulative sum in C#
             var p = 0.0;
             foreach (var entry in probabilities)
@@ -86,9 +56,9 @@ namespace LimitOrderBookUtilities
         /// </summary>
         /// <param name="weights"></param>
         /// <returns></returns>
-        public T NextFromWeights<T>(Dictionary<T, long> weights)
+        public T NextFromWeights<T>(Dictionary<T, int> weights)
         {
-            var r = RandomGenerator.NextDouble();
+            var r = NextDouble();
             // cumulative sum in C#
             var p = 0.0;
             var totalWeight = weights.Select(q=>q.Value).Sum();
@@ -105,7 +75,5 @@ namespace LimitOrderBookUtilities
             // will never be reached as r el [0,1]
             return default(T) ;
         }
-
-        #endregion Methods
     }
 }

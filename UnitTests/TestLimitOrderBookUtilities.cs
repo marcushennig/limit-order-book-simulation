@@ -12,7 +12,7 @@ namespace UnitTests
         [Test]  
         public void TestSelectionOfRandomEvents()
         {
-            var random = new RandomUtilities(34);
+            var random = new ExtendedRandom(34);
             var element = new List<string>{"A", "B", "C", "D"};
             
             var probability = new Dictionary<string, double>

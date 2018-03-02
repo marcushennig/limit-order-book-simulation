@@ -114,7 +114,7 @@ namespace LimitOrderBookUtilities
         /// <summary>
         /// Constructor 
         /// </summary>
-        public DiscreteDistribution(IDictionary<long, long> data)
+        public DiscreteDistribution(IDictionary<int, int> data)
         {
             if (data == null) throw new ArgumentException("Data cannot be null");
 
@@ -129,7 +129,7 @@ namespace LimitOrderBookUtilities
         /// <summary>
         /// Constructor 
         /// </summary>
-        public DiscreteDistribution(IDictionary<long, double> data)
+        public DiscreteDistribution(IDictionary<int, double> data)
         {
             if (data == null) throw new ArgumentException("Data cannot be null");
 
