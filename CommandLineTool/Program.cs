@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using log4net.Config;
 using LimitOrderBookRepositories;
-using LimitOrderBookSimulation;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookUtilities;
 
@@ -29,9 +27,8 @@ namespace CommandLineTool
 
             };
             var lobRepository = new LobRepository(symbol, level, tradingDates);
-            var lobModel = new SmithFarmerModel();
 
-            lobModel.Calibrate(lobRepository);
+            SmithFarmerModelCalibration.Calibrate(lobRepository);
 
             Console.WriteLine(lobRepository);
 
@@ -101,6 +98,7 @@ namespace CommandLineTool
             // LoadLobData();
             //StartSimulation();
             LoadLobData();
+            
             Console.WriteLine("Press any key.");
             Console.ReadKey();
         }

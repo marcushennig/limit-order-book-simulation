@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EventModels\SmithFarmerModelCalibration.cs" />
     <Compile Include="EventModels\SmithFarmerModelParameter.cs" />
     <Compile Include="LimitOrderBooks\Enums.cs" />
     <Compile Include="LimitOrderBooks\ILimitOrderBook.cs" />

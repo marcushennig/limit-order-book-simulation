@@ -36,6 +36,7 @@
         <e p="bin" t="ExcludeRecursive" />
         <e p="EventModels" t="Include">
           <e p="SmithFarmerModel.cs" t="Include" />
+          <e p="SmithFarmerModelCalibration.cs" t="Include" />
           <e p="SmithFarmerModelParameter.cs" t="Include" />
         </e>
         <e p="LimitOrderBooks" t="Include">
