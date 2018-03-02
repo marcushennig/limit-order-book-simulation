@@ -40,7 +40,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// Unit: Price: ticks
         ///       Depth: characteristic orderSize
         /// </summary>
-        public LimitOrderBook LimitOrderBook { set; get; }
+        public ILimitOrderBook LimitOrderBook { set; get; }
         
         /// <summary>
         /// Model paramater
@@ -83,6 +83,7 @@ namespace LimitOrderBookSimulation.EventModels
         {
             LimitOrderBook = new LimitOrderBook();
             Parameter = new SmithFarmerModelParameter();
+            Random = new ExtendedRandom(42);
         }
         
         /// <inheritdoc />
@@ -303,18 +304,8 @@ namespace LimitOrderBookSimulation.EventModels
         {
             var minTick = LimitOrderBook.Ask;
             var maxTick = minTick + Parameter.SimulationIntervalSize;
+            var priceTick = LimitOrderBook.GetRandomPriceFromSellSide(Random, minTick, maxTick);
             
-            /*var n = LimitOrderBook.NumberOfSellOrders(minTick, maxTick);
-            var q = Random.Next(1, n);
-            var priceTick = LimitOrderBook.InverseCDFSellSide(minTick, maxTick, q)*/;
-            
-            var weightedPriceTicks = LimitOrderBook.DepthSellSide
-                .Where(p => p.Key >= minTick && 
-                            p.Key <= maxTick)
-                .ToDictionary(s => s.Key, 
-                              s => s.Value);
-            
-            var priceTick = Random.NextFromWeights(weightedPriceTicks);
             LimitOrderBook.CancelLimitSellOrder(price:priceTick, amount: 1);
             
             return priceTick;
@@ -328,18 +319,8 @@ namespace LimitOrderBookSimulation.EventModels
         {
             var maxTick = LimitOrderBook.Bid;
             var minTick = maxTick - Parameter.SimulationIntervalSize;
+            var priceTick = LimitOrderBook.GetRandomPriceFromBuySide(Random, minTick, maxTick);
             
-            //var n = LimitOrderBook.NumberOfBuyOrders(minTick, maxTick);
-            //var q = Random.Next(1, n);
-            //var priceTick = LimitOrderBook.InverseCDFBuySide(minTick, maxTick, q);
-            
-            var weightedPriceTicks = LimitOrderBook.DepthBuySide
-                .Where(p => p.Key >= minTick && 
-                            p.Key <= maxTick)
-                .ToDictionary(s => s.Key, 
-                              s => s.Value);
-            
-            var priceTick = Random.NextFromWeights(weightedPriceTicks);
             LimitOrderBook.CancelLimitBuyOrder(price:priceTick, amount: 1);
             
             return priceTick;
@@ -663,7 +644,7 @@ namespace LimitOrderBookSimulation.EventModels
                     var orderFlowEvent = Random.NextFromProbabilities(probability);
                     orderFlowEvent.Invoke();
 
-                    if (!LimitOrderBook.DepthSellSide.Any() || !LimitOrderBook.DepthBuySide.Any())
+                    if (LimitOrderBook.IsBuySideEmpty() || LimitOrderBook.IsSellSideEmpty())
                     {
                         throw new Exception("Either the bid or ask side is empty");
                     }

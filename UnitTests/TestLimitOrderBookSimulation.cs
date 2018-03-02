@@ -23,8 +23,8 @@ namespace UnitTests
         private const int BuyMaxPriceTick = BuyMinPriceTick + 200;
         private const int SellMinPriceTick = BuyMaxPriceTick + Spread;
         private const int SellMaxPriceTick = SellMinPriceTick + 200;
-        private const int BuyMaxDepth = 100;
-        private const int SellMaxDepth = 100;
+        private const int BuyMaxDepth = 10000;
+        private const int SellMaxDepth = 1000;
 
         #endregion
         
@@ -152,9 +152,6 @@ namespace UnitTests
             Assert.True(lob.Counter[LimitOrderBookEvent.CancelLimitBuyOrder] > 0);
             
             // Make sure that all depths are positive 
-            Assert.True(lob.DepthSellSide.Values.All(p => p > 0), "Depth cannot be negative on sell side");
-            Assert.True(lob.DepthBuySide.Values.All(p => p > 0), "Depth cannot be negative on buy side");
-
             Assert.True(lob.Ask > lob.Bid, "Ask must be greater than bid price");
             
             Assert.True(lob.PriceTimeSeries.Any(), "No events where triggered");

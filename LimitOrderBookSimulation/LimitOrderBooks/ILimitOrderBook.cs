@@ -1,18 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using LimitOrderBookUtilities;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
 {
     public interface ILimitOrderBook
     {
-        #region Properties
-
         double Time { set; get; }
 
         int Ask { get; }
 
         int Bid { get; }
-        
-        #endregion Properties
+
+        int GetDepthAtPriceTick(int priceTick);
+
+        int GetRandomPriceFromSellSide(ExtendedRandom random, int pmin, int pmax);
+
+        int GetRandomPriceFromBuySide(ExtendedRandom random, int pmin, int pmax);
 
         #region Events
 
@@ -23,7 +27,6 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         int SubmitMarketBuyOrder(int amount =1);
 
         int SubmitMarketSellOrder(int amount =1);
-
 
         void CancelLimitBuyOrder(int price, int amount = 1);
 
@@ -44,7 +47,9 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         #region Statistics
 
-        #region Number of orders
+        bool IsBuySideEmpty();
+        
+        bool IsSellSideEmpty();
 
         int NumberOfBuyOrders(int minPrice = 0, int maxPrice = int.MaxValue);
 
@@ -52,18 +57,6 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
         int NumberOfLimitOrders(int minPrice = 0, int maxPrice = int.MaxValue);
 
-        #endregion Number of orders
-
-        #region Inverse CDF
-
-        int InverseCDF(int minPrice, int maxPrice, int q);
-
-        int InverseCDFSellSide(int minPrice, int maxPrice, int q);
-
-        int InverseCDFBuySide(int minPrice, int maxPrice, int q);
-
-        #endregion Inverse CDF
-        
         #endregion
         
         #region Iinitialize
