@@ -37,6 +37,7 @@
       <HintPath>..\packages\MathNet.Numerics.4.4.0\lib\net461\MathNet.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -50,6 +51,8 @@
     <Compile Include="TestLimitOrderBookRepository.cs" />
     <Compile Include="TestLimitOrderBookSimulation.cs" />
     <Compile Include="TestLimitOrderBookUtilities.cs" />
+    <Compile Include="TestLobRepository.cs" />
+    <Compile Include="TestSmithFarmerModelCalibration.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LimitOrderBookRepositories\LimitOrderBookRepositories.csproj">
@@ -64,6 +67,12 @@
       <Project>{7e16bf4c-1404-4384-9a5e-eae5d84e4e93}</Project>
       <Name>LimitOrderBookUtilities</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

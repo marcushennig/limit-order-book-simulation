@@ -1,11 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using LimitOrderBookRepositories.Model;
 using LimitOrderBookUtilities;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
 {
     public interface ILimitOrderBook
     {
+        #region Recording
+
+        LobTradingData TradingData { get; }
+
+        #endregion 
+
         double Time { set; get; }
 
         int Ask { get; }

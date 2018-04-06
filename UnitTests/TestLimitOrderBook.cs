@@ -294,8 +294,7 @@ namespace UnitTests
                 lob.CancelLimitSellOrder(price);    
             }
             Assert.True(lob.GetDepthAtPriceTick(price) == 0);
-        }
-        
+        }    
         
         [Test]
         public void TestSubmitMarketBuyOrderRobustness()

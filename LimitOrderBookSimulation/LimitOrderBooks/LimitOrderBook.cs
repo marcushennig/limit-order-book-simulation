@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LimitOrderBookRepositories.Model;
 using LimitOrderBookUtilities;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
@@ -22,8 +22,19 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// Map: price tick => depth
         /// </summary>
         private SortedDictionary<int, int> DepthBuySide { get; }
-        
+
         #region Interface
+        
+        #region Recording
+
+        private bool RecordEvents = true;
+        private int Level = 10;
+        private List<LobState> States { get; }
+        private List<LobEvent> Events { get; }
+
+        public LobTradingData TradingData => new LobTradingData(Level, Events.ToArray(), States.ToArray());
+
+        #endregion 
 
         /// <summary>
         /// Current time 
@@ -93,19 +104,65 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// Evolution of the limit order book
         /// </summary>
         public SortedList<double, Price> PriceTimeSeries { get; }
-        
+
+        private void SaveCurrentState()
+        {
+            var askPrice = new int[Level];
+            var askVolume = new int[Level];
+            var bidPrice = new int[Level];
+            var bidVolume = new int[Level];
+
+            var n = DepthBuySide.Count;
+            for (var j = 0; j < Level; j++)
+            {
+                var sellEntry = DepthSellSide.ElementAt(j);
+                var buyEntry = DepthBuySide.ElementAt(n - 1 - j);
+
+                askPrice[j] = sellEntry.Key;
+                askVolume[j] = sellEntry.Value;
+                bidPrice[j] = buyEntry.Key;
+                bidVolume[j] = buyEntry.Value;
+            }
+            States.Add(new LobState(askPrice, askVolume, bidPrice, bidVolume));
+        }
+
         #region Limit order
         
         public void SubmitLimitBuyOrder(int price, int amount = 1)
         {
             AddToBuySide(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitBuyOrder]++;
+
+            if (RecordEvents)
+            {
+                Events.Add(new LobEvent(orderId: 1,
+                    time: Time,
+                    type: LobEventType.Submission,
+                    volume: 1,
+                    price: price,
+                    side: LimitOrderBookRepositories.Model.MarketSide.Buy));
+
+                SaveCurrentState();
+            }
+
         }
 
         public void SubmitLimitSellOrder(int price, int amount = 1)
         {
             AddToSellSide(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitSellOrder]++;
+
+            if (RecordEvents)
+            {
+                Events.Add(new LobEvent(orderId: 1,
+                    time: Time,
+                    type: LobEventType.Submission,
+                    volume: amount,
+                    price: price,
+                    side: LimitOrderBookRepositories.Model.MarketSide.Sell));
+
+                SaveCurrentState();
+            }
         }
         
         #endregion Limit order
@@ -115,10 +172,22 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         public int SubmitMarketBuyOrder(int amount = 1)
         {
             var price = Ask;
-            
             RemoveFromSellSide(price,  amount);
+
             Counter[LimitOrderBookEvent.SubmitMarketBuyOrder]++;
-            
+
+            if (RecordEvents)
+            {
+                Events.Add(new LobEvent(orderId: 1,
+                    time: Time,
+                    type: LobEventType.ExecutionVisibleLimitOrder,
+                    volume: amount,
+                    price: price,
+                    side:  LimitOrderBookRepositories.Model.MarketSide.Buy));
+
+                SaveCurrentState();
+            }
+
             return price;
         }
 
@@ -128,7 +197,19 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
             
             RemoveFromBuySide(price, amount);
             Counter[LimitOrderBookEvent.SubmitMarketSellOrder]++;
-            
+
+            if (RecordEvents)
+            {
+                Events.Add(new LobEvent(orderId: 1,
+                    time: Time,
+                    type: LobEventType.ExecutionVisibleLimitOrder,
+                    volume: amount,
+                    price: price,
+                    side: LimitOrderBookRepositories.Model.MarketSide.Sell));
+
+                SaveCurrentState();
+            }
+
             return price;
         }
 
@@ -140,12 +221,35 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         {
             RemoveFromBuySide(price, amount);
             Counter[LimitOrderBookEvent.CancelLimitBuyOrder]++;
+
+            if (RecordEvents)
+            {
+                Events.Add(new LobEvent(orderId: 1,
+                    time: Time,
+                    type: LobEventType.Cancellation,
+                    volume: amount,
+                    price: price,
+                    side: LimitOrderBookRepositories.Model.MarketSide.Buy));
+
+                SaveCurrentState();
+            }
         }
 
         public void CancelLimitSellOrder(int price, int amount = 1)
         {
             RemoveFromSellSide(price, amount);
             Counter[LimitOrderBookEvent.CancelLimitSellOrder]++;
+
+            if (RecordEvents)
+            {
+                Events.Add(new LobEvent(orderId: 1,
+                    time: Time,
+                    type: LobEventType.Cancellation,
+                    volume: amount,
+                    price: price,
+                    side: LimitOrderBookRepositories.Model.MarketSide.Sell));
+                SaveCurrentState();
+            }
         }
 
         #endregion Cancel order
@@ -240,6 +344,9 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         {
             DepthSellSide = new SortedDictionary<int, int>();
             DepthBuySide = new SortedDictionary<int, int>();
+
+            Events = new List<LobEvent>();
+            States = new List<LobState>();
 
             PriceTimeSeries = new SortedList<double, Price>();
 

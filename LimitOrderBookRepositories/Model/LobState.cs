@@ -40,7 +40,6 @@ namespace LimitOrderBookRepositories.Model
         /// </summary>
         public int[] BidVolume { get; }
         
-
         #endregion Properties 
 
         #region Characteristics
@@ -168,7 +167,6 @@ namespace LimitOrderBookRepositories.Model
                 return false;
             }
         }
-
 
         /// <summary>
         /// Determine the depth at given price on buy or sell side

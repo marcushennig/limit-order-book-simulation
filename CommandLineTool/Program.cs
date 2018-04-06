@@ -54,8 +54,6 @@ namespace CommandLineTool
 
             var lobData = lobRepository.TradingData[tradingDate];
 
-            lobData.CheckConsistency();
-
             var model = new SmithFarmerModel(lobData);
             
             // Save the calibration parameters
@@ -97,8 +95,9 @@ namespace CommandLineTool
             // ExportPriceEvolution();
             // LoadLobData();
             //StartSimulation();
-            LoadLobData();
-            
+            int x = Convert.ToInt32("9999999999");
+            Console.WriteLine(x);
+
             Console.WriteLine("Press any key.");
             Console.ReadKey();
         }

@@ -11,7 +11,7 @@ using LimitOrderBookRepositories.Model;
 namespace LimitOrderBookRepositories
 {
     /// <summary>
-    /// Lob repository conssisting of LOB data for 
+    /// Lob repository consisting of LOB data for 
     /// multiple trading days for a given asset
     /// </summary>
     public class LobRepository
@@ -126,6 +126,7 @@ namespace LimitOrderBookRepositories
             const long dummyValue = 9999999999;
 
             var data = line.Split(',').Select(p => Convert.ToInt32(p)).ToList();
+
             var askPrice = data.Where((value, index) => index % 4 == 0);
             var askVolume = data.Where((value, index) => (index - 1) % 4 == 0);
             var bidPrice = data.Where((value, index) => (index - 2) % 4 == 0);

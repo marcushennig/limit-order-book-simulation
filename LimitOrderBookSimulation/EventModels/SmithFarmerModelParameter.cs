@@ -1,6 +1,4 @@
-﻿using LimitOrderBookSimulation.LimitOrderBooks;
-
-namespace LimitOrderBookSimulation.EventModels
+﻿namespace LimitOrderBookSimulation.EventModels
 {
     public class SmithFarmerModelParameter
     {
@@ -22,7 +20,8 @@ namespace LimitOrderBookSimulation.EventModels
         public double MarketOrderRate { set; get; }
 
         /// <summary>
-        /// Cancellation rate (in units of 1/time)
+        /// Cancellation rate:
+        /// Unit: 1 / time)
         /// </summary>
         public double CancellationRate { set; get; }
         

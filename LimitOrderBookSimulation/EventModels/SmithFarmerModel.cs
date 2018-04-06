@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using log4net;
-using LimitOrderBookRepositories;
 using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
 using MathNet.Numerics.Statistics;
+using MarketSide = LimitOrderBookRepositories.Model.MarketSide;
 
 namespace LimitOrderBookSimulation.EventModels
 {
@@ -41,7 +41,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// Model paramater
         /// </summary>
         public SmithFarmerModelParameter Parameter { set; get; }
-        
+
         #region Characteric scales
 
         public double CharacteristicNumberOfShares => Parameter.MarketOrderRate / (2 * Parameter.CancellationRate);
@@ -274,7 +274,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// Submit market buy order 
         /// </summary>
         public int SubmitMarketBuyOrder()
-        {
+        {          
             return LimitOrderBook.SubmitMarketBuyOrder(amount: 1);
         }
 
@@ -283,7 +283,6 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int SubmitMarketSellOrder()
         {
-            
             return LimitOrderBook.SubmitMarketSellOrder(amount: 1);
         }
         
@@ -296,7 +295,7 @@ namespace LimitOrderBookSimulation.EventModels
             var minTick = LimitOrderBook.Ask;
             var maxTick = minTick + Parameter.SimulationIntervalSize;
             var priceTick = LimitOrderBook.GetRandomPriceFromSellSide(Random, minTick, maxTick);
-            
+           
             LimitOrderBook.CancelLimitSellOrder(price:priceTick, amount: 1);
             
             return priceTick;
@@ -311,7 +310,7 @@ namespace LimitOrderBookSimulation.EventModels
             var maxTick = LimitOrderBook.Bid;
             var minTick = maxTick - Parameter.SimulationIntervalSize;
             var priceTick = LimitOrderBook.GetRandomPriceFromBuySide(Random, minTick, maxTick);
-            
+
             LimitOrderBook.CancelLimitBuyOrder(price:priceTick, amount: 1);
             
             return priceTick;
@@ -324,7 +323,7 @@ namespace LimitOrderBookSimulation.EventModels
         {
             var priceTick = LimitOrderBook.Ask - 1 - Random.Next(Parameter.SimulationIntervalSize + 1);
             LimitOrderBook.SubmitLimitBuyOrder(priceTick, amount:1);
-            
+           
             return priceTick;
         }
 
@@ -335,7 +334,7 @@ namespace LimitOrderBookSimulation.EventModels
         {
             var priceTick = LimitOrderBook.Bid + 1 + Random.Next(Parameter.SimulationIntervalSize + 1);
             LimitOrderBook.SubmitLimitSellOrder(priceTick, amount:1);
-            
+           
             return priceTick;
         }
 
@@ -406,7 +405,7 @@ namespace LimitOrderBookSimulation.EventModels
                     
                     var orderFlowEvent = Random.NextFromProbabilities(probability);
                     orderFlowEvent.Invoke();
-
+                    
                     if (LimitOrderBook.IsBuySideEmpty() || 
                         LimitOrderBook.IsSellSideEmpty())
                     {

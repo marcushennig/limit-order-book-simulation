@@ -2,15 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using log4net;
-using log4net.Config;
 using LimitOrderBookUtilities;
 using MathNet.Numerics;
 using MathNet.Numerics.Statistics;
-
-// Necessary to configure log4net
-[assembly: XmlConfigurator(Watch = true)]
 
 namespace LimitOrderBookRepositories.Model
 {
@@ -19,13 +13,6 @@ namespace LimitOrderBookRepositories.Model
     /// </summary>
     public class LobTradingData
     {
-        #region Logging
-
-        //Logging  
-        private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-
-        #endregion Logging
-
         #region Fields
 
         private List<LobEvent> _limitOrders;
@@ -44,51 +31,38 @@ namespace LimitOrderBookRepositories.Model
         #endregion Fields
 
         #region Properties
-
-        #region Repository Parameter
-
-        private string WorkFolder { set; get; }
-        private string RepositoryFolder { set; get; }
-        private string LogFolder { set; get; }
-
-        #endregion Repository Parameter
-
+    
         #region LOB parameter
         
         /// <summary>
         /// Start trading duration [seconds after midnight]
         /// </summary>
-        public double StartTradingTime { private set; get; }
+        public double StartTradingTime { get; }
 
         /// <summary>
         /// End trading duration [seconds after midnight]
         /// </summary>
-        public double EndTradingTime { private set; get; }
+        public double EndTradingTime { get; }
 
         /// <summary>
         /// Total trading duration [seconds]
         /// </summary>
-        public double TradingDuration { private set; get; }
+        public double TradingDuration { get; }
 
         /// <summary>
         /// Level of the LOB data
         /// </summary>
-        public int Level { private set; get; }
-
-        /// <summary>
-        /// Stock symbol
-        /// </summary>
-        public string Symbol { private set; get; }
+        public int Level { get; }
         
         /// <summary>
         /// Limit order book states
         /// </summary>
-        public LobState[] States { private set; get; }
+        public LobState[] States { get; }
 
         /// <summary>
         /// Limit order book events
         /// </summary>
-        public LobEvent[] Events { private set; get; }
+        public LobEvent[] Events { get; }
 
         /// <summary>
         /// Limit orders
@@ -97,13 +71,7 @@ namespace LimitOrderBookRepositories.Model
         {
             get
             {
-                if (_limitOrders == null)
-                {
-                    _limitOrders = Events.Where(p => p.Type == LobEventType.Submission)
-                                         .ToList();
-                }
-                return _limitOrders; 
-                
+                return _limitOrders ?? (_limitOrders = Events.Where(p => p.Type == LobEventType.Submission).ToList());
             }
         }
 
@@ -116,22 +84,7 @@ namespace LimitOrderBookRepositories.Model
         {
             get
             {
-                if (_marketOrders == null)
-                {
-                    // Select all crossing limit limit orders, that result in an at least a partial transaction,
-                    // The non-transacted part => limit order & transacted part => effective market order 
-                    // var crossingLimitOrders = Entries.Where(p => p.IsCrossingLimitOrder)
-                    //                                  .Select(p => p.Event).ToList();
-                    // Select all those events that result in an immediate execution 
-                    // var marketOrders = Entries.GroupBy(p => p.Event.OrderId)
-                    //                             .Where(p => p.Count() == 1 && (p.First().Event.Type == EventType.ExecutionHiddenLimitOrder ||
-                    //                                                            p.First().Event.Type == EventType.ExecutionVisibleLimitOrder))
-                    //                             .SelectMany(p => p)
-                    //                             .ToList();
-                    _marketOrders = Events.Where(p => p.Type == LobEventType.ExecutionVisibleLimitOrder).ToList();
-                }
-                return _marketOrders;
-
+                return _marketOrders ?? (_marketOrders = Events.Where(p => p.Type == LobEventType.ExecutionVisibleLimitOrder).ToList());
             }
         }
 
@@ -143,13 +96,13 @@ namespace LimitOrderBookRepositories.Model
         {
             get
             {
-                if (_submittedOrders == null)
-                {
-                    _submittedOrders = new List<LobEvent>();
+                if (_submittedOrders != null) return _submittedOrders;
 
-                    _submittedOrders.AddRange(LimitOrders);
-                    _submittedOrders.AddRange(MarketOrders);
-                }
+                _submittedOrders = new List<LobEvent>();
+
+                _submittedOrders.AddRange(LimitOrders);
+                _submittedOrders.AddRange(MarketOrders);
+
                 return _submittedOrders;
             }
         }
@@ -161,14 +114,9 @@ namespace LimitOrderBookRepositories.Model
         public List<LobEvent> CanceledOrders
         {
             get
-            {
-                if (_canceledOrders == null)
-                {
-                    _canceledOrders = Events.Where(p => p.Type == LobEventType.Deletion || 
-                                                        p.Type == LobEventType.Cancellation)
-                                                 .ToList();
-                }
-                return _canceledOrders;
+            {                
+                return _canceledOrders ?? (_canceledOrders = Events.Where(p => p.Type == LobEventType.Deletion ||
+                                                                               p.Type == LobEventType.Cancellation).ToList());
             }
         }
 
@@ -199,22 +147,22 @@ namespace LimitOrderBookRepositories.Model
         /// <summary>
         /// Price tick size  
         /// </summary>
-        public int PriceTickSize { private set; get; }
+        public int PriceTickSize { get; }
 
         /// <summary>
         /// Characteristic order size  
         /// </summary>
-        public double AverageOrderSize { private set; get; }
+        public double AverageOrderSize { get; }
 
         /// <summary>
         /// Characteristic order size  
         /// </summary>
-        public double AverageMarketOrderSize { private set; get; }
+        public double AverageMarketOrderSize { get; }
 
         /// <summary>
         /// Characteristic order size  
         /// </summary>
-        public double AverageLimitOrderSize { private set; get; }
+        public double AverageLimitOrderSize { get; }
 
         /// <summary>
         /// List of the order ids of hidden orders
@@ -238,7 +186,7 @@ namespace LimitOrderBookRepositories.Model
                 if (_averageDepthProfile != null) return _averageDepthProfile;
 
                 var outstandingLimitOrders = new Dictionary<int, double>();
-                const long priceError = 9999999999;
+
                 var totalWeight = 0.0;
                 for (var i = 0; i < Events.Length - 1; i++)
                 {
@@ -252,26 +200,20 @@ namespace LimitOrderBookRepositories.Model
                         
                         var askDistance = state.AskPrice[j] - state.BestBidPrice;
 
-                        if (Math.Abs(state.BestBidPrice) != priceError)
+                        if (!outstandingLimitOrders.ContainsKey(askDistance))
                         {
-                            if (!outstandingLimitOrders.ContainsKey(askDistance))
-                            {
-                                outstandingLimitOrders.Add(askDistance, 0);
-                            }
-                            outstandingLimitOrders[askDistance] += weight * askVolume;
+                            outstandingLimitOrders.Add(askDistance, 0);
                         }
+                        outstandingLimitOrders[askDistance] += weight * askVolume;
                         
                         // Bid side
                         var bidVolume = state.BidVolume[j];
                         var bidDistance = state.BestAskPrice - state.BidPrice[j];
-                        if (Math.Abs(state.BestAskPrice) != priceError)
+                        if (!outstandingLimitOrders.ContainsKey(bidDistance))
                         {
-                            if (!outstandingLimitOrders.ContainsKey(bidDistance))
-                            {
-                                outstandingLimitOrders.Add(bidDistance, 0);
-                            }
-                            outstandingLimitOrders[bidDistance] += weight *bidVolume;
+                            outstandingLimitOrders.Add(bidDistance, 0);
                         }
+                        outstandingLimitOrders[bidDistance] += weight * bidVolume;
                     }   
                 }
                 _averageDepthProfile = new DiscreteDistribution(outstandingLimitOrders.ToDictionary(p => p.Key, p => p.Value / totalWeight));
@@ -513,7 +455,6 @@ namespace LimitOrderBookRepositories.Model
 
             AverageLimitOrderSize = LimitOrders.Select(p => (double)p.Volume).Mean();
             AverageMarketOrderSize = MarketOrders.Select(p => (double)p.Volume).Mean();
-
             AverageOrderSize = 0.5 * (AverageLimitOrderSize + AverageMarketOrderSize);
 
             #endregion Characteristic order size 
@@ -529,267 +470,6 @@ namespace LimitOrderBookRepositories.Model
 
 
         #endregion Constructor
-
-        #region Testing
-
-        /// <summary>
-        /// Check if the given event is a consistent limit order
-        /// </summary>
-        /// <returns></returns>
-        private static bool IsConsistentLimitOrder(LobEvent order)
-        {
-            var consistent = true;
-
-            var initialState = order.InitialState;
-            var finalState = order.FinalState;
-                
-            #region  Check if order price is non-positive
-            if (order.Price <= 0)
-            {
-                Log.Error($"The price of limit order '{order.OrderId} (t={order.Time})' is not positive");
-                consistent = false;
-            }
-            #endregion
-
-            #region Check if order volume is non-positive
-            if (order.Volume <= 0)
-            {
-                Log.Error($"The volume of limit order '{order.OrderId} (t={order.Time})' is not positive");
-                consistent = false;
-            }
-            #endregion
-
-            #region Sell limit order: price > best bid
-            if (order.Side == MarketSide.Sell && !(order.Price > initialState.BestBidPrice))
-            {
-                Log.Error($"'{order.OrderId} (t={order.Time})' failed test: sell limit order: Price = {order.Price} > Best Bid = {initialState.BestBidPrice}");
-                consistent = false;
-            }
-            #endregion
-
-            #region Buy limit order: price < best ask
-            if (order.Side == MarketSide.Buy && !(order.Price < initialState.BestAskPrice))
-            {
-                Log.Error($"'{order.OrderId} (t={order.Time})' failed test: buy limit order: Price = {order.Price} < Best ask = {initialState.BestAskPrice}");
-                consistent = false;
-            }
-            #endregion
-
-            #region Limit order: final depth - intial depth = order volume
-
-            var intialDepth = initialState.Depth(order.Price, order.Side);
-            var finalDepth = finalState.Depth(order.Price, order.Side);
-
-            if (finalDepth - intialDepth != order.Volume)
-            {
-                Log.Error($"'{order.OrderId} (t={order.Time})' failed test: final depth - intial depth = order volume");
-                consistent = false;
-            }
-            #endregion 
-          
-            return consistent;
-        }
-
-        /// <summary>
-        /// Measured the change of total volume near spread of two given states, total difference 
-        /// cannot be determined, as levels are fixed (number of price points for depth profile 
-        /// on buý or sell side) 
-        /// </summary>
-        /// <param name="side"></param>
-        /// <param name="initialState"></param>
-        /// <param name="finalState"></param>
-        /// <returns></returns>
-        private int DepthDifferenceNearSpread(MarketSide side, LobState initialState, LobState finalState)
-        {
-            // Volume change near spread
-            int dDepth = 0;
-            int depthDifferenceNearSpread = 0;
-            var price = side == MarketSide.Buy ? initialState.BestBidPrice : initialState.BestAskPrice;
-            do
-            {
-                dDepth = initialState.Depth(price, side) - finalState.Depth(price, side);
-                depthDifferenceNearSpread += dDepth;
-                price = price + (side == MarketSide.Buy ? -1 : 1) * PriceTickSize;
-            } while (dDepth > 0);
-            return depthDifferenceNearSpread;
-        }
-
-        /// <summary>
-        /// Check if given order is a market order 
-        /// </summary>
-        /// <returns></returns>
-        private bool IsConsistentMarketOrder(LobEvent order)
-        {
-            var consistent = true;
-
-            var initialState = order.InitialState;
-            var finalState = order.FinalState;
-            
-            #region Check if order volume is non-positive
-            if (order.Volume <= 0)
-            {
-                Log.Error($"The volume of limit order '{order.OrderId} (t={order.Time})' is not positive");
-                consistent = false;
-            }
-            #endregion
-
-            #region Buy market order: price = best ask price
-            if (order.Side == MarketSide.Buy && order.Price != initialState.BestBidPrice)
-            {
-                Log.Error(
-                    $"'{order.OrderId} (t={order.Time})' failed test: sell market order: Price = {order.Price} == Best bid = {initialState.BestBidPrice}");
-                consistent = false;
-            }
-            #endregion
-            
-            #region Buy market order: initial total bid volume - final total bid volume = order volume
-            if (order.Side == MarketSide.Buy && order.Price == initialState.BestBidPrice)
-            {
-                // The following lines below wond help, as boundary effects can take place due
-                // the finite number of levels observed. 
-                //var initialTotalVolume = initialState.BidVolume.Sum();
-                //var finalTotalVolume = finalState.BidVolume.Sum();
-                // Depth difference near spread on buy side (BestBidPrice)
-                var depthDifference = DepthDifferenceNearSpread(order.Side, initialState, finalState);
-                if (depthDifference != order.Volume)
-                {
-                    Log.Error($"'{order.OrderId} (t={order.Time})' failed test: sell market order: initial total bid volume - final total bid volume = order volume");
-                    consistent = false;
-                }
-            }
-            #endregion
-
-            #region Sell market order: price = best bid price
-            // Order.Side means which side of the LOB is addressed, if the sell side is addressed
-            // the order is a buy order 
-            if (order.Side == MarketSide.Sell && order.Price != initialState.BestAskPrice)
-            {
-                Log.Error(
-                    $"'{order.OrderId} (t={order.Time})' failed test: buy market order: Price = {order.Price} == Best ask = {initialState.BestBidPrice}");
-                consistent = false;
-            }
-            #endregion
-
-            #region Sell market order: initial total ask volume - final total ask volume = order volume
-            if (order.Side == MarketSide.Sell && order.Price == initialState.BestAskPrice)
-            {
-                // Depth difference near spread on sell side (BestAskPrice)
-                var depthDifference = DepthDifferenceNearSpread(order.Side, initialState, finalState);
-                if (depthDifference != order.Volume)
-                {
-                    Log.Error($"'{order.OrderId} (t={order.Time})' failed test: buy market order: initial total ask volume - final total ask volume = order volume");
-                    consistent = false;
-                }
-            }
-            #endregion 
-
-            return consistent;
-        }
-
-        /// <summary>
-        /// Check of order is a consistent canceled order 
-        /// </summary>
-        /// <param name="order"></param>
-        /// <returns></returns>
-        private static bool IsConsistentCanceledOrder(LobEvent order)
-        {
-            var consistent = true;
-
-            var initialState = order.InitialState;
-            var finalState = order.FinalState;
-
-            #region Cancel buy order: price <= best bid price
-            if (order.Side == MarketSide.Buy && !(order.Price <= initialState.BestBidPrice))
-            {
-                Log.Error($"Cancel buy order: '{order.OrderId} (t={order.Time})' failed test: price <= best bid price");
-                consistent = false;
-            }
-            #endregion 
-
-            #region Cancel sell order: price <= best bid price
-            if (order.Side == MarketSide.Sell && !(order.Price >= initialState.BestAskPrice))
-            {
-                Log.Error($"Cancel sell order: '{order.OrderId} (t={order.Time})' failed test: price >= best ask price");
-                consistent = false;
-            }
-            #endregion
-
-            #region Was order really cancelled?
-            if (order.Side == MarketSide.Buy && order.Price <= initialState.BestBidPrice || (order.Side == MarketSide.Sell && order.Price >= initialState.BestAskPrice))
-            {
-                var initialDepth = initialState.Depth(order.Price, order.Side);
-                var finalDepth = finalState.Depth(order.Price, order.Side);
-
-                if (initialDepth - finalDepth != order.Volume)
-                {
-                    Log.Error($"Cancel order: '{order.OrderId} (t={order.Time})' failed test: depth(price,t-) - depth(price,t+) == volume");
-                    consistent = false;
-                }
-            }
-            #endregion 
-
-            return consistent;
-        }
-
-        /// <summary>
-        /// Check consistency
-        /// </summary>
-        public void CheckConsistency()
-        {
-            #region  Time consistency
-
-            if (Events.Select(p => p.Time).Count() != Events.Select(p => p.Time).Distinct().Count())
-            {
-                var ng = Events.GroupBy(p => p.Time).Count(g => g.Count() > 1);
-                Log.Warn($"There are {ng} different time goups");
-            }
-
-            #endregion
-
-            #region Check limit orders
-            var inconsistentLimitOrders = LimitOrders.Where(order => !IsConsistentLimitOrder(order))
-                .ToList();
-
-            if (inconsistentLimitOrders.Any())
-            {
-                Log.Error($"Inconsistent limit orders: {inconsistentLimitOrders.Count}");
-            }
-            else
-            {
-                Log.Info($"All {LimitOrders.Count} limit order are consistent");
-            }
-            #endregion
-
-            #region Check market orders
-            var inconsistentMarketOrders = MarketOrders.Where(order => !IsConsistentMarketOrder(order))
-                .ToList();
-
-            if (inconsistentMarketOrders.Any())
-            {
-                Log.Error($"Inconsistent market orders: {inconsistentMarketOrders.Count}");
-            }
-            else
-            {
-                Log.Info($"All {MarketOrders.Count} market order are consistent");
-            }
-            #endregion
-
-            #region Check canceled orders
-            var inconsistentCanceledOrders = CanceledOrders.Where(order => !IsConsistentCanceledOrder(order))
-                .ToList();
-
-            if (inconsistentCanceledOrders.Any())
-            {
-                Log.Error($"Inconsistent canceled orders: {inconsistentCanceledOrders.Count}");
-            }
-            else
-            {
-                Log.Info($"All {CanceledOrders.Count} canceled order are consistent");
-            }
-            #endregion
-        }
-
-        #endregion Testing
 
         #region Methods
         

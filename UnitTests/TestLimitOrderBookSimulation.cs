@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
+using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
@@ -93,18 +95,17 @@ namespace UnitTests
         /// Generate model with sythetic parameters 
         /// </summary>
         /// <returns></returns>
-        private SmithFarmerModel GenerateSmithFarmerModel()
+        private SmithFarmerModel GenerateSmithFarmerModel(double muC = 0.05, int seed=42)
         {
             // Choose parameter such that certain end result is achieved 
             // Check characteristic scales 
             const double asymtoticDepth = 0.5 * (BuyMaxDepth + SellMaxDepth);
-            const double muC = 0.05;
-            const double muL = asymtoticDepth * muC;
-            const double muM = Spread * muL * 2;
+            var muL = asymtoticDepth * muC;
+            var muM = Spread * muL * 2;
 
             var parameter = new SmithFarmerModelParameter
             {
-                Seed = 50,
+                Seed = seed,
                 CancellationRate = muC,
                 MarketOrderRate = muM,
                 LimitOrderRateDensity = muL,
@@ -123,23 +124,20 @@ namespace UnitTests
         [Test]
         public void TestSmithFarmerModel()
         {
-            const string outputFolder =
-                "C:\\Users\\d90789\\Documents" +
-                "\\d-fine\\Trainings\\Oxford MSc in Mathematical Finance" +
-                "\\Thesis\\Source\\4 Output\\";
+            var workFolder = ConfigurationManager.AppSettings["WorkFolder"];
             
             var model = GenerateSmithFarmerModel();
             
-            model.SaveDepthProfile(Path.Combine(outputFolder, "depth_start.csv"));
+            model.SaveDepthProfile(Path.Combine(workFolder, "depth_start.csv"));
             
             model.SimulateOrderFlow(duration: 1000);
             
             // Save simulation result for further inspection in e.g. Matlab
-            model.SavePriceProcess(Path.Combine(outputFolder, "price_process.csv"));
-            model.SaveDepthProfile(Path.Combine(outputFolder, "depth_end.csv"));
+            model.SavePriceProcess(Path.Combine(workFolder, "price_process.csv"));
+            model.SaveDepthProfile(Path.Combine(workFolder, "depth_end.csv"));
             
-            SharedUtilities.SaveAsJson(model.LimitOrderBook.Counter, Path.Combine(outputFolder, "counter.json"));
-            SharedUtilities.SaveAsJson(model.Parameter, Path.Combine(outputFolder, "model_parameter.json"));
+            SharedUtilities.SaveAsJson(model.LimitOrderBook.Counter, Path.Combine(workFolder, "counter.json"));
+            SharedUtilities.SaveAsJson(model.Parameter, Path.Combine(workFolder, "model_parameter.json"));
             
             // Do some plausibility checks
             var lob = model.LimitOrderBook;
@@ -159,6 +157,82 @@ namespace UnitTests
             Assert.True(lob.PriceTimeSeries
                 .Select(p => p.Value)
                 .All(p => p.Ask > p.Bid), "Ask must be greater than bid price");          
+        }
+
+        [TestCase(0.05)]
+        [TestCase(0.025)]
+        public void TestCalibration(double cancellationRate)
+        {
+            const double duration = 100.0;
+            const double characteristicOrderSize = 1;
+            const double percent = 0.01;
+            const double relativeTolerance = 1 * percent;
+
+            #region Simulate events
+
+            var model = GenerateSmithFarmerModel(cancellationRate);
+            model.SimulateOrderFlow(duration);
+
+            var tradingData = model.LimitOrderBook.TradingData;
+
+            var marketOrderEvents = tradingData.Events
+                .Where(p => p.Type == LobEventType.ExecutionVisibleLimitOrder)
+                .ToList();
+
+            var limitOrderEvents = tradingData.Events
+                .Where(p => p.Type == LobEventType.Submission)
+                .ToList();
+
+            #endregion
+
+            var tickSize = tradingData.PriceTickSize;
+
+            // Use average depth profile to determine a small band around 
+            // the spread, where we calibrate the limit order rate 
+            const double probabilityLow = 0.01;
+            const double probabilityHigh = 0.8;
+            
+            var averageDepthProfile = tradingData.AverageDepthProfile;
+            var lowerQuantileForDistanceBestOppositeQuote = averageDepthProfile.Quantile(probabilityLow);
+            var higherQuantileForDistanceBestOppositeQuote = averageDepthProfile.Quantile(probabilityHigh);
+
+            /*var measuredProbability = averageDepthProfile.Probability
+                .Where(p => p.Key <= distanceBestOppositeQuoteQuantile)
+                .Select(p => p.Value)
+                .Sum();
+
+            Assert.True(Math.Abs(probability - measuredProbability) < tolerance, 
+                $"Probability: {probability}, Measured: {measuredProbability}");*/
+
+            #region Estimate market order rate 
+
+            var marketRate = model.Parameter.MarketOrderRate;
+            var estimatedMarketOrderRate = SmithFarmerModelCalibration.EstimateMarketOrderRate(marketOrderEvents, characteristicOrderSize);
+
+            Assert.True(Math.Abs(1 - estimatedMarketOrderRate / marketRate) < relativeTolerance,
+                $"Market order rate: {marketRate}, estimated rate: {estimatedMarketOrderRate}");
+
+            #endregion
+
+            #region Estimate Limit order rate 
+
+            var limitOrderRateDensity = model.Parameter.LimitOrderRateDensity;
+            var estimateLimitOrderRateDensity =
+                SmithFarmerModelCalibration.EstimateLimitOrderRate(limitOrderEvents, 
+                    characteristicOrderSize,
+                    tickSize,
+                    lowerQuantileForDistanceBestOppositeQuote,
+                    higherQuantileForDistanceBestOppositeQuote);
+
+            Assert.True(Math.Abs(1 - estimateLimitOrderRateDensity / limitOrderRateDensity) < relativeTolerance,
+                $"Limit order rate: {limitOrderRateDensity}, estimated rate: {estimateLimitOrderRateDensity}");
+
+            #endregion
+
+            #region Estimate cancelation rate
+            
+            #endregion
+
         }
 
         [Test]
