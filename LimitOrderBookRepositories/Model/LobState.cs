@@ -131,7 +131,7 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="side"></param>
         /// <param name="quantile"></param>
         /// <returns></returns>
-        public bool IsPriceInQuantile(int price, MarketSide side, double quantile)
+        public bool IsPriceInQuantile(int price, LobMarketSide side, double quantile)
         {
             if (quantile < 0 || quantile > 1)
             {
@@ -143,7 +143,7 @@ namespace LimitOrderBookRepositories.Model
                 return true;
             }
 
-            if (side == MarketSide.Sell)
+            if (side == LobMarketSide.Sell)
             {
                 
                 double totalVolume = AskVolume.Sum();
@@ -174,9 +174,9 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="price"></param>
         /// <param name="side"></param>
         /// <returns></returns>
-        public int Depth(int price, MarketSide side)
+        public int Depth(int price, LobMarketSide side)
         {
-            if (side == MarketSide.Sell)
+            if (side == LobMarketSide.Sell)
             {
                 var k = Array.IndexOf(AskPrice, price);
                 if (k >= 0)
@@ -186,7 +186,7 @@ namespace LimitOrderBookRepositories.Model
                 return 0;
 
             }
-            if (side == MarketSide.Buy)
+            if (side == LobMarketSide.Buy)
             {
                 var k = Array.IndexOf(BidPrice, price);
                 if (k >= 0)

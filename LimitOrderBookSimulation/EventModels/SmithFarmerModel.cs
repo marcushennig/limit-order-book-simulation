@@ -8,7 +8,6 @@ using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
 using MathNet.Numerics.Statistics;
-using MarketSide = LimitOrderBookRepositories.Model.MarketSide;
 
 namespace LimitOrderBookSimulation.EventModels
 {

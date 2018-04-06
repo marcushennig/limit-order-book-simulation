@@ -48,7 +48,7 @@ namespace LimitOrderBookRepositories.Model
         ///		order corresponds to a buyer (seller) 
         ///		initiated trade, i.e. Buy (Sell) trade.
         /// </summary>
-        public MarketSide Side { get; }
+        public LobMarketSide Side { get; }
         
         /// <summary>
         ///Initial state of limit order book before the above event occured 
@@ -69,7 +69,7 @@ namespace LimitOrderBookRepositories.Model
         /// Submission event that will at least partlly be executed
         /// </summary>
         public bool IsMarketableLimitOrder => Type == LobEventType.Submission &&
-                                              (Side == MarketSide.Buy ?
+                                              (Side == LobMarketSide.Buy ?
                                                   AskRelativePrice >= 0 : BidRelativePrice >= 0);
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace LimitOrderBookRepositories.Model
         /// Check if order is crossing limit order 
         /// </summary>
         public bool IsCrossingLimitOrder => Type == LobEventType.Submission &&
-                                            (Side == MarketSide.Buy
+                                            (Side == LobMarketSide.Buy
                                                 ? Price >= InitialState.AskPrice[0]
                                                 : InitialState.BidPrice[0] >= Price);
 
@@ -89,14 +89,14 @@ namespace LimitOrderBookRepositories.Model
         /// Relative price of the event to 
         /// the state before the event was submitted 
         /// </summary>
-        public int RelativePrice => Side == MarketSide.Buy
+        public int RelativePrice => Side == LobMarketSide.Buy
             ? InitialState.BestBidPrice - Price
             : Price - InitialState.BestAskPrice;
 
         /// <summary>
         /// Distance i from the opposite best quote 
         /// </summary>
-        public int DistanceBestOppositeQuote => Side == MarketSide.Buy 
+        public int DistanceBestOppositeQuote => Side == LobMarketSide.Buy 
             ? InitialState.BestAskPrice - Price 
             : Price - InitialState.BestBidPrice;
         
@@ -125,7 +125,7 @@ namespace LimitOrderBookRepositories.Model
         /// <param name="volume"></param>
         /// <param name="price"></param>
         /// <param name="side"></param>
-        public LobEvent(int orderId, double time, LobEventType type, int volume, int price, MarketSide side)
+        public LobEvent(int orderId, double time, LobEventType type, int volume, int price, LobMarketSide side)
         {
             OrderId = orderId;
             Time = time;

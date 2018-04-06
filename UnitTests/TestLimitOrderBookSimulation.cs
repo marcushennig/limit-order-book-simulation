@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.EventModels;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
@@ -162,7 +161,6 @@ namespace UnitTests
                 .All(p => p.Ask > p.Bid), "Ask must be greater than bid price");          
         }
 
-        [TestCase(0.08)]
         [TestCase(0.06)]
         [TestCase(0.05)]
         [TestCase(0.04)]
@@ -170,9 +168,9 @@ namespace UnitTests
         [TestCase(0.02)]
         public void TestCalibrationOfSmithFarmerModel(double cancellationRate)
         {
-            const double duration = 1000.0;
+            const double duration = 100.0;
             const double percent = 0.01;
-            const double relativeTolerance = 5 * percent;
+            const double relativeTolerance = 4 * percent;
 
             #region Simulate events
 

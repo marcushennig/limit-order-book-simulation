@@ -26,17 +26,17 @@ namespace UnitTests
         /// <param name="finalState"></param>
         /// <param name="priceTickSize"></param>
         /// <returns></returns>
-        private  static int DepthDifferenceNearSpread(MarketSide side, LobState initialState, LobState finalState, int priceTickSize)
+        private  static int DepthDifferenceNearSpread(LobMarketSide side, LobState initialState, LobState finalState, int priceTickSize)
         {
             // Volume change near spread
             var dDepth = 0;
             var depthDifferenceNearSpread = 0;
-            var price = side == MarketSide.Buy ? initialState.BestBidPrice : initialState.BestAskPrice;
+            var price = side == LobMarketSide.Buy ? initialState.BestBidPrice : initialState.BestAskPrice;
             do
             {
                 dDepth = initialState.Depth(price, side) - finalState.Depth(price, side);
                 depthDifferenceNearSpread += dDepth;
-                price = price + (side == MarketSide.Buy ? -1 : 1) * priceTickSize;
+                price = price + (side == LobMarketSide.Buy ? -1 : 1) * priceTickSize;
             } while (dDepth > 0);
             return depthDifferenceNearSpread;
         }
@@ -52,16 +52,16 @@ namespace UnitTests
             var finalState = order.FinalState;
 
             // Cancel buy order: price <= best bid price
-            Assert.False(order.Side == MarketSide.Buy && !(order.Price <= initialState.BestBidPrice),
+            Assert.False(order.Side == LobMarketSide.Buy && !(order.Price <= initialState.BestBidPrice),
                 $"Cancel buy order: '{order.OrderId} (t={order.Time})' failed test: price <= best bid price");
 
             // Cancel sell order: price <= best bid price
-            Assert.False(order.Side == MarketSide.Sell && !(order.Price >= initialState.BestAskPrice),
+            Assert.False(order.Side == LobMarketSide.Sell && !(order.Price >= initialState.BestAskPrice),
                 $"Cancel sell order: '{order.OrderId} (t={order.Time})' failed test: price >= best ask price");
 
             // Was order really cancelled?
-            if (order.Side == MarketSide.Buy && order.Price <= initialState.BestBidPrice || 
-               (order.Side == MarketSide.Sell && order.Price >= initialState.BestAskPrice))
+            if (order.Side == LobMarketSide.Buy && order.Price <= initialState.BestBidPrice || 
+               (order.Side == LobMarketSide.Sell && order.Price >= initialState.BestAskPrice))
             {
                 var initialDepth = initialState.Depth(order.Price, order.Side);
                 var finalDepth = finalState.Depth(order.Price, order.Side);
@@ -89,11 +89,11 @@ namespace UnitTests
                         $"The volume of limit order '{order.OrderId} (t={order.Time})' is not positive");
             
             // Sell limit order: price > best bid
-            Assert.False(order.Side == MarketSide.Sell && !(order.Price > initialState.BestBidPrice), 
+            Assert.False(order.Side == LobMarketSide.Sell && !(order.Price > initialState.BestBidPrice), 
                 $"'{order.OrderId} (t={order.Time})' failed test: sell limit order: Price = {order.Price} > Best Bid = {initialState.BestBidPrice}");
 
             // Buy limit order: price < best ask
-            Assert.False(order.Side == MarketSide.Buy && !(order.Price < initialState.BestAskPrice),
+            Assert.False(order.Side == LobMarketSide.Buy && !(order.Price < initialState.BestAskPrice),
                 $"'{order.OrderId} (t={order.Time})' failed test: buy limit order: Price = {order.Price} < Best ask = {initialState.BestAskPrice}");
             
             // Limit order: final depth - intial depth = order volume
@@ -119,11 +119,11 @@ namespace UnitTests
                 $"The volume of limit order '{order.OrderId} (t={order.Time})' is not positive");
             
             // Buy market order: price = best ask price
-            Assert.False(order.Side == MarketSide.Buy && order.Price != initialState.BestBidPrice,
+            Assert.False(order.Side == LobMarketSide.Buy && order.Price != initialState.BestBidPrice,
                 $"'{order.OrderId} (t={order.Time})' failed test: sell market order: Price = {order.Price} == Best bid = {initialState.BestBidPrice}");
 
             // Buy market order: initial total bid volume - final total bid volume = order volume
-            if (order.Side == MarketSide.Buy && order.Price == initialState.BestBidPrice)
+            if (order.Side == LobMarketSide.Buy && order.Price == initialState.BestBidPrice)
             {
                 // The following lines below wond help, as boundary effects can take place due
                 // the finite number of levels observed. 
@@ -138,11 +138,11 @@ namespace UnitTests
              // Sell market order: price = best bid price
             // Order.Side means which side of the LOB is addressed, if the sell side is addressed
             // the order is a buy order 
-            Assert.False(order.Side == MarketSide.Sell && order.Price != initialState.BestAskPrice, 
+            Assert.False(order.Side == LobMarketSide.Sell && order.Price != initialState.BestAskPrice, 
                 $"'{order.OrderId} (t={order.Time})' failed test: buy market order: Price = {order.Price} == Best ask = {initialState.BestBidPrice}");
 
             // Sell market order: initial total ask volume - final total ask volume = order volume
-            if (order.Side == MarketSide.Sell && order.Price == initialState.BestAskPrice)
+            if (order.Side == LobMarketSide.Sell && order.Price == initialState.BestAskPrice)
             {
                 // Depth difference near spread on sell side (BestAskPrice)
                 var depthDifference = DepthDifferenceNearSpread(order.Side, initialState, finalState, priceTickSize);

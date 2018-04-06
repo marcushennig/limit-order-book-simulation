@@ -140,7 +140,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                     type: LobEventType.Submission,
                     volume: 1,
                     price: price,
-                    side: LimitOrderBookRepositories.Model.MarketSide.Buy));
+                    side: LobMarketSide.Buy));
 
                 SaveCurrentState();
             }
@@ -159,7 +159,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                     type: LobEventType.Submission,
                     volume: amount,
                     price: price,
-                    side: LimitOrderBookRepositories.Model.MarketSide.Sell));
+                    side: LobMarketSide.Sell));
 
                 SaveCurrentState();
             }
@@ -183,7 +183,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                     type: LobEventType.ExecutionVisibleLimitOrder,
                     volume: amount,
                     price: price,
-                    side:  LimitOrderBookRepositories.Model.MarketSide.Buy));
+                    side:  LobMarketSide.Buy));
 
                 SaveCurrentState();
             }
@@ -205,7 +205,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                     type: LobEventType.ExecutionVisibleLimitOrder,
                     volume: amount,
                     price: price,
-                    side: LimitOrderBookRepositories.Model.MarketSide.Sell));
+                    side: LobMarketSide.Sell));
 
                 SaveCurrentState();
             }
@@ -229,7 +229,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                     type: LobEventType.Cancellation,
                     volume: amount,
                     price: price,
-                    side: LimitOrderBookRepositories.Model.MarketSide.Buy));
+                    side: LobMarketSide.Buy));
 
                 SaveCurrentState();
             }
@@ -247,7 +247,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                     type: LobEventType.Cancellation,
                     volume: amount,
                     price: price,
-                    side: LimitOrderBookRepositories.Model.MarketSide.Sell));
+                    side: LobMarketSide.Sell));
                 SaveCurrentState();
             }
         }

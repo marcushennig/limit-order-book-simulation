@@ -97,7 +97,7 @@ namespace LimitOrderBookRepositories
             var orderId = Convert.ToInt32(data[2]);
             var volume = Convert.ToInt32(data[3]);
             var price = Convert.ToInt32(data[4]);
-            var side = (MarketSide)Convert.ToInt32(data[5]);
+            var side = (LobMarketSide)Convert.ToInt32(data[5]);
             
             return new LobEvent(orderId, time, type, volume, price, side);
         }

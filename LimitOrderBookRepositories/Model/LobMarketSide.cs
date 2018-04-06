@@ -3,7 +3,7 @@
     /// <summary>
     /// Buy or sell
     /// </summary>
-    public enum MarketSide
+    public enum LobMarketSide
     {
         Buy = 1,
         Sell = -1

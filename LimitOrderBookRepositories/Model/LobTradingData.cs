@@ -257,7 +257,7 @@ namespace LimitOrderBookRepositories.Model
                 if (_limitSellOrderDistribution != null) return _limitSellOrderDistribution;
 
                 var data = new SortedDictionary<int, int>();
-                foreach (var entry in LimitOrders.Where(p=>p.Side == MarketSide.Sell)
+                foreach (var entry in LimitOrders.Where(p=>p.Side == LobMarketSide.Sell)
                                                  .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
                     data.Add(entry.Key, entry.Sum(p => p.Volume));
@@ -280,7 +280,7 @@ namespace LimitOrderBookRepositories.Model
                 if (_limitBuyOrderDistribution != null) return _limitBuyOrderDistribution;
 
                 var data = new SortedDictionary<int, int>();
-                foreach (var entry in LimitOrders.Where(p => p.Side == MarketSide.Buy)
+                foreach (var entry in LimitOrders.Where(p => p.Side == LobMarketSide.Buy)
                                                  .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
                     data.Add(entry.Key, entry.Sum(p => p.Volume));
@@ -326,7 +326,7 @@ namespace LimitOrderBookRepositories.Model
                 if (_canceledSellOrderDistribution != null) return _canceledSellOrderDistribution;
 
                 var data = new SortedDictionary<int, int>();
-                foreach (var entry in CanceledOrders.Where(p=>p.Side == MarketSide.Sell)
+                foreach (var entry in CanceledOrders.Where(p=>p.Side == LobMarketSide.Sell)
                                                     .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
                     data.Add(entry.Key, entry.Sum(p => p.Volume));
@@ -347,7 +347,7 @@ namespace LimitOrderBookRepositories.Model
                 if (_canceledBuyOrderDistribution != null) return _canceledBuyOrderDistribution;
 
                 var data = new SortedDictionary<int, int>();
-                foreach (var entry in CanceledOrders.Where(p => p.Side == MarketSide.Buy)
+                foreach (var entry in CanceledOrders.Where(p => p.Side == LobMarketSide.Buy)
                                                     .GroupBy(p => p.DistanceBestOppositeQuote))
                 {
                     data.Add(entry.Key, entry.Sum(p => p.Volume));
@@ -479,21 +479,21 @@ namespace LimitOrderBookRepositories.Model
         /// distance to best opposite quote 
         /// </summary>
         /// <returns></returns>
-        public Dictionary<int, double> AverageNumberOfOutstandingLimitOrders(MarketSide side)
+        public Dictionary<int, double> AverageNumberOfOutstandingLimitOrders(LobMarketSide side)
         {
             var averageNumber = new Dictionary<int, double>();
-            var sign = side == MarketSide.Sell ? -1 : 1;
+            var sign = side == LobMarketSide.Sell ? -1 : 1;
             var totalWeight = 0.0;
 
             for (var i = 0; i < Events.Length - 1; i++)
             {
                 var state = Events[i].FinalState;
 
-                var bestOppositePrice = side==MarketSide.Sell? state.BestBidPrice : state.BestAskPrice;
+                var bestOppositePrice = side==LobMarketSide.Sell? state.BestBidPrice : state.BestAskPrice;
 
                 var weight = (Events[i + 1].Time - Events[i].Time) / TradingDuration;
                 totalWeight += weight;
-                var level = side == MarketSide.Sell ? state.AskPrice.Length : state.BidPrice.Length;
+                var level = side == LobMarketSide.Sell ? state.AskPrice.Length : state.BidPrice.Length;
                 
                 if (Math.Abs(bestOppositePrice) == 9999999999)
                 {
@@ -502,9 +502,9 @@ namespace LimitOrderBookRepositories.Model
                 
                 for (var j = 0; j < level; j++)
                 {
-                    var price = side == MarketSide.Sell ? state.AskPrice[j] : state.BidPrice[j];
+                    var price = side == LobMarketSide.Sell ? state.AskPrice[j] : state.BidPrice[j];
                     var distance = sign * (bestOppositePrice - price);
-                    var depth = (double) (side == MarketSide.Sell ? state.AskVolume[j] : state.BidVolume[j]);
+                    var depth = (double) (side == LobMarketSide.Sell ? state.AskVolume[j] : state.BidVolume[j]);
 
                     if (Math.Abs(price) == 9999999999)
                     {
@@ -528,8 +528,8 @@ namespace LimitOrderBookRepositories.Model
         /// </summary>
         public Dictionary<int, double> AverageNumberOfOutstandingLimitOrders()
         {
-            var averageBuy = AverageNumberOfOutstandingLimitOrders(MarketSide.Buy);
-            var averageSell = AverageNumberOfOutstandingLimitOrders(MarketSide.Sell);
+            var averageBuy = AverageNumberOfOutstandingLimitOrders(LobMarketSide.Buy);
+            var averageSell = AverageNumberOfOutstandingLimitOrders(LobMarketSide.Sell);
 
             var average = new Dictionary<int, double>();
             foreach (var key in averageBuy.Keys.Concat(averageSell.Keys).Distinct())

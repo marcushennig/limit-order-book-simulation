@@ -22,9 +22,9 @@
         <e p="Model" t="Include">
           <e p="LobEvent.cs" t="Include" />
           <e p="LobEventType.cs" t="Include" />
+          <e p="LobMarketSide.cs" t="Include" />
           <e p="LobState.cs" t="Include" />
           <e p="LobTradingData.cs" t="Include" />
-          <e p="MarketSide.cs" t="Include" />
         </e>
         <e p="obj" t="ExcludeRecursive" />
         <e p="packages.config" t="Include" />

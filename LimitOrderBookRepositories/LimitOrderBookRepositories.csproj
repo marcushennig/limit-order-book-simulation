@@ -80,7 +80,7 @@
     <Compile Include="Model\LobEvent.cs" />
     <Compile Include="Model\LobEventType.cs" />
     <Compile Include="Model\LobState.cs" />
-    <Compile Include="Model\MarketSide.cs" />
+    <Compile Include="Model\LobMarketSide.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
