@@ -50,13 +50,7 @@ namespace UnitTests
 
             averageDepthProfile.Save(Path.Combine(workFolder, $"depth_profile_{symbol}_{tradingDate:yyyyMMdd}.csv"));
 
-            var orderSize = SmithFarmerModelCalibration.CalibrateCharacteristicOrderSize(tradingData);
-            var marketOrderRate = SmithFarmerModelCalibration.CalibrateMarketOrderRate(tradingData, orderSize);
-            var limitOrderRate = SmithFarmerModelCalibration.CalibrateLimitOrderRate(tradingData, orderSize, tickSize, distanceBestOppositeQuoteQuantile);
-            var cancelationRate = SmithFarmerModelCalibration.CalibrateCancelationRate(tradingData, orderSize, tickSize, distanceBestOppositeQuoteQuantile);
-
-
-            Console.WriteLine(cancelationRate);
+            
         }
     }
 }

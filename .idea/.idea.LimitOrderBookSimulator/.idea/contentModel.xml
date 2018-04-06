@@ -69,6 +69,7 @@
       </e>
       <e p="packages" t="ExcludeRecursive" />
       <e p="UnitTests" t="IncludeRecursive">
+        <e p="App.config" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
         <e p="obj" t="ExcludeRecursive" />
         <e p="Properties" t="Include">
@@ -78,6 +79,8 @@
         <e p="TestLimitOrderBookRepository.cs" t="Include" />
         <e p="TestLimitOrderBookSimulation.cs" t="Include" />
         <e p="TestLimitOrderBookUtilities.cs" t="Include" />
+        <e p="TestLobRepository.cs" t="Include" />
+        <e p="TestSmithFarmerModelCalibration.cs" t="Include" />
         <e p="UnitTests.csproj" t="IncludeRecursive" />
       </e>
     </e>

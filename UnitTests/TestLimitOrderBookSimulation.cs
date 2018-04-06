@@ -29,10 +29,13 @@ namespace UnitTests
         private const int SellMaxDepth = 100;
 
         #endregion
-        
+
+        private string WorkFolder { set; get; }
+
         [SetUp]
         public void Init()
         {
+            WorkFolder = ConfigurationManager.AppSettings["WorkFolder"];
             SellSide = new SortedDictionary<int, int>();
             BuySide = new SortedDictionary<int, int>();
 
@@ -159,80 +162,46 @@ namespace UnitTests
                 .All(p => p.Ask > p.Bid), "Ask must be greater than bid price");          
         }
 
+        [TestCase(0.08)]
+        [TestCase(0.06)]
         [TestCase(0.05)]
-        [TestCase(0.025)]
-        public void TestCalibration(double cancellationRate)
+        [TestCase(0.04)]
+        [TestCase(0.03)]
+        [TestCase(0.02)]
+        public void TestCalibrationOfSmithFarmerModel(double cancellationRate)
         {
-            const double duration = 100.0;
-            const double characteristicOrderSize = 1;
+            const double duration = 1000.0;
             const double percent = 0.01;
-            const double relativeTolerance = 1 * percent;
+            const double relativeTolerance = 5 * percent;
 
             #region Simulate events
 
             var model = GenerateSmithFarmerModel(cancellationRate);
             model.SimulateOrderFlow(duration);
-
+            
+            var parameter = model.Parameter;           
             var tradingData = model.LimitOrderBook.TradingData;
 
-            var marketOrderEvents = tradingData.Events
-                .Where(p => p.Type == LobEventType.ExecutionVisibleLimitOrder)
-                .ToList();
-
-            var limitOrderEvents = tradingData.Events
-                .Where(p => p.Type == LobEventType.Submission)
-                .ToList();
-
-            #endregion
-
-            var tickSize = tradingData.PriceTickSize;
-
-            // Use average depth profile to determine a small band around 
-            // the spread, where we calibrate the limit order rate 
-            const double probabilityLow = 0.01;
-            const double probabilityHigh = 0.8;
+            const double probabilityLow  = 0.01;
+            const double probabilityHigh = 0.80;
             
-            var averageDepthProfile = tradingData.AverageDepthProfile;
-            var lowerQuantileForDistanceBestOppositeQuote = averageDepthProfile.Quantile(probabilityLow);
-            var higherQuantileForDistanceBestOppositeQuote = averageDepthProfile.Quantile(probabilityHigh);
-
-            /*var measuredProbability = averageDepthProfile.Probability
-                .Where(p => p.Key <= distanceBestOppositeQuoteQuantile)
-                .Select(p => p.Value)
-                .Sum();
-
-            Assert.True(Math.Abs(probability - measuredProbability) < tolerance, 
-                $"Probability: {probability}, Measured: {measuredProbability}");*/
-
-            #region Estimate market order rate 
-
-            var marketRate = model.Parameter.MarketOrderRate;
-            var estimatedMarketOrderRate = SmithFarmerModelCalibration.EstimateMarketOrderRate(marketOrderEvents, characteristicOrderSize);
-
-            Assert.True(Math.Abs(1 - estimatedMarketOrderRate / marketRate) < relativeTolerance,
-                $"Market order rate: {marketRate}, estimated rate: {estimatedMarketOrderRate}");
+            // Estimate parameter from simulated trading data 
+            // within a narrow band near the spread (given by the 1% and 80% quantile)            
+            var estimated = SmithFarmerModelCalibration.Calibrate(tradingData, probabilityLow, probabilityHigh);
 
             #endregion
-
-            #region Estimate Limit order rate 
-
-            var limitOrderRateDensity = model.Parameter.LimitOrderRateDensity;
-            var estimateLimitOrderRateDensity =
-                SmithFarmerModelCalibration.EstimateLimitOrderRate(limitOrderEvents, 
-                    characteristicOrderSize,
-                    tickSize,
-                    lowerQuantileForDistanceBestOppositeQuote,
-                    higherQuantileForDistanceBestOppositeQuote);
-
-            Assert.True(Math.Abs(1 - estimateLimitOrderRateDensity / limitOrderRateDensity) < relativeTolerance,
-                $"Limit order rate: {limitOrderRateDensity}, estimated rate: {estimateLimitOrderRateDensity}");
-
-            #endregion
-
-            #region Estimate cancelation rate
             
-            #endregion
+            var relativeErrorMarketOrderRate = 1 - estimated.MarketOrderRate / parameter.MarketOrderRate; 
+            Assert.True(Math.Abs(relativeErrorMarketOrderRate) < relativeTolerance,
+                $"Market order rate: {parameter.MarketOrderRate}, estimated rate: {estimated.MarketOrderRate} ({relativeErrorMarketOrderRate * 100}%)");
 
+            var relativeErrorLimitOrderRateDensity = 1 - estimated.LimitOrderRateDensity / parameter.LimitOrderRateDensity; 
+            Assert.True(Math.Abs(relativeErrorLimitOrderRateDensity) < relativeTolerance,
+                $"Limit order rate: {parameter.LimitOrderRateDensity}, estimated rate: {estimated.LimitOrderRateDensity} ({relativeErrorLimitOrderRateDensity * 100}%)");
+
+            var relativeErrorCancelationRate = 1 - estimated.CancellationRate / parameter.CancellationRate;           
+            Assert.True(Math.Abs(relativeErrorCancelationRate) < relativeTolerance,
+                $"Cancellation rate: { parameter.CancellationRate}, estimated rate: {estimated.CancellationRate} ({relativeErrorCancelationRate * 100}%)");            
         }
 
         [Test]
