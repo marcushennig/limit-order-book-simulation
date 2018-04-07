@@ -191,20 +191,13 @@ namespace LimitOrderBookSimulation.EventModels
         #endregion Events
 
         /// <summary>
-        // Pseudo-code:
-        // [1] Compute the best bid B(t) and best offer A(t).
-        // [2] Compute the number of shares n_B on the bid side of the book from level A(t) - 1 to level A(t) - L.
-        // [3] Compute the number of shares n_A on the offered side of the book from level B(t) + 1 to level B(t) + L.
-        // [4] Draw a new event according to the relative probabilities {ℙMB, ℙMS, ℙLB, ℙLS, ℙCS, ℙCB} ~ {μ/2, μ/2, L * α, L * α, δ * nA, δ * nB}
-        //      - If the selected event is a limit order, draw the relative price level from {1, 2,…, L}.
-        //      - If the selected event is a cancelation, select randomly which order within the band to cancel.
-        // [5] Update the order book and increment t.
         /// </summary>
         /// <param name="duration">In units of seconds</param>
-        public void SimulateOrderFlow(double duration)
+        /// <param name="useSeed">True if results shoule be reproducible otherwise false</param>
+        public void SimulateOrderFlow(double duration, bool useSeed=true)
         {
-            Random = new ExtendedRandom(Parameter.Seed);
-            
+            Random = useSeed ? new ExtendedRandom(Parameter.Seed) : new ExtendedRandom();
+
             var t0 = LimitOrderBook.Time;
             var tEnd = t0 + duration;
             var limitOrderRate = Parameter.LimitOrderRateDensity * Parameter.SimulationIntervalSize;

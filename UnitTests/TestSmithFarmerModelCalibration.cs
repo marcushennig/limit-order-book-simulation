@@ -192,5 +192,72 @@ namespace UnitTests
             
             #endregion
         }
+
+        [TestCase("2016-01-04", "AMZN", 1000)]
+        public void TestSamplingOfModel(string tradingDateString,
+            string symbol,
+            double duration)
+        {
+            var tradingDate = DateTime.ParseExact(tradingDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            
+            #region Load Trading data
+            
+            const int level = 10;
+            var tradingDates = new List<DateTime> { tradingDate };
+            var repository = new LobRepository(symbol, level, tradingDates);          
+            var tradingData =  repository.TradingData[tradingDate];
+            
+            #endregion
+            
+            #region Calibrate Smith-Farmer model
+            
+            // Calibrate Smith-Farmer model within a narrow price-band near
+            // the spread (given by lower and upper price quantile). For this purpose 
+            // we use the time-averaged depth profile (depth vs. distance to best opposite quote) 
+            const double lowerProbability  = 0.01;
+            const double upperProbability = 0.80;
+            
+            var calibratedParameters = SmithFarmerModelCalibration.Calibrate(tradingData, 
+                lowerProbability, 
+                upperProbability);
+            
+            #endregion
+            
+            #region Initial state of LOB
+            
+            // Problematic part, as scaling with characteristic order size 
+            // results in very low depth profiles, any suggestion here from M. Gould  
+            var initalState = tradingData.States.First();
+            
+            var initialBids = initalState.Bids
+                .ToDictionary(p => (int) (p.Key / calibratedParameters.PriceTickSize), 
+                    p => (int) Math.Ceiling(p.Value / calibratedParameters.CharacteristicOrderSize));
+            
+            var initialAsks = initalState.Asks
+                .ToDictionary(p => (int) (p.Key / calibratedParameters.PriceTickSize),
+                    p => (int) Math.Ceiling(p.Value / calibratedParameters.CharacteristicOrderSize));
+
+            var initialSpread = (int) (initalState.Spread / calibratedParameters.PriceTickSize);
+            
+            #endregion 
+            
+            // Choose narrow simulation interval in order of the spread
+            var simulationIntervalSize = 4 * initialSpread;
+            
+            for (var pathNumber = 0; pathNumber < 10; pathNumber++)
+            {
+                var testFolder = Path.Combine(WorkFolder, $"Simulation_{symbol}_{tradingDate:yyyyMMdd}/Paths");
+                Directory.CreateDirectory(testFolder);
+                Assert.True(Directory.Exists(testFolder), $"The test folder  {testFolder} could not be created");  
+             
+                var model = new SmithFarmerModel(calibratedParameters, 
+                    initialBids, 
+                    initialAsks, 
+                    simulationIntervalSize);
+                
+                model.SimulateOrderFlow(duration, useSeed:false);
+                model.SavePriceProcess(Path.Combine(testFolder, $"model_price_{pathNumber}.csv"));
+            }
+        }
     }
 }

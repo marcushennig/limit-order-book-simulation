@@ -12,7 +12,14 @@ namespace LimitOrderBookUtilities
         /// </summary>
         /// <param name="seed"></param>
         public ExtendedRandom(int seed) : base(seed) {}
-
+        
+        /// <inheritdoc />
+        /// <summary>
+        /// Start without seed
+        /// </summary>
+        public ExtendedRandom()
+        {}
+        
         /// <summary>
         /// Interarrival time of Poisson point process:  {X_n}
         /// are i.i.d with common distribution 
