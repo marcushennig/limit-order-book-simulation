@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
 using LimitOrderBookRepositories.Model;
 using LimitOrderBookUtilities;
+using Newtonsoft.Json;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
 {
     public interface ILimitOrderBook
     {
         #region Recording
-
+        
+        bool RecordTradingData { set; get; }
+        
+        [JsonIgnore]
         LobTradingData TradingData { get; }
 
         #endregion 
@@ -47,6 +51,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <summary>
         /// Time-dependent pricing information 
         /// </summary>
+        [JsonIgnore]
         SortedList<double, Price> PriceTimeSeries { get; }
 
         #endregion Time evolution

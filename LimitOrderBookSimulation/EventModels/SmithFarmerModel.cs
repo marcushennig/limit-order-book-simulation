@@ -58,38 +58,38 @@ namespace LimitOrderBookSimulation.EventModels
             LimitOrderBook = new LimitOrderBook();
             Parameter = new SmithFarmerModelParameter();
         }
-        
+
         /// <inheritdoc />
         /// <summary>
         /// Initialize the model with calibrated parameters and set initial
         /// state of the limit order book
         /// </summary>
-        /// <param name="calibrated"></param>
-        /// <param name="intialDepthProfile"></param>
+        /// <param name="calibrated">Calibrated model parameter</param>
+        /// <param name="initialBids">Initial depth profile of buy side of LOB</param>
+        /// <param name="initialAsks">Initial depth profile of sell side of LOB</param>
+        /// <param name="simulationIntervalSize">Size of the simulation interval</param>
         public SmithFarmerModel(SmithFarmerModelParameter calibrated, 
-                                LobState intialDepthProfile) : this()
+                                IDictionary<int, int> initialBids,
+                                IDictionary<int, int> initialAsks,
+                                int simulationIntervalSize) : this()
         {
             #region Model parameter
+            
+            Parameter.Seed = 42;                   
+            Parameter.SimulationIntervalSize = simulationIntervalSize;
             
             Parameter.CharacteristicOrderSize = calibrated.CharacteristicOrderSize;
             Parameter.PriceTickSize = calibrated.PriceTickSize;            
             Parameter.MarketOrderRate = calibrated.MarketOrderRate;
             Parameter.CancellationRate = calibrated.CancellationRate;
             Parameter.LimitOrderRateDensity = calibrated.LimitOrderRateDensity;
-            Parameter.Seed = 42;
                        
             #endregion
 
             #region Initialize sell and buy side of the limit order book
-
-           var initalBids = intialDepthProfile.Bids.ToDictionary(p => (int)(p.Key / Parameter.PriceTickSize), 
-                p => (int)Math.Ceiling(1*(p.Value) / Parameter.CharacteristicOrderSize));
-
-            var initalAsks = intialDepthProfile.Asks.ToDictionary(p => (int) (p.Key/Parameter.PriceTickSize),
-                p => (int) Math.Ceiling(1*(p.Value) / Parameter.CharacteristicOrderSize));
-            
-            LimitOrderBook.InitializeDepthProfileBuySide(initalBids);
-            LimitOrderBook.InitializeDepthProfileSellSide(initalAsks);
+  
+            LimitOrderBook.InitializeDepthProfileBuySide(initialBids);
+            LimitOrderBook.InitializeDepthProfileSellSide(initialAsks);
             LimitOrderBook.Time = 0;
             
             #endregion
@@ -201,13 +201,8 @@ namespace LimitOrderBookSimulation.EventModels
             var t0 = LimitOrderBook.Time;
             var tEnd = t0 + duration;
             
-            // It is impossible to simulate order arrivals and cancelations at integer price levels from −∞ to −∞
-            // So consider only order arrivals and cancelations in a moving band of width centered around
-            // the current best quotes.
-            //  - L should be chosen conservatively so as to ensure minimal edge effects.
-            //  - Within the band, the arrival rate of limit orders is α, cancelation rate is δ times outstanding shares.
-            //  - Outside the band, orders may neither arrive nor be canceled.
-            // TODO: Parameter.SimulationIntervalSize = ?
+      
+            // TODO: Parameter.SimulationIntervalSize = ? Spread * 4 ?
             
             var limitOrderRate = Parameter.LimitOrderRateDensity * Parameter.SimulationIntervalSize;
 

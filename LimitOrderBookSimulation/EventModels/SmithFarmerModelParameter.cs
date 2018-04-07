@@ -40,7 +40,15 @@
         public double CancellationRate { set; get; }
         
         /// <summary>
-        /// Size of the simulation interval (in units of ticks)
+        /// Size of the simulation interval L (in units of ticks)
+        /// It is impossible to simulate order arrivals and cancelations at integer price levels from −∞ to −∞
+        // So consider only order arrivals and cancelations in a moving band of width centered around
+        // the current best quotes.
+        //  - The size L should be chosen conservatively so as to ensure minimal edge effects.        
+        //  - L should be chosen conservatively so as to ensure minimal edge effects.
+        //  - Within the band, the arrival rate of limit orders is α, cancelation rate is δ times outstanding shares.
+        //  - Outside the band, orders may neither arrive nor be canceled.
+        /// Unit: PriceTicks
         /// </summary>
         public int SimulationIntervalSize { set; get; }
         

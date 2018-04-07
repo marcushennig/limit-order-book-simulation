@@ -25,19 +25,19 @@ namespace UnitTests
         }
         
 
-        [TestCase("2016-01-04", "AMZN", 10)]
-        [TestCase("2016-01-05", "AMZN", 10)]
+        [TestCase("2016-01-04", "AMZN", 10)]        
         public void TestCalibration(string tradingDateString, 
                                     string symbol, 
                                     double duration)
         {
             var tradingDate = DateTime.ParseExact(tradingDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            
             const double percent = 1e-2;
             const double relativeTolerance  = 2 * percent;
             
             #region Create test folder
             
-            var testFolder = Path.Combine(WorkFolder, $"Test_Case_{symbol}_{tradingDate:yyyyMMdd}");
+            var testFolder = Path.Combine(WorkFolder, $"Simulation_{symbol}_{tradingDate:yyyyMMdd}");
             Directory.CreateDirectory(testFolder);
             Assert.True(Directory.Exists(testFolder), $"The test folder  {testFolder} could not be created");
             
@@ -80,31 +80,50 @@ namespace UnitTests
                 .Select(p => p.Value)
                 .Sum();
             
-            var probability = upperProbability - lowerProbability;
+            const double probability = upperProbability - lowerProbability;
             var relativeError = 1 - measuredProbability / probability;
             Assert.True(Math.Abs(relativeError) < relativeTolerance, 
                 $"Probability: {probability} Measured: {measuredProbability} ({relativeError * 100}%)");
             
             var calibratedParameters = SmithFarmerModelCalibration.Calibrate(tradingData, lowerProbability, upperProbability);
             
-            SharedUtilities.SaveAsJson(calibratedParameters, Path.Combine(testFolder, "model_calibrated_parameters.json"));
+            SharedUtilities.SaveAsJson(calibratedParameters, Path.Combine(testFolder, "model_parameter.json"));
             averageDepthProfile.Save(Path.Combine(testFolder, "model_average_depth_profile.csv"));
-            SharedUtilities.SaveAsJson(averageDepthProfile,  Path.Combine(testFolder, "model_average_depth_profile.json"));
             
             #endregion
+           
+            #region Initial state of LOB
             
-            #region Simulate order flow
-
             var initalState = tradingData.States.First();
             
-            // TODO: Save intial state 
+            var initialBids = initalState.Bids.ToDictionary(p => (int)(p.Key / calibratedParameters.PriceTickSize), 
+                p => (int)Math.Ceiling(1 * p.Value / calibratedParameters.CharacteristicOrderSize));
             
-            var model = new SmithFarmerModel(calibratedParameters, initalState);
+            var initialAsks = initalState.Asks.ToDictionary(p => (int) (p.Key / calibratedParameters.PriceTickSize),
+                p => (int) Math.Ceiling(1 * p.Value / calibratedParameters.CharacteristicOrderSize));
+
+            var initialSpread = (int) (initalState.Spread / calibratedParameters.PriceTickSize);
+            
+            #endregion 
+            
+            #region Simulate order flow
+            
+            // Choose narrow simulation interval in order of the spread
+            var simulationIntervalSize = 4 * initialSpread;
+                
+            var model = new SmithFarmerModel(calibratedParameters, 
+                initialBids, 
+                initialAsks, 
+                simulationIntervalSize);
+            
+            model.SaveDepthProfile(Path.Combine(testFolder, "model_initial_depth_profile.csv"));
+            
             model.SimulateOrderFlow(duration);
             
-            // Save the model            
-            SharedUtilities.SaveAsJson(model, Path.Combine(testFolder, "model.json"));
+            model.SaveDepthProfile(Path.Combine(testFolder, "model_final_depth_profile.csv"));
             model.SavePriceProcess(Path.Combine(testFolder, "model_price.csv"));
+            
+            SharedUtilities.SaveAsJson(model, Path.Combine(testFolder, "model.json"));
             
             #endregion
         }

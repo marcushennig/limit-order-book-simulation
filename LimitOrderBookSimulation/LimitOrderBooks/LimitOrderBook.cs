@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using LimitOrderBookRepositories.Model;
 using LimitOrderBookUtilities;
+using Newtonsoft.Json;
 
 namespace LimitOrderBookSimulation.LimitOrderBooks
 {
@@ -27,11 +28,11 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         
         #region Recording
 
-        private bool RecordEvents = true;
+        public bool RecordTradingData { set; get; }
+    
         private int Level = 10;
         private List<LobState> States { get; }
         private List<LobEvent> Events { get; }
-
         public LobTradingData TradingData => new LobTradingData(Level, Events.ToArray(), States.ToArray());
 
         #endregion 
@@ -133,7 +134,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
             AddToBuySide(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitBuyOrder]++;
 
-            if (RecordEvents)
+            if (RecordTradingData)
             {
                 Events.Add(new LobEvent(orderId: 1,
                     time: Time,
@@ -152,7 +153,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
             AddToSellSide(price, amount);
             Counter[LimitOrderBookEvent.SubmitLimitSellOrder]++;
 
-            if (RecordEvents)
+            if (RecordTradingData)
             {
                 Events.Add(new LobEvent(orderId: 1,
                     time: Time,
@@ -176,7 +177,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
 
             Counter[LimitOrderBookEvent.SubmitMarketBuyOrder]++;
 
-            if (RecordEvents)
+            if (RecordTradingData)
             {
                 Events.Add(new LobEvent(orderId: 1,
                     time: Time,
@@ -198,7 +199,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
             RemoveFromBuySide(price, amount);
             Counter[LimitOrderBookEvent.SubmitMarketSellOrder]++;
 
-            if (RecordEvents)
+            if (RecordTradingData)
             {
                 Events.Add(new LobEvent(orderId: 1,
                     time: Time,
@@ -222,7 +223,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
             RemoveFromBuySide(price, amount);
             Counter[LimitOrderBookEvent.CancelLimitBuyOrder]++;
 
-            if (RecordEvents)
+            if (RecordTradingData)
             {
                 Events.Add(new LobEvent(orderId: 1,
                     time: Time,
@@ -240,7 +241,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
             RemoveFromSellSide(price, amount);
             Counter[LimitOrderBookEvent.CancelLimitSellOrder]++;
 
-            if (RecordEvents)
+            if (RecordTradingData)
             {
                 Events.Add(new LobEvent(orderId: 1,
                     time: Time,
@@ -340,16 +341,17 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         /// <summary>
         /// Constructor 
         /// </summary>
-        public LimitOrderBook()
+        public LimitOrderBook(bool recordTradingData = false)
         {
             DepthSellSide = new SortedDictionary<int, int>();
             DepthBuySide = new SortedDictionary<int, int>();
-
+            
             Events = new List<LobEvent>();
             States = new List<LobState>();
 
             PriceTimeSeries = new SortedList<double, Price>();
-
+            RecordTradingData = recordTradingData;
+            
             // Counter used for statistics
             Counter = new Dictionary<LimitOrderBookEvent, int>
             {

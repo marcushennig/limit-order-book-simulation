@@ -113,7 +113,7 @@ namespace UnitTests
                 LimitOrderRateDensity = muL,
                 SimulationIntervalSize = Spread * 4,
                 CharacteristicOrderSize = 10.3,
-                PriceTickSize = 5.6,
+                PriceTickSize = 5.6
             };
             
             return new SmithFarmerModel
@@ -174,6 +174,10 @@ namespace UnitTests
             #region Simulate events
 
             var model = GenerateSmithFarmerModel(cancellationRate);
+            
+            // Set flag to record trading data 
+            model.LimitOrderBook.RecordTradingData = true;
+            
             model.SimulateOrderFlow(duration);
             
             var parameter = model.Parameter;           
