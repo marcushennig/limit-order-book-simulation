@@ -24,8 +24,7 @@ namespace UnitTests
             Assert.True(Directory.Exists(WorkFolder));
         }
         
-
-        [TestCase("2016-01-04", "AMZN", 10)]        
+        [TestCase("2016-01-05", "AMZN", 1000)]        
         public void TestCalibration(string tradingDateString, 
                                     string symbol, 
                                     double duration)
@@ -97,7 +96,7 @@ namespace UnitTests
             var initalState = tradingData.States.First();
             
             var initialBids = initalState.Bids.ToDictionary(p => (int)(p.Key / calibratedParameters.PriceTickSize), 
-                p => (int)Math.Ceiling(1 * p.Value / calibratedParameters.CharacteristicOrderSize));
+                p => (int)Math.Ceiling((1 * p.Value) / calibratedParameters.CharacteristicOrderSize));
             
             var initialAsks = initalState.Asks.ToDictionary(p => (int) (p.Key / calibratedParameters.PriceTickSize),
                 p => (int) Math.Ceiling(1 * p.Value / calibratedParameters.CharacteristicOrderSize));

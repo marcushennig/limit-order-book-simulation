@@ -86,6 +86,15 @@ namespace LimitOrderBookSimulation.EventModels
                        
             #endregion
 
+            #region Calibration information 
+
+            Parameter.LowerQuantile = calibrated.LowerQuantile;
+            Parameter.LowerQuantileProbability = calibrated.LowerQuantileProbability;
+            Parameter.UpperQuantile = calibrated.UpperQuantile;
+            Parameter.UpperQuantileProbability = calibrated.UpperQuantileProbability;
+            
+            #endregion
+            
             #region Initialize sell and buy side of the limit order book
   
             LimitOrderBook.InitializeDepthProfileBuySide(initialBids);

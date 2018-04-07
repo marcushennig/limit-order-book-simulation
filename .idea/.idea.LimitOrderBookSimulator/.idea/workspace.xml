@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="25fa8e57-4fb3-4fb1-b280-c240f4c2f5a6" name="Default" comment="Cleaned up code">
+    <list default="true" id="25fa8e57-4fb3-4fb1-b280-c240f4c2f5a6" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LimitOrderBookSimulator/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/.idea.LimitOrderBookSimulator/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/CommandLineTool/Program.cs" afterPath="$PROJECT_DIR$/CommandLineTool/Program.cs" />
       <change beforePath="$PROJECT_DIR$/LimitOrderBookSimulation/EventModels/SmithFarmerModel.cs" afterPath="$PROJECT_DIR$/LimitOrderBookSimulation/EventModels/SmithFarmerModel.cs" />
-      <change beforePath="$PROJECT_DIR$/LimitOrderBookSimulation/EventModels/SmithFarmerModelParameter.cs" afterPath="$PROJECT_DIR$/LimitOrderBookSimulation/EventModels/SmithFarmerModelParameter.cs" />
-      <change beforePath="$PROJECT_DIR$/LimitOrderBookSimulation/LimitOrderBooks/ILimitOrderBook.cs" afterPath="$PROJECT_DIR$/LimitOrderBookSimulation/LimitOrderBooks/ILimitOrderBook.cs" />
-      <change beforePath="$PROJECT_DIR$/LimitOrderBookSimulation/LimitOrderBooks/LimitOrderBook.cs" afterPath="$PROJECT_DIR$/LimitOrderBookSimulation/LimitOrderBooks/LimitOrderBook.cs" />
-      <change beforePath="$PROJECT_DIR$/UnitTests/TestLimitOrderBookSimulation.cs" afterPath="$PROJECT_DIR$/UnitTests/TestLimitOrderBookSimulation.cs" />
       <change beforePath="$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs" afterPath="$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs" />
     </list>
     <ignored path="UnitTests/bin/Debug/LimitOrderBookRepositories.dll" />
@@ -110,20 +105,20 @@
       <file leaf-file-name="TestSmithFarmerModelCalibration.cs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="468">
-              <caret line="106" column="23" lean-forward="true" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+            <state relative-caret-position="312">
+              <caret line="27" column="62" lean-forward="true" selection-start-line="27" selection-start-column="62" selection-end-line="27" selection-end-column="62" />
               <folding>
-                <marker date="1523093136919" expanded="false" signature="6:271" ph="..." />
-                <marker date="1523093136919" expanded="true" signature="292:6220" ph="{...}" />
-                <marker date="1523093136919" expanded="true" signature="361:6218" ph="{...}" />
-                <marker date="1523093136919" expanded="true" signature="475:663" ph="{...}" />
-                <marker date="1523093136919" expanded="true" signature="894:6212" ph="{...}" />
-                <marker date="1523093136919" expanded="false" signature="1157:1495" ph="Create test folder" />
-                <marker date="1523093136919" expanded="false" signature="1521:2932" ph="Load trading data and save statistics" />
-                <marker date="1523093136919" expanded="false" signature="2958:4601" ph="Calibrate Smith-Farmer model" />
-                <marker date="1523093136919" expanded="true" signature="3020:3269" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
-                <marker date="1523093136919" expanded="false" signature="4626:5322" ph="Initial state of LOB" />
-                <marker date="1523093136919" expanded="false" signature="5349:6202" ph="Simulate order flow" />
+                <marker date="1523095682930" expanded="false" signature="6:271" ph="..." />
+                <marker date="1523095682930" expanded="true" signature="292:6223" ph="{...}" />
+                <marker date="1523095682930" expanded="true" signature="361:6221" ph="{...}" />
+                <marker date="1523095682930" expanded="true" signature="475:663" ph="{...}" />
+                <marker date="1523095682930" expanded="true" signature="895:6215" ph="{...}" />
+                <marker date="1523095682930" expanded="false" signature="1158:1496" ph="Create test folder" />
+                <marker date="1523095682930" expanded="false" signature="1522:2933" ph="Load trading data and save statistics" />
+                <marker date="1523095682930" expanded="false" signature="2959:4602" ph="Calibrate Smith-Farmer model" />
+                <marker date="1523095682930" expanded="true" signature="3021:3270" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
+                <marker date="1523095682930" expanded="false" signature="4627:5325" ph="Initial state of LOB" />
+                <marker date="1523095682930" expanded="false" signature="5352:6205" ph="Simulate order flow" />
               </folding>
             </state>
           </provider>
@@ -173,52 +168,53 @@
       <file leaf-file-name="SmithFarmerModel.cs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LimitOrderBookSimulation/EventModels/SmithFarmerModel.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-755">
-              <caret line="60" column="0" lean-forward="false" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
+            <state relative-caret-position="673">
+              <caret line="88" column="44" lean-forward="false" selection-start-line="88" selection-start-column="44" selection-end-line="88" selection-end-column="44" />
               <folding>
-                <marker date="1523092722055" expanded="false" signature="6:242" ph="..." />
-                <marker date="1523092722055" expanded="true" signature="290:11778" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="297:960" ph="/// Artifical double auction market proposed by E. Smith &amp; J.D. Farmer,  ... " />
-                <marker date="1523092722055" expanded="true" signature="994:11776" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="1009:1163" ph="Logging" />
-                <marker date="1523092722055" expanded="true" signature="1181:1670" ph="Properties" />
-                <marker date="1523092722055" expanded="true" signature="1286:1443" ph="/// Underlying limit order book ... " />
-                <marker date="1523092722055" expanded="true" signature="1521:1585" ph="/// Model paramater ... " />
-                <marker date="1523092722055" expanded="true" signature="1688:4232" ph="Constructor" />
-                <marker date="1523092722055" expanded="true" signature="1726:1794" ph="/// Empty constructor   ... " />
-                <marker date="1523092722055" expanded="false" signature="1828:1956" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="1966:2483" ph="/// Initialize the model with calibrated parameters and set initial ... " />
-                <marker date="1523092722055" expanded="true" signature="2757:4207" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="2780:3377" ph="Model parameter" />
-                <marker date="1523092722055" expanded="true" signature="3391:3670" ph="Initialize sell and buy side of the limit order book" />
-                <marker date="1523092722055" expanded="true" signature="4250:11770" ph="Methods" />
-                <marker date="1523092722055" expanded="false" signature="4283:6873" ph="Limit order book Events" />
-                <marker date="1523092722055" expanded="true" signature="4332:4401" ph="/// Function signature   ... " />
-                <marker date="1523092722055" expanded="true" signature="4471:4544" ph="/// Submit market buy order  ... " />
-                <marker date="1523092722055" expanded="true" signature="4586:4683" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="4693:4766" ph="/// Submit market sell order ... " />
-                <marker date="1523092722055" expanded="true" signature="4809:4897" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="4915:5114" ph="///  Cancel limit sell order by selecting the price randomly from ... " />
-                <marker date="1523092722055" expanded="true" signature="5156:5521" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="5531:5728" ph="///  Cancel limit buy order by selecting the price randomly from ... " />
-                <marker date="1523092722055" expanded="true" signature="5769:6121" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="6131:6206" ph="/// Limit buy order @ time = t ... " />
-                <marker date="1523092722055" expanded="true" signature="6247:6482" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="6492:6568" ph="/// Limit sell order @ time = t ... " />
-                <marker date="1523092722055" expanded="true" signature="6610:6846" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="6883:7721" ph="/// Pseudo-code: ... " />
-                <marker date="1523092722055" expanded="true" signature="7776:10752" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="8275:8547" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="8614:10742" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="8738:8922" ph="/* var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1); ... */" />
-                <marker date="1523092722055" expanded="true" signature="10468:10584" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="10602:10687" ph="/* Update time of limit order book ... */" />
-                <marker date="1523092722055" expanded="false" signature="10768:10894" ph="/// Save the price process to a file  ... " />
-                <marker date="1523092722055" expanded="true" signature="10948:11475" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="11016:11465" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="11100:11451" ph="{...}" />
-                <marker date="1523092722055" expanded="true" signature="11493:11613" ph="/// Save current depth profile  ... " />
-                <marker date="1523092722055" expanded="true" signature="11667:11742" ph="{...}" />
+                <marker date="1523095348510" expanded="false" signature="6:242" ph="..." />
+                <marker date="1523095348510" expanded="true" signature="290:12173" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="297:960" ph="/// Artifical double auction market proposed by E. Smith &amp; J.D. Farmer,  ... " />
+                <marker date="1523095348510" expanded="true" signature="994:12171" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="1009:1163" ph="Logging" />
+                <marker date="1523095348510" expanded="true" signature="1181:1670" ph="Properties" />
+                <marker date="1523095348510" expanded="true" signature="1286:1443" ph="/// Underlying limit order book ... " />
+                <marker date="1523095348510" expanded="true" signature="1521:1585" ph="/// Model paramater ... " />
+                <marker date="1523095348510" expanded="true" signature="1688:4627" ph="Constructor" />
+                <marker date="1523095348510" expanded="true" signature="1726:1794" ph="/// Empty constructor   ... " />
+                <marker date="1523095348510" expanded="false" signature="1828:1956" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="1966:2483" ph="/// Initialize the model with calibrated parameters and set initial ... " />
+                <marker date="1523095348510" expanded="true" signature="2757:4602" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="2780:3377" ph="Model parameter" />
+                <marker date="1523095348510" expanded="true" signature="3391:3760" ph="Calibration information" />
+                <marker date="1523095348510" expanded="true" signature="3786:4065" ph="Initialize sell and buy side of the limit order book" />
+                <marker date="1523095348510" expanded="true" signature="4645:12165" ph="Methods" />
+                <marker date="1523095348510" expanded="false" signature="4678:7268" ph="Limit order book Events" />
+                <marker date="1523095348510" expanded="true" signature="4727:4796" ph="/// Function signature   ... " />
+                <marker date="1523095348510" expanded="true" signature="4866:4939" ph="/// Submit market buy order  ... " />
+                <marker date="1523095348510" expanded="true" signature="4981:5078" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="5088:5161" ph="/// Submit market sell order ... " />
+                <marker date="1523095348510" expanded="true" signature="5204:5292" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="5310:5509" ph="///  Cancel limit sell order by selecting the price randomly from ... " />
+                <marker date="1523095348510" expanded="true" signature="5551:5916" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="5926:6123" ph="///  Cancel limit buy order by selecting the price randomly from ... " />
+                <marker date="1523095348510" expanded="true" signature="6164:6516" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="6526:6601" ph="/// Limit buy order @ time = t ... " />
+                <marker date="1523095348510" expanded="true" signature="6642:6877" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="6887:6963" ph="/// Limit sell order @ time = t ... " />
+                <marker date="1523095348510" expanded="true" signature="7005:7241" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="7278:8116" ph="/// Pseudo-code: ... " />
+                <marker date="1523095348510" expanded="true" signature="8171:11147" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="8670:8942" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="9009:11137" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="9133:9317" ph="/* var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1); ... */" />
+                <marker date="1523095348510" expanded="true" signature="10863:10979" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="10997:11082" ph="/* Update time of limit order book ... */" />
+                <marker date="1523095348510" expanded="false" signature="11163:11289" ph="/// Save the price process to a file  ... " />
+                <marker date="1523095348510" expanded="true" signature="11343:11870" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="11411:11860" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="11495:11846" ph="{...}" />
+                <marker date="1523095348510" expanded="true" signature="11888:12008" ph="/// Save current depth profile  ... " />
+                <marker date="1523095348510" expanded="true" signature="12062:12137" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -587,11 +583,11 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="127" />
-    <option name="y" value="3" />
-    <option name="width" value="1403" />
-    <option name="height" value="1092" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="13" />
+    <option name="y" value="45" />
+    <option name="width" value="1746" />
+    <option name="height" value="1034" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -715,7 +711,7 @@
       <workItem from="1520322910275" duration="129000" />
       <workItem from="1523027517325" duration="8838000" />
       <workItem from="1523081610694" duration="6852000" />
-      <workItem from="1523088520416" duration="4497000" />
+      <workItem from="1523088520416" duration="6487000" />
     </task>
     <task id="LOCAL-00001" summary="Added unit tests to solution&#10;Changed to .NET 4.6.1">
       <created>1519833958557</created>
@@ -878,11 +874,18 @@
       <option name="project" value="LOCAL" />
       <updated>1523035953038</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Improved simulation">
+      <created>1523093162171</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1523093162171</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="79492000" />
+    <option name="totallyTimeSpent" value="81482000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -894,17 +897,18 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1176" extended-state="6" />
+    <frame x="13" y="45" width="1746" height="1034" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290441" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Errors In Solution" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2536023" sideWeight="0.44936034" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24626121" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="40" y="384" width="1876" height="479" />
+      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3205575" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="40" y="384" width="1876" height="479" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43713164" sideWeight="0.5506396" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26286766" sideWeight="0.49383804" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290441" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="NuGet" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32907662" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1913646" sideWeight="0.49401197" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.21293001" sideWeight="0.49401197" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Docker" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32907662" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1001,11 +1005,27 @@
     <MESSAGE value="New class for testing LOB repository" />
     <MESSAGE value="Improved calibration of order flow rates" />
     <MESSAGE value="Cleaned up code" />
-    <option name="LAST_COMMIT_MESSAGE" value="Cleaned up code" />
+    <MESSAGE value="Improved simulation" />
+    <option name="LAST_COMMIT_MESSAGE" value="Improved simulation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="24" />
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs</url>
+          <line>97</line>
+          <properties documentPath="$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs" initialLine="98">
+            <startOffsets>
+              <startOffset value="4752" />
+            </startOffsets>
+            <endOffsets>
+              <endOffset value="4959" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="24" />
+        </line-breakpoint>
+      </breakpoints>
+      <option name="time" value="25" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1233,49 +1253,50 @@
         <state relative-caret-position="10740">
           <caret line="728" column="0" lean-forward="false" selection-start-line="728" selection-start-column="0" selection-end-line="728" selection-end-column="0" />
           <folding>
-            <marker date="1523092722055" expanded="false" signature="6:242" ph="..." />
-            <marker date="1523092722055" expanded="true" signature="290:11778" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="297:960" ph="/// Artifical double auction market proposed by E. Smith &amp; J.D. Farmer,  ... " />
-            <marker date="1523092722055" expanded="true" signature="994:11776" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="1009:1163" ph="Logging" />
-            <marker date="1523092722055" expanded="true" signature="1181:1670" ph="Properties" />
-            <marker date="1523092722055" expanded="true" signature="1286:1443" ph="/// Underlying limit order book ... " />
-            <marker date="1523092722055" expanded="true" signature="1521:1585" ph="/// Model paramater ... " />
-            <marker date="1523092722055" expanded="true" signature="1688:4232" ph="Constructor" />
-            <marker date="1523092722055" expanded="true" signature="1726:1794" ph="/// Empty constructor   ... " />
-            <marker date="1523092722055" expanded="false" signature="1828:1956" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="1966:2483" ph="/// Initialize the model with calibrated parameters and set initial ... " />
-            <marker date="1523092722055" expanded="true" signature="2757:4207" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="2780:3377" ph="Model parameter" />
-            <marker date="1523092722055" expanded="true" signature="3391:3670" ph="Initialize sell and buy side of the limit order book" />
-            <marker date="1523092722055" expanded="true" signature="4250:11770" ph="Methods" />
-            <marker date="1523092722055" expanded="false" signature="4283:6873" ph="Limit order book Events" />
-            <marker date="1523092722055" expanded="true" signature="4332:4401" ph="/// Function signature   ... " />
-            <marker date="1523092722055" expanded="true" signature="4471:4544" ph="/// Submit market buy order  ... " />
-            <marker date="1523092722055" expanded="true" signature="4586:4683" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="4693:4766" ph="/// Submit market sell order ... " />
-            <marker date="1523092722055" expanded="true" signature="4809:4897" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="4915:5114" ph="///  Cancel limit sell order by selecting the price randomly from ... " />
-            <marker date="1523092722055" expanded="true" signature="5156:5521" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="5531:5728" ph="///  Cancel limit buy order by selecting the price randomly from ... " />
-            <marker date="1523092722055" expanded="true" signature="5769:6121" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="6131:6206" ph="/// Limit buy order @ time = t ... " />
-            <marker date="1523092722055" expanded="true" signature="6247:6482" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="6492:6568" ph="/// Limit sell order @ time = t ... " />
-            <marker date="1523092722055" expanded="true" signature="6610:6846" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="6883:7721" ph="/// Pseudo-code: ... " />
-            <marker date="1523092722055" expanded="true" signature="7776:10752" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="8275:8547" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="8614:10742" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="8738:8922" ph="/* var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1); ... */" />
-            <marker date="1523092722055" expanded="true" signature="10468:10584" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="10602:10687" ph="/* Update time of limit order book ... */" />
-            <marker date="1523092722055" expanded="false" signature="10768:10894" ph="/// Save the price process to a file  ... " />
-            <marker date="1523092722055" expanded="true" signature="10948:11475" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="11016:11465" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="11100:11451" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="11493:11613" ph="/// Save current depth profile  ... " />
-            <marker date="1523092722055" expanded="true" signature="11667:11742" ph="{...}" />
+            <marker date="1523095348510" expanded="false" signature="6:242" ph="..." />
+            <marker date="1523095348510" expanded="true" signature="290:12173" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="297:960" ph="/// Artifical double auction market proposed by E. Smith &amp; J.D. Farmer,  ... " />
+            <marker date="1523095348510" expanded="true" signature="994:12171" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="1009:1163" ph="Logging" />
+            <marker date="1523095348510" expanded="true" signature="1181:1670" ph="Properties" />
+            <marker date="1523095348510" expanded="true" signature="1286:1443" ph="/// Underlying limit order book ... " />
+            <marker date="1523095348510" expanded="true" signature="1521:1585" ph="/// Model paramater ... " />
+            <marker date="1523095348510" expanded="true" signature="1688:4627" ph="Constructor" />
+            <marker date="1523095348510" expanded="true" signature="1726:1794" ph="/// Empty constructor   ... " />
+            <marker date="1523095348510" expanded="false" signature="1828:1956" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="1966:2483" ph="/// Initialize the model with calibrated parameters and set initial ... " />
+            <marker date="1523095348510" expanded="true" signature="2757:4602" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="2780:3377" ph="Model parameter" />
+            <marker date="1523095348510" expanded="true" signature="3391:3760" ph="Calibration information" />
+            <marker date="1523095348510" expanded="true" signature="3786:4065" ph="Initialize sell and buy side of the limit order book" />
+            <marker date="1523095348510" expanded="true" signature="4645:12165" ph="Methods" />
+            <marker date="1523095348510" expanded="false" signature="4678:7268" ph="Limit order book Events" />
+            <marker date="1523095348510" expanded="true" signature="4727:4796" ph="/// Function signature   ... " />
+            <marker date="1523095348510" expanded="true" signature="4866:4939" ph="/// Submit market buy order  ... " />
+            <marker date="1523095348510" expanded="true" signature="4981:5078" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="5088:5161" ph="/// Submit market sell order ... " />
+            <marker date="1523095348510" expanded="true" signature="5204:5292" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="5310:5509" ph="///  Cancel limit sell order by selecting the price randomly from ... " />
+            <marker date="1523095348510" expanded="true" signature="5551:5916" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="5926:6123" ph="///  Cancel limit buy order by selecting the price randomly from ... " />
+            <marker date="1523095348510" expanded="true" signature="6164:6516" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="6526:6601" ph="/// Limit buy order @ time = t ... " />
+            <marker date="1523095348510" expanded="true" signature="6642:6877" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="6887:6963" ph="/// Limit sell order @ time = t ... " />
+            <marker date="1523095348510" expanded="true" signature="7005:7241" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="7278:8116" ph="/// Pseudo-code: ... " />
+            <marker date="1523095348510" expanded="true" signature="8171:11147" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="8670:8942" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="9009:11137" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="9133:9317" ph="/* var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1); ... */" />
+            <marker date="1523095348510" expanded="true" signature="10863:10979" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="10997:11082" ph="/* Update time of limit order book ... */" />
+            <marker date="1523095348510" expanded="false" signature="11163:11289" ph="/// Save the price process to a file  ... " />
+            <marker date="1523095348510" expanded="true" signature="11343:11870" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="11411:11860" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="11495:11846" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="11888:12008" ph="/// Save current depth profile  ... " />
+            <marker date="1523095348510" expanded="true" signature="12062:12137" ph="{...}" />
           </folding>
         </state>
       </provider>
@@ -2051,58 +2072,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LimitOrderBookSimulation/EventModels/SmithFarmerModel.cs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-755">
-          <caret line="60" column="0" lean-forward="false" selection-start-line="60" selection-start-column="0" selection-end-line="60" selection-end-column="0" />
-          <folding>
-            <marker date="1523092722055" expanded="false" signature="6:242" ph="..." />
-            <marker date="1523092722055" expanded="true" signature="290:11778" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="297:960" ph="/// Artifical double auction market proposed by E. Smith &amp; J.D. Farmer,  ... " />
-            <marker date="1523092722055" expanded="true" signature="994:11776" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="1009:1163" ph="Logging" />
-            <marker date="1523092722055" expanded="true" signature="1181:1670" ph="Properties" />
-            <marker date="1523092722055" expanded="true" signature="1286:1443" ph="/// Underlying limit order book ... " />
-            <marker date="1523092722055" expanded="true" signature="1521:1585" ph="/// Model paramater ... " />
-            <marker date="1523092722055" expanded="true" signature="1688:4232" ph="Constructor" />
-            <marker date="1523092722055" expanded="true" signature="1726:1794" ph="/// Empty constructor   ... " />
-            <marker date="1523092722055" expanded="false" signature="1828:1956" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="1966:2483" ph="/// Initialize the model with calibrated parameters and set initial ... " />
-            <marker date="1523092722055" expanded="true" signature="2757:4207" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="2780:3377" ph="Model parameter" />
-            <marker date="1523092722055" expanded="true" signature="3391:3670" ph="Initialize sell and buy side of the limit order book" />
-            <marker date="1523092722055" expanded="true" signature="4250:11770" ph="Methods" />
-            <marker date="1523092722055" expanded="false" signature="4283:6873" ph="Limit order book Events" />
-            <marker date="1523092722055" expanded="true" signature="4332:4401" ph="/// Function signature   ... " />
-            <marker date="1523092722055" expanded="true" signature="4471:4544" ph="/// Submit market buy order  ... " />
-            <marker date="1523092722055" expanded="true" signature="4586:4683" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="4693:4766" ph="/// Submit market sell order ... " />
-            <marker date="1523092722055" expanded="true" signature="4809:4897" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="4915:5114" ph="///  Cancel limit sell order by selecting the price randomly from ... " />
-            <marker date="1523092722055" expanded="true" signature="5156:5521" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="5531:5728" ph="///  Cancel limit buy order by selecting the price randomly from ... " />
-            <marker date="1523092722055" expanded="true" signature="5769:6121" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="6131:6206" ph="/// Limit buy order @ time = t ... " />
-            <marker date="1523092722055" expanded="true" signature="6247:6482" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="6492:6568" ph="/// Limit sell order @ time = t ... " />
-            <marker date="1523092722055" expanded="true" signature="6610:6846" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="6883:7721" ph="/// Pseudo-code: ... " />
-            <marker date="1523092722055" expanded="true" signature="7776:10752" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="8275:8547" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="8614:10742" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="8738:8922" ph="/* var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1); ... */" />
-            <marker date="1523092722055" expanded="true" signature="10468:10584" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="10602:10687" ph="/* Update time of limit order book ... */" />
-            <marker date="1523092722055" expanded="false" signature="10768:10894" ph="/// Save the price process to a file  ... " />
-            <marker date="1523092722055" expanded="true" signature="10948:11475" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="11016:11465" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="11100:11451" ph="{...}" />
-            <marker date="1523092722055" expanded="true" signature="11493:11613" ph="/// Save current depth profile  ... " />
-            <marker date="1523092722055" expanded="true" signature="11667:11742" ph="{...}" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/UnitTests/TestLimitOrderBookSimulation.cs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1477">
@@ -2144,22 +2113,75 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/LimitOrderBookSimulation/EventModels/SmithFarmerModel.cs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="673">
+          <caret line="88" column="44" lean-forward="false" selection-start-line="88" selection-start-column="44" selection-end-line="88" selection-end-column="44" />
+          <folding>
+            <marker date="1523095348510" expanded="false" signature="6:242" ph="..." />
+            <marker date="1523095348510" expanded="true" signature="290:12173" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="297:960" ph="/// Artifical double auction market proposed by E. Smith &amp; J.D. Farmer,  ... " />
+            <marker date="1523095348510" expanded="true" signature="994:12171" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="1009:1163" ph="Logging" />
+            <marker date="1523095348510" expanded="true" signature="1181:1670" ph="Properties" />
+            <marker date="1523095348510" expanded="true" signature="1286:1443" ph="/// Underlying limit order book ... " />
+            <marker date="1523095348510" expanded="true" signature="1521:1585" ph="/// Model paramater ... " />
+            <marker date="1523095348510" expanded="true" signature="1688:4627" ph="Constructor" />
+            <marker date="1523095348510" expanded="true" signature="1726:1794" ph="/// Empty constructor   ... " />
+            <marker date="1523095348510" expanded="false" signature="1828:1956" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="1966:2483" ph="/// Initialize the model with calibrated parameters and set initial ... " />
+            <marker date="1523095348510" expanded="true" signature="2757:4602" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="2780:3377" ph="Model parameter" />
+            <marker date="1523095348510" expanded="true" signature="3391:3760" ph="Calibration information" />
+            <marker date="1523095348510" expanded="true" signature="3786:4065" ph="Initialize sell and buy side of the limit order book" />
+            <marker date="1523095348510" expanded="true" signature="4645:12165" ph="Methods" />
+            <marker date="1523095348510" expanded="false" signature="4678:7268" ph="Limit order book Events" />
+            <marker date="1523095348510" expanded="true" signature="4727:4796" ph="/// Function signature   ... " />
+            <marker date="1523095348510" expanded="true" signature="4866:4939" ph="/// Submit market buy order  ... " />
+            <marker date="1523095348510" expanded="true" signature="4981:5078" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="5088:5161" ph="/// Submit market sell order ... " />
+            <marker date="1523095348510" expanded="true" signature="5204:5292" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="5310:5509" ph="///  Cancel limit sell order by selecting the price randomly from ... " />
+            <marker date="1523095348510" expanded="true" signature="5551:5916" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="5926:6123" ph="///  Cancel limit buy order by selecting the price randomly from ... " />
+            <marker date="1523095348510" expanded="true" signature="6164:6516" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="6526:6601" ph="/// Limit buy order @ time = t ... " />
+            <marker date="1523095348510" expanded="true" signature="6642:6877" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="6887:6963" ph="/// Limit sell order @ time = t ... " />
+            <marker date="1523095348510" expanded="true" signature="7005:7241" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="7278:8116" ph="/// Pseudo-code: ... " />
+            <marker date="1523095348510" expanded="true" signature="8171:11147" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="8670:8942" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="9009:11137" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="9133:9317" ph="/* var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1); ... */" />
+            <marker date="1523095348510" expanded="true" signature="10863:10979" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="10997:11082" ph="/* Update time of limit order book ... */" />
+            <marker date="1523095348510" expanded="false" signature="11163:11289" ph="/// Save the price process to a file  ... " />
+            <marker date="1523095348510" expanded="true" signature="11343:11870" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="11411:11860" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="11495:11846" ph="{...}" />
+            <marker date="1523095348510" expanded="true" signature="11888:12008" ph="/// Save current depth profile  ... " />
+            <marker date="1523095348510" expanded="true" signature="12062:12137" ph="{...}" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="468">
-          <caret line="106" column="23" lean-forward="true" selection-start-line="106" selection-start-column="23" selection-end-line="106" selection-end-column="23" />
+        <state relative-caret-position="312">
+          <caret line="27" column="62" lean-forward="true" selection-start-line="27" selection-start-column="62" selection-end-line="27" selection-end-column="62" />
           <folding>
-            <marker date="1523093136919" expanded="false" signature="6:271" ph="..." />
-            <marker date="1523093136919" expanded="true" signature="292:6220" ph="{...}" />
-            <marker date="1523093136919" expanded="true" signature="361:6218" ph="{...}" />
-            <marker date="1523093136919" expanded="true" signature="475:663" ph="{...}" />
-            <marker date="1523093136919" expanded="true" signature="894:6212" ph="{...}" />
-            <marker date="1523093136919" expanded="false" signature="1157:1495" ph="Create test folder" />
-            <marker date="1523093136919" expanded="false" signature="1521:2932" ph="Load trading data and save statistics" />
-            <marker date="1523093136919" expanded="false" signature="2958:4601" ph="Calibrate Smith-Farmer model" />
-            <marker date="1523093136919" expanded="true" signature="3020:3269" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
-            <marker date="1523093136919" expanded="false" signature="4626:5322" ph="Initial state of LOB" />
-            <marker date="1523093136919" expanded="false" signature="5349:6202" ph="Simulate order flow" />
+            <marker date="1523095682930" expanded="false" signature="6:271" ph="..." />
+            <marker date="1523095682930" expanded="true" signature="292:6223" ph="{...}" />
+            <marker date="1523095682930" expanded="true" signature="361:6221" ph="{...}" />
+            <marker date="1523095682930" expanded="true" signature="475:663" ph="{...}" />
+            <marker date="1523095682930" expanded="true" signature="895:6215" ph="{...}" />
+            <marker date="1523095682930" expanded="false" signature="1158:1496" ph="Create test folder" />
+            <marker date="1523095682930" expanded="false" signature="1522:2933" ph="Load trading data and save statistics" />
+            <marker date="1523095682930" expanded="false" signature="2959:4602" ph="Calibrate Smith-Farmer model" />
+            <marker date="1523095682930" expanded="true" signature="3021:3270" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
+            <marker date="1523095682930" expanded="false" signature="4627:5325" ph="Initial state of LOB" />
+            <marker date="1523095682930" expanded="false" signature="5352:6205" ph="Simulate order flow" />
           </folding>
         </state>
       </provider>
