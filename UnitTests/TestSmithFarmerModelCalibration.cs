@@ -24,13 +24,70 @@ namespace UnitTests
             Assert.True(Directory.Exists(WorkFolder));
         }
         
-        [TestCase("2016-01-05", "AMZN", 1000)]        
+        [TestCase("2016-01-04", "AMZN", 10000)]
+        [TestCase("2016-01-05", "AMZN", 1000)]
+        [TestCase("2016-01-06", "AMZN", 1000)]
+        [TestCase("2016-01-11", "AMZN", 1000)]
+        [TestCase("2016-01-12", "AMZN", 1000)]
+        [TestCase("2016-01-13", "AMZN", 1000)]
+        [TestCase("2016-01-14", "AMZN", 1000)]
+        [TestCase("2016-01-15", "AMZN", 1000)]
+        [TestCase("2016-01-19", "AMZN", 1000)]
+        [TestCase("2016-01-20", "AMZN", 1000)]
+        [TestCase("2016-01-21", "AMZN", 1000)]
+        [TestCase("2016-01-22", "AMZN", 1000)]
+        [TestCase("2016-01-25", "AMZN", 1000)]
+        [TestCase("2016-01-26", "AMZN", 1000)]
+        [TestCase("2016-01-27", "AMZN", 1000)]
+        [TestCase("2016-01-28", "AMZN", 1000)]
+        [TestCase("2016-01-29", "AMZN", 1000)]
+        [TestCase("2016-02-01", "AMZN", 1000)]
+        [TestCase("2016-02-02", "AMZN", 1000)]
+        [TestCase("2016-02-03", "AMZN", 1000)]
+        [TestCase("2016-02-04", "AMZN", 1000)]
+        [TestCase("2016-02-05", "AMZN", 1000)]
+        [TestCase("2016-02-08", "AMZN", 1000)]
+        [TestCase("2016-02-09", "AMZN", 1000)]
+        [TestCase("2016-02-10", "AMZN", 1000)]
+        [TestCase("2016-02-11", "AMZN", 1000)]
+        [TestCase("2016-02-12", "AMZN", 1000)]
+        [TestCase("2016-02-16", "AMZN", 1000)]
+        [TestCase("2016-02-17", "AMZN", 1000)]
+        [TestCase("2016-02-18", "AMZN", 1000)]
+        [TestCase("2016-02-19", "AMZN", 1000)]
+        [TestCase("2016-02-22", "AMZN", 1000)]
+        [TestCase("2016-02-23", "AMZN", 1000)]
+        [TestCase("2016-02-24", "AMZN", 1000)]
+        [TestCase("2016-02-25", "AMZN", 1000)]
+        [TestCase("2016-02-26", "AMZN", 1000)]
+        [TestCase("2016-02-29", "AMZN", 1000)]
+        [TestCase("2016-03-01", "AMZN", 1000)]
+        [TestCase("2016-03-02", "AMZN", 1000)]
+        [TestCase("2016-03-03", "AMZN", 1000)]
+        [TestCase("2016-03-04", "AMZN", 1000)]
+        [TestCase("2016-03-07", "AMZN", 1000)]
+        [TestCase("2016-03-08", "AMZN", 1000)]
+        [TestCase("2016-03-09", "AMZN", 1000)]
+        [TestCase("2016-03-10", "AMZN", 1000)]
+        [TestCase("2016-03-11", "AMZN", 1000)]
+        [TestCase("2016-03-14", "AMZN", 1000)]
+        [TestCase("2016-03-15", "AMZN", 1000)]
+        [TestCase("2016-03-16", "AMZN", 1000)]
+        [TestCase("2016-03-17", "AMZN", 1000)]
+        [TestCase("2016-03-18", "AMZN", 1000)]
+        [TestCase("2016-03-21", "AMZN", 1000)]
+        [TestCase("2016-03-22", "AMZN", 1000)]
+        [TestCase("2016-03-23", "AMZN", 1000)]
+        [TestCase("2016-03-24", "AMZN", 1000)]
+        [TestCase("2016-03-28", "AMZN", 1000)]
+        [TestCase("2016-03-29", "AMZN", 1000)]
+        [TestCase("2016-03-30", "AMZN", 1000)]
+        [TestCase("2016-03-31", "AMZN", 1000)]
         public void TestCalibration(string tradingDateString, 
                                     string symbol, 
                                     double duration)
         {
             var tradingDate = DateTime.ParseExact(tradingDateString, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            
             const double percent = 1e-2;
             const double relativeTolerance  = 2 * percent;
             
@@ -93,13 +150,17 @@ namespace UnitTests
            
             #region Initial state of LOB
             
+            // Problematic part, as scaling with characteristic order size 
+            // results in very low depth profiles, any suggestion here from M. Gould  
             var initalState = tradingData.States.First();
             
-            var initialBids = initalState.Bids.ToDictionary(p => (int)(p.Key / calibratedParameters.PriceTickSize), 
-                p => (int)Math.Ceiling((1 * p.Value) / calibratedParameters.CharacteristicOrderSize));
+            var initialBids = initalState.Bids
+                .ToDictionary(p => (int) (p.Key / calibratedParameters.PriceTickSize), 
+                              p => (int) Math.Ceiling(p.Value / calibratedParameters.CharacteristicOrderSize));
             
-            var initialAsks = initalState.Asks.ToDictionary(p => (int) (p.Key / calibratedParameters.PriceTickSize),
-                p => (int) Math.Ceiling(1 * p.Value / calibratedParameters.CharacteristicOrderSize));
+            var initialAsks = initalState.Asks
+                .ToDictionary(p => (int) (p.Key / calibratedParameters.PriceTickSize),
+                              p => (int) Math.Ceiling(p.Value / calibratedParameters.CharacteristicOrderSize));
 
             var initialSpread = (int) (initalState.Spread / calibratedParameters.PriceTickSize);
             
@@ -115,11 +176,16 @@ namespace UnitTests
                 initialAsks, 
                 simulationIntervalSize);
             
-            model.SaveDepthProfile(Path.Combine(testFolder, "model_initial_depth_profile.csv"));
-            
+            model.LimitOrderBook.SaveDepthProfile(Path.Combine(testFolder, "model_initial_depth_profile.csv"));
+            model.LimitOrderBook.SaveDepthProfileBuySide(Path.Combine(testFolder, "model_initial_depth_profile_buy.csv"));
+            model.LimitOrderBook.SaveDepthProfileSellSide(Path.Combine(testFolder, "model_initial_depth_profile_sell.csv"));
+
             model.SimulateOrderFlow(duration);
             
-            model.SaveDepthProfile(Path.Combine(testFolder, "model_final_depth_profile.csv"));
+            model.LimitOrderBook.SaveDepthProfile(Path.Combine(testFolder, "model_final_depth_profile.csv"));
+            model.LimitOrderBook.SaveDepthProfileBuySide(Path.Combine(testFolder, "model_final_depth_profile_buy.csv"));
+            model.LimitOrderBook.SaveDepthProfileSellSide(Path.Combine(testFolder, "model_final_depth_profile_sell.csv"));
+
             model.SavePriceProcess(Path.Combine(testFolder, "model_price.csv"));
             
             SharedUtilities.SaveAsJson(model, Path.Combine(testFolder, "model.json"));

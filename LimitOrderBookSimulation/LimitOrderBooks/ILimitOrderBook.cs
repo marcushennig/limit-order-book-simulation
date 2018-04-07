@@ -78,5 +78,7 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
         #endregion Iinitialize
 
         void SaveDepthProfile(string path);
+        void SaveDepthProfileBuySide(string path);
+        void SaveDepthProfileSellSide(string path);
     }
 }

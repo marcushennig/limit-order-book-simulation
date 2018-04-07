@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using log4net;
-using LimitOrderBookRepositories.Model;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
 
@@ -209,10 +207,6 @@ namespace LimitOrderBookSimulation.EventModels
             
             var t0 = LimitOrderBook.Time;
             var tEnd = t0 + duration;
-            
-      
-            // TODO: Parameter.SimulationIntervalSize = ? Spread * 4 ?
-            
             var limitOrderRate = Parameter.LimitOrderRateDensity * Parameter.SimulationIntervalSize;
 
             // Initialize event probabilities
@@ -223,7 +217,7 @@ namespace LimitOrderBookSimulation.EventModels
                 {SubmitMarketBuyOrder, 0},
                 {SubmitMarketSellOrder, 0},
                 {CancelLimitSellOrder, 0},
-                {CancelLimitBuyOrder, 0},
+                {CancelLimitBuyOrder, 0}
             };
            
             var t = t0;
@@ -269,7 +263,7 @@ namespace LimitOrderBookSimulation.EventModels
                 LimitOrderBook.Time = t;
             }
         }
-      
+        
         /// <summary>
         /// Save the price process to a file 
         /// </summary>
@@ -288,15 +282,6 @@ namespace LimitOrderBookSimulation.EventModels
                                    $"{price.Ask * Parameter.PriceTickSize}");
                 }
             }
-        }
-        
-        /// <summary>
-        /// Save current depth profile 
-        /// </summary>
-        /// <param name="fileName"></param>
-        public void SaveDepthProfile(string fileName)
-        {
-            LimitOrderBook.SaveDepthProfile(fileName);
         }
         
         #endregion

@@ -181,5 +181,10 @@ namespace LimitOrderBookSimulation.EventModels
 
             return mean;
         }
+        
+        public static SortedDictionary<int, int> CalibrateInitalBuySide(LobState intialState)
+        {
+            return null;
+        }
     }
 }

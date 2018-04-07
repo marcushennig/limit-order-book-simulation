@@ -130,12 +130,12 @@ namespace UnitTests
             
             var model = GenerateSmithFarmerModel();
             
-            model.SaveDepthProfile(Path.Combine(workFolder, "depth_start.csv"));
+            model.LimitOrderBook.SaveDepthProfile(Path.Combine(workFolder, "depth_start.csv"));
             model.SimulateOrderFlow(duration: 1000);
             
             // Save simulation result for further inspection in e.g. Matlab
             model.SavePriceProcess(Path.Combine(workFolder, "price_process.csv"));
-            model.SaveDepthProfile(Path.Combine(workFolder, "depth_end.csv"));
+            model.LimitOrderBook.SaveDepthProfile(Path.Combine(workFolder, "depth_end.csv"));
             
             SharedUtilities.SaveAsJson(model.LimitOrderBook.Counter, Path.Combine(workFolder, "counter.json"));
             SharedUtilities.SaveAsJson(model.Parameter, Path.Combine(workFolder, "model_parameter.json"));

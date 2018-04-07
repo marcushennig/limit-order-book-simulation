@@ -313,7 +313,43 @@ namespace LimitOrderBookSimulation.LimitOrderBooks
                         file.WriteLine($"{price}\t{depth}");
                     }
                 }
-            }
+            }            
+        }
+        
+        /// <summary>
+        /// Save depth profile of buy side as CSV 
+        /// </summary>
+        /// <param name="fileName">Path of CSV file</param>
+        public void SaveDepthProfileBuySide(string fileName)
+        {
+            using (var file = new StreamWriter(fileName))
+            {              
+                foreach (var entry in DepthBuySide)
+                {
+                    var price = entry.Key;
+                    var depth = entry.Value;
+                    
+                    file.WriteLine($"{price}\t{depth}");
+                }                
+            }            
+        }
+        
+        /// <summary>
+        /// Save depth profile of sell side as CSV 
+        /// </summary>
+        /// <param name="fileName">Path of CSV file</param>
+        public void SaveDepthProfileSellSide(string fileName)
+        {
+            using (var file = new StreamWriter(fileName))
+            {              
+                foreach (var entry in DepthSellSide)
+                {
+                    var price = entry.Key;
+                    var depth = entry.Value;
+                    
+                    file.WriteLine($"{price}\t{depth}");
+                }                
+            }            
         }
         
         /// <summary>
