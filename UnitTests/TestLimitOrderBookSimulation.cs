@@ -131,7 +131,6 @@ namespace UnitTests
             var model = GenerateSmithFarmerModel();
             
             model.SaveDepthProfile(Path.Combine(workFolder, "depth_start.csv"));
-            
             model.SimulateOrderFlow(duration: 1000);
             
             // Save simulation result for further inspection in e.g. Matlab

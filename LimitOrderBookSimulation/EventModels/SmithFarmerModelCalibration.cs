@@ -18,7 +18,7 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         /// <param name="tradingData">LOB data for a trading day</param>
         /// <returns></returns>
-        private static double CalibrateCharacteristicOrderSize(LobTradingData tradingData)
+        private static double CalibrateCharacteristicOrderSize(LobTradingData tradingData) 
         {
             var sizes = new List<double>();
 
@@ -30,19 +30,33 @@ namespace LimitOrderBookSimulation.EventModels
         }
         
         /// <summary>
-        /// Calibrate Smith Farmer model with trading data in a narrow band
-        /// arround the spread (given by a lower and higher quantile) 
+        /// Calibrate model with trading data from LOB within a narrow price band near the spread,
+        /// given by a lower and higher quantile of the limit order distribution
+        // Select only limit order events events that fall into window where price < price_60%
+        // Check Paper: PNAS: The predictive power of zero intelligence models in financial markes
+        // C:\Users\d90789\Documents\Oxford MSc in Mathematical Finance\Thesis\Literature\Farmer Smith Model
+        /// Note: Martin Gould suggested to calibrate in a closed window near the spread 
+        /// Roughly 70% of all orders are placed either at
+        /// the best price or inside the spread. Outside the spread the density
+        /// of limit order placement falls o as a power law as a function of
+        /// the distance from the best prices
+        /// Determine the number of orders within a q_lower and q_upper, where q_n is the n quantil 
+        /// of the distribution of orders, any strategy for estimating the density 
+        /// q_upper is made in a compromise to include as much data as possible for 
+        /// statistical stability, but not so much as to
+        /// include orders that are unlikely to ever be executed, and therefore
+        /// unlikely to have any effect on prices.
         /// </summary>
         /// <param name="tradingData"></param>
         /// <param name="lowerQuantileProbability"></param>
-        /// <param name="higherQuantileProbability"></param>
+        /// <param name="upperQuantileProbability"></param>
         /// <returns></returns>
         public static SmithFarmerModelParameter Calibrate(LobTradingData tradingData, 
             double lowerQuantileProbability = 0.01, 
-            double higherQuantileProbability = 0.80)
+            double upperQuantileProbability = 0.80) 
         {
             var parameter = new SmithFarmerModelParameter();
-            
+
             var duration = tradingData.TradingDuration;            
             var sigma = CalibrateCharacteristicOrderSize(tradingData);
             var pi = tradingData.PriceTickSize;
@@ -50,12 +64,20 @@ namespace LimitOrderBookSimulation.EventModels
             parameter.PriceTickSize = pi;
             parameter.CharacteristicOrderSize = sigma;
             
-            // Use average depth profile to determine a small band around 
-            // the spread, where we calibrate the limit order rate 
+            // Calibrate within a narrow band within the lower - upper quantile
+            // of the limit order distribution. Use average limit order depth
+            // profile to determine a small band around the spread, where we
+            // calibrate the limit order rate 
             var averageDepthProfile = tradingData.AverageDepthProfile;
             
             var lowerQuantile = averageDepthProfile.Quantile(lowerQuantileProbability);
-            var higherQuantile = averageDepthProfile.Quantile(higherQuantileProbability); 
+            var upperQuantile = averageDepthProfile.Quantile(upperQuantileProbability); 
+            
+            // Save parameters
+            parameter.LowerQuantileProbability = lowerQuantileProbability;
+            parameter.UpperQuantileProbability = upperQuantileProbability;
+            parameter.LowerQuantile = lowerQuantile;
+            parameter.UpperQuantile = upperQuantile;
             
             #region Estimate market order rate
             
@@ -67,12 +89,12 @@ namespace LimitOrderBookSimulation.EventModels
             
             #region Estimate limit order rate
             
-            var priceRangeInTicks = (higherQuantile - lowerQuantile) / pi;
+            var priceRangeInTicks = (upperQuantile - lowerQuantile) / pi;
             // Count the number of limit sell and buy orders that where placed within price band in 
             // units of the characteristic order size 
             var countOfLimitOrders = tradingData.LimitOrders
                                          .Where(order => lowerQuantile <= order.DistanceBestOppositeQuote && 
-                                                         order.DistanceBestOppositeQuote <= higherQuantile)
+                                                         order.DistanceBestOppositeQuote <= upperQuantile)
                                          .Sum(order => order.Volume) / sigma;
 
             // Determine the rate density of limit sell/buy orders 
@@ -84,12 +106,12 @@ namespace LimitOrderBookSimulation.EventModels
             var canceledOrderRateDistribution = tradingData.CanceledOrderDistribution;
             
             var totalDepthOfLimitOrderInQuantile = averageDepthProfile.Data
-                .Where(p => lowerQuantile <= p.Key && p.Key <= higherQuantile)
+                .Where(p => lowerQuantile <= p.Key && p.Key <= upperQuantile)
                 .Select(p => p.Value)
                 .Sum();
             
             var totalCanceledVolumeOfOrderInQuantile = canceledOrderRateDistribution.Data
-                .Where(p => lowerQuantile <= p.Key && p.Key <= higherQuantile)
+                .Where(p => lowerQuantile <= p.Key && p.Key <= upperQuantile)
                 .Select(p => p.Value)
                 .Sum();
             
@@ -101,7 +123,8 @@ namespace LimitOrderBookSimulation.EventModels
         }
 
         /// <summary>
-        /// Calibrate model with LOB data  
+        /// Calibrate model with a set of trading data by averaging the
+        /// calibration results for each trading date  
         /// </summary>
         /// <param name="repository"></param>
         public static SmithFarmerModelParameter Calibrate(LobRepository repository)

@@ -10,6 +10,7 @@ namespace LimitOrderBookUtilities
     {
         private static readonly ILog Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+
         /// <summary>
         /// Save bid as well as ask side into a CSV file
         /// </summary>
