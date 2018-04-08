@@ -9,12 +9,38 @@
 
         #region Calibration parameter
 
-        /* Price band used for calibration*/
+        /// <summary>
+        /// Percentage of events with
+        /// price distance to the oposite quote smallter than 'LowerQuantile' 
+        /// </summary>
         public double LowerQuantileProbability { set; get; }
+        
+        /// <summary>
+        /// Percentage of events with
+        /// price distance to the oposite quote smallter than 'UpperQuantile' 
+        /// </summary>
         public double UpperQuantileProbability { set; get; }
+        
+        /// <summary>
+        /// Lower quantile of the price bane
+        /// </summary>
         public double LowerQuantile { set; get; }
+
+        /// <summary>
+        /// Upper quantile of the price bane
+        /// </summary>
         public double UpperQuantile { set; get; }
 
+        /// <summary>
+        /// Model is calibrated from Trading data within tim interval [MinTradingTime, MaxTradingTime]
+        /// </summary>
+        public double MinTradingTime { set; get; }
+
+        /// <summary>
+        /// Model is calibrated from Trading data within tim interval [MinTradingTime, MaxTradingTime]
+        /// </summary>
+        public double MaxTradingTime { set; get; }
+        
         #endregion
         
         #region Model parameter

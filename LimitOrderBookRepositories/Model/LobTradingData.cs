@@ -461,8 +461,8 @@ namespace LimitOrderBookRepositories.Model
 
             #region Time
 
-            StartTradingTime = events.Min(p => p.Time);
-            EndTradingTime = events.Max(p => p.Time);
+            StartTradingTime = Events.Min(p => p.Time);
+            EndTradingTime = Events.Max(p => p.Time);
             TradingDuration = EndTradingTime - StartTradingTime;
             
             #endregion

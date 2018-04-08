@@ -31,7 +31,7 @@ namespace LimitOrderBookSimulation.EventModels
         
         /// <summary>
         /// Calibrate model with trading data from LOB within a narrow price band near the spread,
-        /// given by a lower and higher quantile of the limit order distribution
+        /// given by a lower and higher quantile of the limit order distribution. 
         // Select only limit order events events that fall into window where price < price_60%
         // Check Paper: PNAS: The predictive power of zero intelligence models in financial markes
         // C:\Users\d90789\Documents\Oxford MSc in Mathematical Finance\Thesis\Literature\Farmer Smith Model
@@ -56,8 +56,8 @@ namespace LimitOrderBookSimulation.EventModels
             double upperQuantileProbability = 0.80) 
         {
             var parameter = new SmithFarmerModelParameter();
-
-            var duration = tradingData.TradingDuration;            
+            var duration = tradingData.TradingDuration;
+            
             var sigma = CalibrateCharacteristicOrderSize(tradingData);
             var pi = tradingData.PriceTickSize;
             
@@ -79,6 +79,9 @@ namespace LimitOrderBookSimulation.EventModels
             parameter.LowerQuantile = lowerQuantile;
             parameter.UpperQuantile = upperQuantile;
             
+            parameter.MinTradingTime = tradingData.StartTradingTime;
+            parameter.MaxTradingTime = tradingData.EndTradingTime;
+
             #region Estimate market order rate
             
             var totalVolumeOfMarketOrders = tradingData.MarketOrders.Sum(p => p.Volume);
