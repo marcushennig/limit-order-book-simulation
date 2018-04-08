@@ -194,13 +194,72 @@ namespace UnitTests
         }
 
         /// <summary>
-        ///  
+        ///  Calibrate model using an in-sample set and trying to predict the
+        /// LOB price behavior of the out-of-sample LOB price data 
         /// </summary>
         /// <param name="tradingDateString"></param>
         /// <param name="symbol"></param>
         /// <param name="duration"></param>
         /// <param name="maxPathNumber"></param>
-        [TestCase("2016-01-04", "AMZN", 10, 10)]
+        [TestCase("2016-01-04", "AMZN", 10000, 40)]
+        [TestCase("2016-01-05", "AMZN", 10000, 40)]
+        [TestCase("2016-01-06", "AMZN", 10000, 40)]
+        [TestCase("2016-01-11", "AMZN", 10000, 40)]
+        [TestCase("2016-01-12", "AMZN", 10000, 40)]
+        [TestCase("2016-01-13", "AMZN", 10000, 40)]
+        [TestCase("2016-01-14", "AMZN", 10000, 40)]
+        [TestCase("2016-01-15", "AMZN", 10000, 40)]
+        [TestCase("2016-01-19", "AMZN", 10000, 40)]
+        [TestCase("2016-01-20", "AMZN", 10000, 40)]
+        [TestCase("2016-01-21", "AMZN", 10000, 40)]
+        [TestCase("2016-01-22", "AMZN", 10000, 40)]
+        [TestCase("2016-01-25", "AMZN", 10000, 40)]
+        [TestCase("2016-01-26", "AMZN", 10000, 40)]
+        [TestCase("2016-01-27", "AMZN", 10000, 40)]
+        [TestCase("2016-01-28", "AMZN", 10000, 40)]
+        [TestCase("2016-01-29", "AMZN", 10000, 40)]
+        [TestCase("2016-02-01", "AMZN", 10000, 40)]
+        [TestCase("2016-02-02", "AMZN", 10000, 40)]
+        [TestCase("2016-02-03", "AMZN", 10000, 40)]
+        [TestCase("2016-02-04", "AMZN", 10000, 40)]
+        [TestCase("2016-02-05", "AMZN", 10000, 40)]
+        [TestCase("2016-02-08", "AMZN", 10000, 40)]
+        [TestCase("2016-02-09", "AMZN", 10000, 40)]
+        [TestCase("2016-02-10", "AMZN", 10000, 40)]
+        [TestCase("2016-02-11", "AMZN", 10000, 40)]
+        [TestCase("2016-02-12", "AMZN", 10000, 40)]
+        [TestCase("2016-02-16", "AMZN", 10000, 40)]
+        [TestCase("2016-02-17", "AMZN", 10000, 40)]
+        [TestCase("2016-02-18", "AMZN", 10000, 40)]
+        [TestCase("2016-02-19", "AMZN", 10000, 40)]
+        [TestCase("2016-02-22", "AMZN", 10000, 40)]
+        [TestCase("2016-02-23", "AMZN", 10000, 40)]
+        [TestCase("2016-02-24", "AMZN", 10000, 40)]
+        [TestCase("2016-02-25", "AMZN", 10000, 40)]
+        [TestCase("2016-02-26", "AMZN", 10000, 40)]
+        [TestCase("2016-02-29", "AMZN", 10000, 40)]
+        [TestCase("2016-03-01", "AMZN", 10000, 40)]
+        [TestCase("2016-03-02", "AMZN", 10000, 40)]
+        [TestCase("2016-03-03", "AMZN", 10000, 40)]
+        [TestCase("2016-03-04", "AMZN", 10000, 40)]
+        [TestCase("2016-03-07", "AMZN", 10000, 40)]
+        [TestCase("2016-03-08", "AMZN", 10000, 40)]
+        [TestCase("2016-03-09", "AMZN", 10000, 40)]
+        [TestCase("2016-03-10", "AMZN", 10000, 40)]
+        [TestCase("2016-03-11", "AMZN", 10000, 40)]
+        [TestCase("2016-03-14", "AMZN", 10000, 40)]
+        [TestCase("2016-03-15", "AMZN", 10000, 40)]
+        [TestCase("2016-03-16", "AMZN", 10000, 40)]
+        [TestCase("2016-03-17", "AMZN", 10000, 40)]
+        [TestCase("2016-03-18", "AMZN", 10000, 40)]
+        [TestCase("2016-03-21", "AMZN", 10000, 40)]
+        [TestCase("2016-03-22", "AMZN", 10000, 40)]
+        [TestCase("2016-03-23", "AMZN", 10000, 40)]
+        [TestCase("2016-03-24", "AMZN", 10000, 40)]
+        [TestCase("2016-03-28", "AMZN", 10000, 40)]
+        [TestCase("2016-03-29", "AMZN", 10000, 40)]
+        [TestCase("2016-03-30", "AMZN", 10000, 40)]
+        [TestCase("2016-03-31", "AMZN", 10000, 40)]
         public void TestSamplingOfModel(string tradingDateString,
             string symbol,
             double duration, 
@@ -211,7 +270,10 @@ namespace UnitTests
             
             // Folder to store all results 
             var outputFolder = Path.Combine(WorkFolder, $"{symbol}\\{tradingDate:yyyyMMdd}");
+            
             Directory.CreateDirectory(outputFolder);
+            Directory.CreateDirectory(Path.Combine(outputFolder, "Paths"));
+            
             Assert.True(Directory.Exists(outputFolder), $"The output folder {outputFolder} could not be created");  
 
             #region Load in- and out-of-sample trading data
@@ -253,6 +315,8 @@ namespace UnitTests
             const double lowerProbability  = 0.01;
             const double upperProbability = 0.80;
             
+            inSampleTradingData.AverageDepthProfile.Save(Path.Combine(outputFolder, "in_sample_average_depth_profile.csv"));
+            
             var calibratedParameters = SmithFarmerModelCalibration.Calibrate(inSampleTradingData, 
                 lowerProbability, 
                 upperProbability);
@@ -279,6 +343,8 @@ namespace UnitTests
             
             #endregion 
             
+            #region Simulate mutiple price paths 
+            
             // Choose narrow simulation interval in order of the spread
             var simulationIntervalSize = 4 * initialSpread;
             for (var pathNumber = 0; pathNumber < maxPathNumber; pathNumber++)
@@ -286,10 +352,13 @@ namespace UnitTests
                 var model = new SmithFarmerModel(calibratedParameters, 
                     initialBids, 
                     initialAsks, 
-                    simulationIntervalSize);                
+                    simulationIntervalSize);  
+                
                 model.SimulateOrderFlow(duration, useSeed:false);
-                model.SavePriceProcess(Path.Combine(outputFolder, $"simulated_price_{pathNumber}.csv"));
+                model.SavePriceProcess(Path.Combine(outputFolder, $"Paths\\simulated_price_{pathNumber}.csv"));                
             }
+            
+            #endregion
         }
     }
 }
