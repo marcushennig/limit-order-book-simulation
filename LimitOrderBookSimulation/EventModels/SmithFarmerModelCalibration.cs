@@ -70,6 +70,7 @@ namespace LimitOrderBookSimulation.EventModels
             // calibrate the limit order rate 
             var averageDepthProfile = tradingData.AverageDepthProfile;
             
+            // TODO: Should be divded by pi
             var lowerQuantile = averageDepthProfile.Quantile(lowerQuantileProbability);
             var upperQuantile = averageDepthProfile.Quantile(upperQuantileProbability); 
             

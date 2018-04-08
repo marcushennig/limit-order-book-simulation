@@ -202,77 +202,77 @@ namespace UnitTests
         /// <param name="duration"></param>
         /// <param name="maxPathNumber"></param>
         // Amazon
-        [TestCase("2016-01-04", "AMZN", 10000, 40)]
-        [TestCase("2016-01-05", "AMZN", 10000, 40)]
-        [TestCase("2016-01-06", "AMZN", 10000, 40)]
-        [TestCase("2016-01-11", "AMZN", 10000, 40)]
-        [TestCase("2016-01-12", "AMZN", 10000, 40)]
-        [TestCase("2016-01-13", "AMZN", 10000, 40)]
-        [TestCase("2016-01-14", "AMZN", 10000, 40)]
-        [TestCase("2016-01-15", "AMZN", 10000, 40)]
-        [TestCase("2016-01-19", "AMZN", 10000, 40)]
-        [TestCase("2016-01-20", "AMZN", 10000, 40)]
-        [TestCase("2016-01-21", "AMZN", 10000, 40)]
-        [TestCase("2016-01-22", "AMZN", 10000, 40)]
-        [TestCase("2016-01-25", "AMZN", 10000, 40)]
-        [TestCase("2016-01-26", "AMZN", 10000, 40)]
-        [TestCase("2016-01-27", "AMZN", 10000, 40)]
-        [TestCase("2016-01-28", "AMZN", 10000, 40)]
-        [TestCase("2016-01-29", "AMZN", 10000, 40)]
-        [TestCase("2016-02-01", "AMZN", 10000, 40)]
-        [TestCase("2016-02-02", "AMZN", 10000, 40)]
-        [TestCase("2016-02-03", "AMZN", 10000, 40)]
-        [TestCase("2016-02-04", "AMZN", 10000, 40)]
-        [TestCase("2016-02-05", "AMZN", 10000, 40)]
-        [TestCase("2016-02-08", "AMZN", 10000, 40)]
-        [TestCase("2016-02-09", "AMZN", 10000, 40)]
-        [TestCase("2016-02-10", "AMZN", 10000, 40)]
-        [TestCase("2016-02-11", "AMZN", 10000, 40)]
-        [TestCase("2016-02-12", "AMZN", 10000, 40)]
-        [TestCase("2016-02-16", "AMZN", 10000, 40)]
-        [TestCase("2016-02-17", "AMZN", 10000, 40)]
-        [TestCase("2016-02-18", "AMZN", 10000, 40)]
-        [TestCase("2016-02-19", "AMZN", 10000, 40)]
-        [TestCase("2016-02-22", "AMZN", 10000, 40)]
-        [TestCase("2016-02-23", "AMZN", 10000, 40)]
-        [TestCase("2016-02-24", "AMZN", 10000, 40)]
-        [TestCase("2016-02-25", "AMZN", 10000, 40)]
-        [TestCase("2016-02-26", "AMZN", 10000, 40)]
-        [TestCase("2016-02-29", "AMZN", 10000, 40)]
-        [TestCase("2016-03-01", "AMZN", 10000, 40)]
-        [TestCase("2016-03-02", "AMZN", 10000, 40)]
-        [TestCase("2016-03-03", "AMZN", 10000, 40)]
-        [TestCase("2016-03-04", "AMZN", 10000, 40)]
-        [TestCase("2016-03-07", "AMZN", 10000, 40)]
-        [TestCase("2016-03-08", "AMZN", 10000, 40)]
-        [TestCase("2016-03-09", "AMZN", 10000, 40)]
-        [TestCase("2016-03-10", "AMZN", 10000, 40)]
-        [TestCase("2016-03-11", "AMZN", 10000, 40)]
-        [TestCase("2016-03-14", "AMZN", 10000, 40)]
-        [TestCase("2016-03-15", "AMZN", 10000, 40)]
-        [TestCase("2016-03-16", "AMZN", 10000, 40)]
-        [TestCase("2016-03-17", "AMZN", 10000, 40)]
-        [TestCase("2016-03-18", "AMZN", 10000, 40)]
-        [TestCase("2016-03-21", "AMZN", 10000, 40)]
-        [TestCase("2016-03-22", "AMZN", 10000, 40)]
-        [TestCase("2016-03-23", "AMZN", 10000, 40)]
-        [TestCase("2016-03-24", "AMZN", 10000, 40)]
-        [TestCase("2016-03-28", "AMZN", 10000, 40)]
-        [TestCase("2016-03-29", "AMZN", 10000, 40)]
-        [TestCase("2016-03-30", "AMZN", 10000, 40)]
-        [TestCase("2016-03-31", "AMZN", 10000, 40)]
+        [TestCase("2016-01-04", "AMZN", 10000, 10)]
+        [TestCase("2016-01-05", "AMZN", 10000, 10)]
+        [TestCase("2016-01-06", "AMZN", 10000, 10)]
+        [TestCase("2016-01-11", "AMZN", 10000, 10)]
+        [TestCase("2016-01-12", "AMZN", 10000, 10)]
+        [TestCase("2016-01-13", "AMZN", 10000, 10)]
+        [TestCase("2016-01-14", "AMZN", 10000, 10)]
+        [TestCase("2016-01-15", "AMZN", 10000, 10)]
+        [TestCase("2016-01-19", "AMZN", 10000, 10)]
+        [TestCase("2016-01-20", "AMZN", 10000, 10)]
+        [TestCase("2016-01-21", "AMZN", 10000, 10)]
+        [TestCase("2016-01-22", "AMZN", 10000, 10)]
+        [TestCase("2016-01-25", "AMZN", 10000, 10)]
+        [TestCase("2016-01-26", "AMZN", 10000, 10)]
+        [TestCase("2016-01-27", "AMZN", 10000, 10)]
+        [TestCase("2016-01-28", "AMZN", 10000, 10)]
+        [TestCase("2016-01-29", "AMZN", 10000, 10)]        
         // Cisco TODO: Problem with calibration
-        [TestCase("2016-01-04", "CSCO", 10000, 40)]
-        [TestCase("2016-01-05", "CSCO", 10000, 40)]
-        [TestCase("2016-01-06", "CSCO", 10000, 40)]
+        [TestCase("2016-01-04", "CSCO", 10000, 10)]
+        [TestCase("2016-01-05", "CSCO", 10000, 10)]
+        [TestCase("2016-01-06", "CSCO", 10000, 10)]
+        [TestCase("2016-01-11", "CSCO", 10000, 10)]
+        [TestCase("2016-01-12", "CSCO", 10000, 10)]
+        [TestCase("2016-01-13", "CSCO", 10000, 10)]
+        [TestCase("2016-01-14", "CSCO", 10000, 10)]
+        [TestCase("2016-01-15", "CSCO", 10000, 10)]
+        [TestCase("2016-01-19", "CSCO", 10000, 10)]
+        [TestCase("2016-01-20", "CSCO", 10000, 10)]
+        [TestCase("2016-01-21", "CSCO", 10000, 10)]
+        [TestCase("2016-01-22", "CSCO", 10000, 10)]
+        [TestCase("2016-01-25", "CSCO", 10000, 10)]
+        [TestCase("2016-01-26", "CSCO", 10000, 10)]
+        [TestCase("2016-01-27", "CSCO", 10000, 10)]
+        [TestCase("2016-01-28", "CSCO", 10000, 10)]
+        [TestCase("2016-01-29", "CSCO", 10000, 10)]         
         // Tesla
-        [TestCase("2016-01-04", "TSLA", 10000, 40)]
-        [TestCase("2016-01-05", "TSLA", 10000, 40)]
-        [TestCase("2016-01-06", "TSLA", 10000, 40)]
-        // Netlfix
-        [TestCase("2016-01-04", "NFLX", 10000, 40)]
-        [TestCase("2016-01-05", "NFLX", 10000, 40)]
-        [TestCase("2016-01-06", "NFLX", 10000, 40)]
+        [TestCase("2016-01-04", "TSLA", 10000, 10)]
+        [TestCase("2016-01-05", "TSLA", 10000, 10)]
+        [TestCase("2016-01-06", "TSLA", 10000, 10)]
+        [TestCase("2016-01-11", "TSLA", 10000, 10)]
+        [TestCase("2016-01-12", "TSLA", 10000, 10)]
+        [TestCase("2016-01-13", "TSLA", 10000, 10)]
+        [TestCase("2016-01-14", "TSLA", 10000, 10)]
+        [TestCase("2016-01-15", "TSLA", 10000, 10)]
+        [TestCase("2016-01-19", "TSLA", 10000, 10)]
+        [TestCase("2016-01-20", "TSLA", 10000, 10)]
+        [TestCase("2016-01-21", "TSLA", 10000, 10)]
+        [TestCase("2016-01-22", "TSLA", 10000, 10)]
+        [TestCase("2016-01-25", "TSLA", 10000, 10)]
+        [TestCase("2016-01-26", "TSLA", 10000, 10)]
+        [TestCase("2016-01-27", "TSLA", 10000, 10)]
+        [TestCase("2016-01-28", "TSLA", 10000, 10)]
+        [TestCase("2016-01-29", "TSLA", 10000, 10)]
+        // Netflix
+        [TestCase("2016-01-04", "NFLX", 10000, 10)]
+        [TestCase("2016-01-05", "NFLX", 10000, 10)]
+        [TestCase("2016-01-06", "NFLX", 10000, 10)]
+        [TestCase("2016-01-11", "NFLX", 10000, 10)]
+        [TestCase("2016-01-12", "NFLX", 10000, 10)]
+        [TestCase("2016-01-13", "NFLX", 10000, 10)]
+        [TestCase("2016-01-14", "NFLX", 10000, 10)]
+        [TestCase("2016-01-15", "NFLX", 10000, 10)]
+        [TestCase("2016-01-19", "NFLX", 10000, 10)]
+        [TestCase("2016-01-20", "NFLX", 10000, 10)]
+        [TestCase("2016-01-21", "NFLX", 10000, 10)]
+        [TestCase("2016-01-22", "NFLX", 10000, 10)]
+        [TestCase("2016-01-25", "NFLX", 10000, 10)]
+        [TestCase("2016-01-26", "NFLX", 10000, 10)]
+        [TestCase("2016-01-27", "NFLX", 10000, 10)]
+        [TestCase("2016-01-28", "NFLX", 10000, 10)]
+        [TestCase("2016-01-29", "NFLX", 10000, 10)] 
         public void TestSamplingOfModel(string tradingDateString,
             string symbol,
             double duration, 
@@ -371,13 +371,18 @@ namespace UnitTests
                 {
                     model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "model_initial_depth_profile.csv"));
                     model.LimitOrderBook.SaveDepthProfileBuySide(Path.Combine(outputFolder, "model_initial_depth_profile_buy.csv"));
-                    model.LimitOrderBook.SaveDepthProfileSellSide(Path.Combine(outputFolder, "model_initial_depth_profile_sell.csv"));
-                    SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
+                    model.LimitOrderBook.SaveDepthProfileSellSide(Path.Combine(outputFolder, "model_initial_depth_profile_sell.csv"));                   
                 }
                 
                 model.SimulateOrderFlow(duration, useSeed:false);
-                model.SavePriceProcess(Path.Combine(outputFolder, $"Paths\\simulated_price_{pathNumber}.csv"));                
+                model.SavePriceProcess(Path.Combine(outputFolder, $"Paths\\simulated_price_{pathNumber}.csv"));
+
+                if (pathNumber == 0)
+                {
+                    SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
+                }
             }            
+            
             #endregion
         }
     }
