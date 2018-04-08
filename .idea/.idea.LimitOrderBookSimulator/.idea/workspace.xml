@@ -84,31 +84,32 @@
       <file leaf-file-name="TestSmithFarmerModelCalibration.cs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2063">
-              <caret line="265" column="30" lean-forward="false" selection-start-line="265" selection-start-column="30" selection-end-line="265" selection-end-column="30" />
+            <state relative-caret-position="300">
+              <caret line="364" column="22" lean-forward="false" selection-start-line="364" selection-start-column="22" selection-end-line="364" selection-end-column="22" />
               <folding>
-                <marker date="1523192239000" expanded="false" signature="6:271" ph="..." />
-                <marker date="1523192239000" expanded="true" signature="292:18164" ph="{...}" />
-                <marker date="1523192239000" expanded="true" signature="361:18162" ph="{...}" />
-                <marker date="1523192239000" expanded="true" signature="475:663" ph="{...}" />
-                <marker date="1523192239000" expanded="false" signature="3672:9707" ph="{...}" />
-                <marker date="1523192239000" expanded="true" signature="3922:4260" ph="Create test folder" />
-                <marker date="1523192239000" expanded="true" signature="4286:5697" ph="Load trading data and save statistics" />
-                <marker date="1523192239000" expanded="true" signature="5723:7366" ph="Calibrate Smith-Farmer model" />
-                <marker date="1523192239000" expanded="true" signature="5785:6034" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
-                <marker date="1523192239000" expanded="false" signature="7391:8306" ph="Initial state of LOB" />
-                <marker date="1523192239000" expanded="true" signature="7445:7595" ph="/* Problematic part, as scaling with characteristic order size ... */" />
-                <marker date="1523192239000" expanded="true" signature="8333:9697" ph="Simulate order flow" />
-                <marker date="1523192239000" expanded="false" signature="9717:10087" ph="///  Calibrate model using an in-sample set and trying to predict the ... " />
-                <marker date="1523192239000" expanded="false" signature="13309:18156" ph="{...}" />
-                <marker date="1523192239000" expanded="false" signature="13928:15574" ph="Load in- and out-of-sample trading data" />
-                <marker date="1523192239000" expanded="true" signature="14001:14403" ph="/* We will simulate the LOB for a fixed time duration mutliple times (MC-Simualtion) ... */" />
-                <marker date="1523192239000" expanded="true" signature="15600:16410" ph="Calibrate Smith-Farmer model" />
-                <marker date="1523192239000" expanded="true" signature="15662:15826" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
-                <marker date="1523192239000" expanded="true" signature="16436:17396" ph="Initial state of LOB" />
-                <marker date="1523192239000" expanded="true" signature="16490:16699" ph="/* Problematic part, as scaling with characteristic order size ... */" />
-                <marker date="1523192239000" expanded="true" signature="17423:18146" ph="Simulate mutiple price paths" />
-                <marker date="1523192239000" expanded="true" signature="17684:18110" ph="{...}" />
+                <marker date="1523197915526" expanded="false" signature="6:271" ph="..." />
+                <marker date="1523197915526" expanded="true" signature="292:19310" ph="{...}" />
+                <marker date="1523197915526" expanded="true" signature="361:19308" ph="{...}" />
+                <marker date="1523197915526" expanded="false" signature="475:663" ph="{...}" />
+                <marker date="1523197915526" expanded="false" signature="3672:9707" ph="{...}" />
+                <marker date="1523197915526" expanded="true" signature="3922:4260" ph="Create test folder" />
+                <marker date="1523197915526" expanded="true" signature="4286:5697" ph="Load trading data and save statistics" />
+                <marker date="1523197915526" expanded="true" signature="5723:7366" ph="Calibrate Smith-Farmer model" />
+                <marker date="1523197915526" expanded="true" signature="5785:6034" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
+                <marker date="1523197915526" expanded="true" signature="7391:8306" ph="Initial state of LOB" />
+                <marker date="1523197915526" expanded="false" signature="7445:7595" ph="/* Problematic part, as scaling with characteristic order size ... */" />
+                <marker date="1523197915526" expanded="true" signature="8333:9697" ph="Simulate order flow" />
+                <marker date="1523197915526" expanded="true" signature="9717:10105" ph="///  Calibrate model using an in-sample set and trying to predict the ... " />
+                <marker date="1523197915526" expanded="true" signature="13879:19302" ph="{...}" />
+                <marker date="1523197915526" expanded="false" signature="14498:16144" ph="Load in- and out-of-sample trading data" />
+                <marker date="1523197915526" expanded="true" signature="14571:14973" ph="/* We will simulate the LOB for a fixed time duration mutliple times (MC-Simualtion) ... */" />
+                <marker date="1523197915526" expanded="false" signature="16170:16968" ph="Calibrate Smith-Farmer model" />
+                <marker date="1523197915526" expanded="true" signature="16232:16396" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
+                <marker date="1523197915526" expanded="true" signature="16994:17954" ph="Initial state of LOB" />
+                <marker date="1523197915526" expanded="true" signature="17048:17257" ph="/* Problematic part, as scaling with characteristic order size ... */" />
+                <marker date="1523197915526" expanded="true" signature="17981:19292" ph="Simulate mutiple price paths" />
+                <marker date="1523197915526" expanded="true" signature="18254:19257" ph="{...}" />
+                <marker date="1523197915526" expanded="true" signature="18509:19032" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -564,9 +565,9 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="72" />
-    <option name="y" value="65" />
-    <option name="width" value="1746" />
+    <option name="x" value="569" />
+    <option name="y" value="56" />
+    <option name="width" value="1068" />
     <option name="height" value="1034" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -697,7 +698,7 @@
       <workItem from="1523027517325" duration="8838000" />
       <workItem from="1523081610694" duration="6852000" />
       <workItem from="1523088520416" duration="18209000" />
-      <workItem from="1523171132004" duration="15635000" />
+      <workItem from="1523171132004" duration="19779000" />
     </task>
     <task id="LOCAL-00001" summary="Added unit tests to solution&#10;Changed to .NET 4.6.1">
       <created>1519833958557</created>
@@ -888,11 +889,18 @@
       <option name="project" value="LOCAL" />
       <updated>1523180073497</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="Added more test cases">
+      <created>1523192278556</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1523192278557</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="108839000" />
+    <option name="totallyTimeSpent" value="112983000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -909,7 +917,7 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290441" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Errors In Solution" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2536023" sideWeight="0.44936034" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.08574277" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="40" y="384" width="1876" height="479" />
+      <window_info id="Unit Tests" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3908275" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" x="40" y="384" width="1876" height="479" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.43713164" sideWeight="0.5506396" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.26286766" sideWeight="0.49383804" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290441" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1013,7 +1021,8 @@
     <MESSAGE value="Cleaned up code" />
     <MESSAGE value="Improved simulation" />
     <MESSAGE value="Fixed minor bug, in-sample and out-of-sample calibration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed minor bug, in-sample and out-of-sample calibration" />
+    <MESSAGE value="Added more test cases" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added more test cases" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -2076,31 +2085,32 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UnitTests/TestSmithFarmerModelCalibration.cs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2063">
-          <caret line="265" column="30" lean-forward="false" selection-start-line="265" selection-start-column="30" selection-end-line="265" selection-end-column="30" />
+        <state relative-caret-position="300">
+          <caret line="364" column="22" lean-forward="false" selection-start-line="364" selection-start-column="22" selection-end-line="364" selection-end-column="22" />
           <folding>
-            <marker date="1523192239000" expanded="false" signature="6:271" ph="..." />
-            <marker date="1523192239000" expanded="true" signature="292:18164" ph="{...}" />
-            <marker date="1523192239000" expanded="true" signature="361:18162" ph="{...}" />
-            <marker date="1523192239000" expanded="true" signature="475:663" ph="{...}" />
-            <marker date="1523192239000" expanded="false" signature="3672:9707" ph="{...}" />
-            <marker date="1523192239000" expanded="true" signature="3922:4260" ph="Create test folder" />
-            <marker date="1523192239000" expanded="true" signature="4286:5697" ph="Load trading data and save statistics" />
-            <marker date="1523192239000" expanded="true" signature="5723:7366" ph="Calibrate Smith-Farmer model" />
-            <marker date="1523192239000" expanded="true" signature="5785:6034" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
-            <marker date="1523192239000" expanded="false" signature="7391:8306" ph="Initial state of LOB" />
-            <marker date="1523192239000" expanded="true" signature="7445:7595" ph="/* Problematic part, as scaling with characteristic order size ... */" />
-            <marker date="1523192239000" expanded="true" signature="8333:9697" ph="Simulate order flow" />
-            <marker date="1523192239000" expanded="false" signature="9717:10087" ph="///  Calibrate model using an in-sample set and trying to predict the ... " />
-            <marker date="1523192239000" expanded="false" signature="13309:18156" ph="{...}" />
-            <marker date="1523192239000" expanded="false" signature="13928:15574" ph="Load in- and out-of-sample trading data" />
-            <marker date="1523192239000" expanded="true" signature="14001:14403" ph="/* We will simulate the LOB for a fixed time duration mutliple times (MC-Simualtion) ... */" />
-            <marker date="1523192239000" expanded="true" signature="15600:16410" ph="Calibrate Smith-Farmer model" />
-            <marker date="1523192239000" expanded="true" signature="15662:15826" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
-            <marker date="1523192239000" expanded="true" signature="16436:17396" ph="Initial state of LOB" />
-            <marker date="1523192239000" expanded="true" signature="16490:16699" ph="/* Problematic part, as scaling with characteristic order size ... */" />
-            <marker date="1523192239000" expanded="true" signature="17423:18146" ph="Simulate mutiple price paths" />
-            <marker date="1523192239000" expanded="true" signature="17684:18110" ph="{...}" />
+            <marker date="1523197915526" expanded="false" signature="6:271" ph="..." />
+            <marker date="1523197915526" expanded="true" signature="292:19310" ph="{...}" />
+            <marker date="1523197915526" expanded="true" signature="361:19308" ph="{...}" />
+            <marker date="1523197915526" expanded="false" signature="475:663" ph="{...}" />
+            <marker date="1523197915526" expanded="false" signature="3672:9707" ph="{...}" />
+            <marker date="1523197915526" expanded="true" signature="3922:4260" ph="Create test folder" />
+            <marker date="1523197915526" expanded="true" signature="4286:5697" ph="Load trading data and save statistics" />
+            <marker date="1523197915526" expanded="true" signature="5723:7366" ph="Calibrate Smith-Farmer model" />
+            <marker date="1523197915526" expanded="true" signature="5785:6034" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
+            <marker date="1523197915526" expanded="true" signature="7391:8306" ph="Initial state of LOB" />
+            <marker date="1523197915526" expanded="false" signature="7445:7595" ph="/* Problematic part, as scaling with characteristic order size ... */" />
+            <marker date="1523197915526" expanded="true" signature="8333:9697" ph="Simulate order flow" />
+            <marker date="1523197915526" expanded="true" signature="9717:10105" ph="///  Calibrate model using an in-sample set and trying to predict the ... " />
+            <marker date="1523197915526" expanded="true" signature="13879:19302" ph="{...}" />
+            <marker date="1523197915526" expanded="false" signature="14498:16144" ph="Load in- and out-of-sample trading data" />
+            <marker date="1523197915526" expanded="true" signature="14571:14973" ph="/* We will simulate the LOB for a fixed time duration mutliple times (MC-Simualtion) ... */" />
+            <marker date="1523197915526" expanded="false" signature="16170:16968" ph="Calibrate Smith-Farmer model" />
+            <marker date="1523197915526" expanded="true" signature="16232:16396" ph="/* Calibrate Smith-Farmer model within a narrow price-band near ... */" />
+            <marker date="1523197915526" expanded="true" signature="16994:17954" ph="Initial state of LOB" />
+            <marker date="1523197915526" expanded="true" signature="17048:17257" ph="/* Problematic part, as scaling with characteristic order size ... */" />
+            <marker date="1523197915526" expanded="true" signature="17981:19292" ph="Simulate mutiple price paths" />
+            <marker date="1523197915526" expanded="true" signature="18254:19257" ph="{...}" />
+            <marker date="1523197915526" expanded="true" signature="18509:19032" ph="{...}" />
           </folding>
         </state>
       </provider>

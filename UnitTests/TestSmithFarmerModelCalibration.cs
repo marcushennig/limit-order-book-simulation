@@ -201,6 +201,7 @@ namespace UnitTests
         /// <param name="symbol"></param>
         /// <param name="duration"></param>
         /// <param name="maxPathNumber"></param>
+        // Amazon
         [TestCase("2016-01-04", "AMZN", 10000, 40)]
         [TestCase("2016-01-05", "AMZN", 10000, 40)]
         [TestCase("2016-01-06", "AMZN", 10000, 40)]
@@ -260,6 +261,18 @@ namespace UnitTests
         [TestCase("2016-03-29", "AMZN", 10000, 40)]
         [TestCase("2016-03-30", "AMZN", 10000, 40)]
         [TestCase("2016-03-31", "AMZN", 10000, 40)]
+        // Cisco TODO: Problem with calibration
+        [TestCase("2016-01-04", "CSCO", 10000, 40)]
+        [TestCase("2016-01-05", "CSCO", 10000, 40)]
+        [TestCase("2016-01-06", "CSCO", 10000, 40)]
+        // Tesla
+        [TestCase("2016-01-04", "TSLA", 10000, 40)]
+        [TestCase("2016-01-05", "TSLA", 10000, 40)]
+        [TestCase("2016-01-06", "TSLA", 10000, 40)]
+        // Netlfix
+        [TestCase("2016-01-04", "NFLX", 10000, 40)]
+        [TestCase("2016-01-05", "NFLX", 10000, 40)]
+        [TestCase("2016-01-06", "NFLX", 10000, 40)]
         public void TestSamplingOfModel(string tradingDateString,
             string symbol,
             double duration, 
@@ -315,14 +328,14 @@ namespace UnitTests
             const double lowerProbability  = 0.01;
             const double upperProbability = 0.80;
             
-            inSampleTradingData.AverageDepthProfile.Save(Path.Combine(outputFolder, "in_sample_average_depth_profile.csv"));
+            inSampleTradingData.AverageDepthProfile.Save(Path.Combine(outputFolder, "average_depth_profile_in_sample.csv"));
             
             var calibratedParameters = SmithFarmerModelCalibration.Calibrate(inSampleTradingData, 
                 lowerProbability, 
                 upperProbability);
             
             SharedUtilities.SaveAsJson(calibratedParameters, Path.Combine(outputFolder, "model_parameter.json"));
-            
+
             #endregion
             
             #region Initial state of LOB
@@ -346,7 +359,7 @@ namespace UnitTests
             #region Simulate mutiple price paths 
             
             // Choose narrow simulation interval in order of the spread
-            var simulationIntervalSize = 4 * initialSpread;
+            var simulationIntervalSize = 4 * initialSpread;            
             for (var pathNumber = 0; pathNumber < maxPathNumber; pathNumber++)
             {
                 var model = new SmithFarmerModel(calibratedParameters, 
@@ -354,10 +367,17 @@ namespace UnitTests
                     initialAsks, 
                     simulationIntervalSize);  
                 
+                if (pathNumber == 0)
+                {
+                    model.LimitOrderBook.SaveDepthProfile(Path.Combine(outputFolder, "model_initial_depth_profile.csv"));
+                    model.LimitOrderBook.SaveDepthProfileBuySide(Path.Combine(outputFolder, "model_initial_depth_profile_buy.csv"));
+                    model.LimitOrderBook.SaveDepthProfileSellSide(Path.Combine(outputFolder, "model_initial_depth_profile_sell.csv"));
+                    SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
+                }
+                
                 model.SimulateOrderFlow(duration, useSeed:false);
                 model.SavePriceProcess(Path.Combine(outputFolder, $"Paths\\simulated_price_{pathNumber}.csv"));                
-            }
-            
+            }            
             #endregion
         }
     }
