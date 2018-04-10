@@ -5,6 +5,7 @@ using System.Reflection;
 using log4net;
 using LimitOrderBookSimulation.LimitOrderBooks;
 using LimitOrderBookUtilities;
+using NUnit.Framework.Constraints;
 
 namespace LimitOrderBookSimulation.EventModels
 {
@@ -142,8 +143,14 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int CancelLimitSellOrder()
         {
+            // Flexible simulation window best opposite quote
             var minTick = LimitOrderBook.Ask;
             var maxTick = minTick + Parameter.SimulationIntervalSize;
+            
+            // Fixed simulation window best opposite quote  
+            //var minTick = LimitOrderBook.Ask;
+            //var maxTick = LimitOrderBook.Bid + 1 + Parameter.SimulationIntervalSize;
+            
             var priceTick = LimitOrderBook.GetRandomPriceFromSellSide(Random, minTick, maxTick);
            
             LimitOrderBook.CancelLimitSellOrder(price:priceTick, amount: 1);
@@ -157,8 +164,14 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int CancelLimitBuyOrder()
         {
+            // Flexible simulation window best opposite quote
             var maxTick = LimitOrderBook.Bid;
             var minTick = maxTick - Parameter.SimulationIntervalSize;
+            
+            // Fixed simulation window best opposite quote  
+            //var maxTick = LimitOrderBook.Bid;
+            //var minTick = LimitOrderBook.Ask - 1 - Parameter.SimulationIntervalSize;
+
             var priceTick = LimitOrderBook.GetRandomPriceFromBuySide(Random, minTick, maxTick);
 
             LimitOrderBook.CancelLimitBuyOrder(price:priceTick, amount: 1);
@@ -171,7 +184,15 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int SubmitLimitBuyOrder()
         {
-            var priceTick = LimitOrderBook.Ask - 1 - Random.Next(Parameter.SimulationIntervalSize + 1);
+            // Flexible simulation window best opposite quote
+            var priceMax = LimitOrderBook.Ask - 1;
+            var priceMin = LimitOrderBook.Bid - Parameter.SimulationIntervalSize;
+            
+            var priceTick = priceMin + Random.Next(priceMax - priceMin + 1);
+            
+            // Fixed simulation window best opposite quote  
+            //var priceTick = LimitOrderBook.Ask - 1 - Random.Next(Parameter.SimulationIntervalSize + 1);
+            
             LimitOrderBook.SubmitLimitBuyOrder(priceTick, amount:1);
            
             return priceTick;
@@ -182,7 +203,14 @@ namespace LimitOrderBookSimulation.EventModels
         /// </summary>
         public int SubmitLimitSellOrder()
         {
-            var priceTick = LimitOrderBook.Bid + 1 + Random.Next(Parameter.SimulationIntervalSize + 1);
+            var priceMin = LimitOrderBook.Bid + 1;
+            var priceMax = LimitOrderBook.Ask + Parameter.SimulationIntervalSize;
+            
+            var priceTick = priceMin + Random.Next(priceMax - priceMin + 1);
+
+            // Fixed simulation window best opposite quote  
+            // var priceTick = LimitOrderBook.Bid + 1 + Random.Next(Parameter.SimulationIntervalSize + 1);
+            
             LimitOrderBook.SubmitLimitSellOrder(priceTick, amount:1);
            
             return priceTick;
@@ -200,7 +228,7 @@ namespace LimitOrderBookSimulation.EventModels
 
             var t0 = LimitOrderBook.Time;
             var tEnd = t0 + duration;
-            var limitOrderRate = Parameter.LimitOrderRateDensity * Parameter.SimulationIntervalSize;
+
 
             // Initialize event probabilities
             var probability = new Dictionary<LimitOrderBookEvent, double>
@@ -218,18 +246,26 @@ namespace LimitOrderBookSimulation.EventModels
             {
                 var ask = LimitOrderBook.Ask;
                 var bid = LimitOrderBook.Bid;
-
-                //var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - TickIntervalSize, ask - 1);
-                //var nAskSide = LimitOrderBook.NumberOfSellOrders(bid + 1, bid + TickIntervalSize);
+                var spread = ask - bid;
+                
+                // Fixed simulation window best opposite quote  
+                // var limitOrderRate = Parameter.LimitOrderRateDensity * Parameter.SimulationIntervalSize;
+                var limitOrderRate = Parameter.LimitOrderRateDensity * (Parameter.SimulationIntervalSize + spread);
+                
+                // Fixed simulation window to oposite quite 
+                //var nBidSide = LimitOrderBook.NumberOfBuyOrders(ask - 1 - Parameter.SimulationIntervalSize, ask - 1);
+                //var nAskSide = LimitOrderBook.NumberOfSellOrders(bid + 1, bid + 1 + Parameter.SimulationIntervalSize);
+                
+                // Flexible simulation window from best price 
                 var nBidSide = LimitOrderBook.NumberOfBuyOrders(bid - Parameter.SimulationIntervalSize, bid);
                 var nAskSide = LimitOrderBook.NumberOfSellOrders(ask, ask + Parameter.SimulationIntervalSize);
 
-                //Console.WriteLine($"({nBidSide}, {nAskSide})");
                 var cancellationRateSell = nAskSide * Parameter.CancellationRate;
                 var cancellationRateBuy = nBidSide * Parameter.CancellationRate;
 
                 // total event rate 
-                var eventRate = 2 * Parameter.MarketOrderRate + 2 * limitOrderRate + 
+                var eventRate = 2 * Parameter.MarketOrderRate + 
+                                2 * limitOrderRate + 
                                 cancellationRateSell + cancellationRateBuy;
 
                 // re-calculate probabilities of events
@@ -243,8 +279,19 @@ namespace LimitOrderBookSimulation.EventModels
                 t += Random.NextExponentialTime(eventRate);
                 
                 var orderFlowEvent = Random.NextFromProbabilities(probability);
+                
+                
+                // Workaround to prevent undefined state of limit order book
+                // Force the algorithm to submit a limit order 
+                if (nAskSide <= 1 && (orderFlowEvent == SubmitMarketBuyOrder || orderFlowEvent == CancelLimitSellOrder) ||
+                    nBidSide <= 1 && (orderFlowEvent == SubmitMarketSellOrder || orderFlowEvent == CancelLimitBuyOrder))
+                {
+                    continue;                    
+                }
+                
                 orderFlowEvent.Invoke();
                 
+                // Check if undefined state was reached 
                 if (LimitOrderBook.IsBuySideEmpty() || 
                     LimitOrderBook.IsSellSideEmpty())
                 {

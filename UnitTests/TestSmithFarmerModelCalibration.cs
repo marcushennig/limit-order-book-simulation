@@ -381,8 +381,7 @@ namespace UnitTests
                 {
                     SharedUtilities.SaveAsJson(model, Path.Combine(outputFolder, "model.json"));
                 }
-            }            
-            
+            }                        
             #endregion
         }
     }
