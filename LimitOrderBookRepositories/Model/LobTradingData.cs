@@ -84,7 +84,8 @@ namespace LimitOrderBookRepositories.Model
         {
             get
             {
-                return _marketOrders ?? (_marketOrders = Events.Where(p => p.Type == LobEventType.ExecutionVisibleLimitOrder).ToList());
+                return _marketOrders ?? (_marketOrders = Events.Where(p => p.Type == LobEventType.ExecutionVisibleLimitOrder || 
+                                                                           p.Type == LobEventType.ExecutionHiddenLimitOrder).ToList());
             }
         }
 
