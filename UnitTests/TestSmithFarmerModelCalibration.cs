@@ -309,12 +309,19 @@ namespace UnitTests
             // and an out-of-sample period, used to evaluate forecasting performance.
             // Forcasting horizon is given by duration 
             const int level = 10;
+
+            var minutes = 60;
+            var hours = 60 * minutes;
+            
+            var skipStart = 1 * hours;
+            var skipEnd = 0.5 * hours;
+            
             var repository = new LobRepository(
                 symbol,
                 level,
                 new List<DateTime> {tradingDate},
-                skipFirstSeconds: 0,
-                skipLastSeconds: duration);
+                skipFirstSeconds: skipStart, // remove first hour
+                skipLastSeconds: duration + skipEnd);
             var inSampleTradingData = repository.TradingData[tradingDate];
 
             // Get the outsample trading data set 
@@ -322,8 +329,8 @@ namespace UnitTests
                 symbol,
                 level,
                 new List<DateTime> {tradingDate},
-                skipFirstSeconds: inSampleTradingData.EndTradingTime - inSampleTradingData.StartTradingTime,
-                skipLastSeconds: 0);
+                skipFirstSeconds: inSampleTradingData.EndTradingTime - inSampleTradingData.StartTradingTime + skipStart,
+                skipLastSeconds: skipEnd);
 
             var outOfSampleTradingData = repository2.TradingData[tradingDate];
 
@@ -415,7 +422,8 @@ namespace UnitTests
             public double RateOfExecutedVisibleOrdersOrdersSellSide { set; get; }
             public double RateOfExecutedHiddenOrdersBuySide { set; get; }
             public double RateOfExecutedHiddenOrdersSellSide { set; get; }
-
+            public double StartTradingTime {set; get;}
+            public double EndTradingTime {set; get;}
             public double[] InterarrivalTimesLimitOrders { set; get; }
             public double[] InterarrivalTimesMarketOrders { set; get; }
             public double[] InterarrivalTimesCancelOrders { set; get; }
@@ -557,7 +565,10 @@ namespace UnitTests
                 RateOfExecutedVisibleOrdersOrdersSellSide = tradingData.Events.Count(p => p.Type == LobEventType.ExecutionVisibleLimitOrder && p.Side == LobMarketSide.Sell) / tradingData.TradingDuration,
                 RateOfExecutedHiddenOrdersBuySide = tradingData.Events.Count(p => p.Type == LobEventType.ExecutionHiddenLimitOrder && p.Side == LobMarketSide.Buy) / tradingData.TradingDuration,
                 RateOfExecutedHiddenOrdersSellSide = tradingData.Events.Count(p => p.Type == LobEventType.ExecutionHiddenLimitOrder && p.Side == LobMarketSide.Sell) / tradingData.TradingDuration,
-                                                     
+                
+                StartTradingTime =tradingData.StartTradingTime,
+                EndTradingTime =tradingData.EndTradingTime,
+                
                 InterarrivalTimesLimitOrders = Diff(tradingData.Events.Where(p => p.Type == LobEventType.Submission).Select(p => p.Time).ToArray()),
                 InterarrivalTimesMarketOrders = Diff(tradingData.Events.Where(p => p.Type == LobEventType.ExecutionHiddenLimitOrder || p.Type == LobEventType.ExecutionVisibleLimitOrder).Select(p => p.Time).ToArray()),
                 InterarrivalTimesCancelOrders = Diff(tradingData.Events.Where(p => p.Type == LobEventType.Deletion || p.Type == LobEventType.Cancellation).Select(p => p.Time).ToArray())
@@ -574,7 +585,11 @@ namespace UnitTests
                 RateOfExecutedVisibleOrdersBuySide = inSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionVisibleLimitOrder && p.Side == LobMarketSide.Buy) / inSampleTradingData.TradingDuration,
                 RateOfExecutedVisibleOrdersOrdersSellSide = inSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionVisibleLimitOrder && p.Side == LobMarketSide.Sell) / inSampleTradingData.TradingDuration,
                 RateOfExecutedHiddenOrdersBuySide = inSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionHiddenLimitOrder && p.Side == LobMarketSide.Buy) / inSampleTradingData.TradingDuration,
-                RateOfExecutedHiddenOrdersSellSide = inSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionHiddenLimitOrder && p.Side == LobMarketSide.Sell) / inSampleTradingData.TradingDuration,                                                     
+                RateOfExecutedHiddenOrdersSellSide = inSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionHiddenLimitOrder && p.Side == LobMarketSide.Sell) / inSampleTradingData.TradingDuration,
+                
+                StartTradingTime =inSampleTradingData.StartTradingTime,
+                EndTradingTime =inSampleTradingData.EndTradingTime,
+                
                 InterarrivalTimesLimitOrders = Diff(inSampleTradingData.Events.Where(p => p.Type == LobEventType.Submission).Select(p => p.Time).ToArray()),
                 InterarrivalTimesMarketOrders = Diff(inSampleTradingData.Events.Where(p => p.Type == LobEventType.ExecutionHiddenLimitOrder || p.Type == LobEventType.ExecutionVisibleLimitOrder).Select(p => p.Time).ToArray()),
                 InterarrivalTimesCancelOrders = Diff(inSampleTradingData.Events.Where(p => p.Type == LobEventType.Deletion || p.Type == LobEventType.Cancellation).Select(p => p.Time).ToArray())
@@ -592,6 +607,10 @@ namespace UnitTests
                 RateOfExecutedVisibleOrdersOrdersSellSide = outOfSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionVisibleLimitOrder && p.Side == LobMarketSide.Sell) / outOfSampleTradingData.TradingDuration,
                 RateOfExecutedHiddenOrdersBuySide = outOfSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionHiddenLimitOrder && p.Side == LobMarketSide.Buy) / outOfSampleTradingData.TradingDuration,
                 RateOfExecutedHiddenOrdersSellSide = outOfSampleTradingData.Events.Count(p => p.Type == LobEventType.ExecutionHiddenLimitOrder && p.Side == LobMarketSide.Sell) / outOfSampleTradingData.TradingDuration,                                                     
+                
+                StartTradingTime =outOfSampleTradingData.StartTradingTime,
+                EndTradingTime =outOfSampleTradingData.EndTradingTime,
+                
                 InterarrivalTimesLimitOrders = Diff(outOfSampleTradingData.Events.Where(p => p.Type == LobEventType.Submission).Select(p => p.Time).ToArray()),
                 InterarrivalTimesMarketOrders = Diff(outOfSampleTradingData.Events.Where(p => p.Type == LobEventType.ExecutionHiddenLimitOrder || p.Type == LobEventType.ExecutionVisibleLimitOrder).Select(p => p.Time).ToArray()),
                 InterarrivalTimesCancelOrders = Diff(outOfSampleTradingData.Events.Where(p => p.Type == LobEventType.Deletion || p.Type == LobEventType.Cancellation).Select(p => p.Time).ToArray())
